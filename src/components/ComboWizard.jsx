@@ -5,13 +5,77 @@ import LanguageSelector from './LanguageSelector';
 import { playClash, playWin, playLoss, setMuted, getMuted } from '../utils/audio';
 import MoveSelectorModal from './MoveSelectorModal';
 
-export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onClear, isMoveModalOpen, setIsMoveModalOpen }) {
+// ═══════════════════════════════════════════════════════════
+// AI Personality Profiles
+// ═══════════════════════════════════════════════════════════
+const AI_PROFILES = {
+  liechtenauer: {
+    nameKey: 'ai_personality_liechtenauer',
+    preferTags: ['Vor', 'Strong', 'Winden'],
+    avoidTags: ['Weak'],
+    style: 'aggressive',
+    bias: (move, userTags) => {
+      let score = 0;
+      const aiTags = move.tags || [];
+      // Liechtenauer: pressure with Vor, exploit Strong/Weak balance
+      if (aiTags.includes('Strong')) score += 4;
+      if (aiTags.includes('Winden')) score += 6;
+      if (userTags.includes('Weak')) score += 8; // Punish weakness aggressively
+      if (aiTags.includes('Retreat') || aiTags.includes('Abzug')) score -= 5; // Never retreat
+      return score;
+    },
+  },
+  fiore: {
+    nameKey: 'ai_personality_fiore',
+    preferTags: ['Zogho Stretto', 'Strong'],
+    avoidTags: ['Zogho Largo'],
+    style: 'grappling',
+    bias: (move, userTags) => {
+      let score = 0;
+      const aiTags = move.tags || [];
+      // Fiore: close distance, grapple, bind
+      if (aiTags.includes('Zogho Stretto')) score += 8;
+      if (move.type === 'grapple') score += 10;
+      if (aiTags.includes('Strong')) score += 3;
+      if (userTags.includes('Zogho Largo')) score += 6; // Exploit open distance
+      return score;
+    },
+  },
+  meyer: {
+    nameKey: 'ai_personality_meyer',
+    preferTags: ['Meisterhau', 'Vor'],
+    avoidTags: [],
+    style: 'technical',
+    bias: (move, userTags) => {
+      let score = 0;
+      const aiTags = move.tags || [];
+      // Meyer: technical brilliance, Meisterhau preference, varied attacks
+      if (aiTags.includes('Meisterhau')) score += 10;
+      if (aiTags.includes('Vor')) score += 3;
+      if (move.type === 'counter') score += 4; // Likes clever counters
+      // Meyer is unpredictable — add more noise
+      score += Math.random() * 6;
+      return score;
+    },
+  },
+};
+
+// AI Difficulty multipliers
+const AI_DIFFICULTY = {
+  novice: { randomWeight: 10, topN: 5, thinkTime: 600 },
+  adept: { randomWeight: 3, topN: 3, thinkTime: 1000 },
+  master: { randomWeight: 0.5, topN: 1, thinkTime: 1400 },
+};
+
+export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onClear, isMoveModalOpen, setIsMoveModalOpen, userScore, aiScore, onScoreUpdate, maxScore }) {
   const { t } = useTranslation();
   const [isAiMode, setIsAiMode] = useState(true);
   const [aiThinking, setAiThinking] = useState(false);
   const [isMutedLocal, setIsMutedLocal] = useState(getMuted());
   const [isExpanded, setIsExpanded] = useState(true);
   const [liveFeedback, setLiveFeedback] = useState(null);
+  const [aiDifficulty, setAiDifficulty] = useState('adept');
+  const [aiPersonality, setAiPersonality] = useState('liechtenauer');
 
   // Clear feedback after 4 seconds
   useEffect(() => {
@@ -28,7 +92,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
   };
 
   // Evaluate Match Status
-  const lastNodeRendered = nodes?.length > 0 ? nodes[nodes.length - 1].data : null; // Strictly for UI checks like showing spinner
+  const lastNodeRendered = nodes?.length > 0 ? nodes[nodes.length - 1].data : null;
   const activePlayNodes = nodes?.filter(n => !n.data?.isSelector) || [];
   const lastNode = activePlayNodes.length > 0 ? activePlayNodes[activePlayNodes.length - 1].data : null;
 
@@ -38,18 +102,23 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
 
   const isUserTurn = !lastNode || lastNode.nodeRole === 'opponent-action' || lastNode.nodeRole === 'opponent-point' || isComplete;
   
-  // Is it the opponent's turn to React? (Only if the true last node is a user action, AND we are NOT currently waiting on a selector)
+  // Is it the opponent's turn to React?
   const isOpponentTurn = lastNode && lastNode.nodeRole === 'user-action' && !lastNodeRendered?.isSelector && !isComplete;
 
+  // Multi-exchange: determine current phase dynamically based on the last action
   let currentPhase = 'starter';
   if (activePlayNodes.length > 0) {
-    if (lastNode?.nodeRole === 'user-action') currentPhase = 'reaction';
-    else if (lastNode?.nodeRole === 'opponent-action') currentPhase = 'followup';
+    if (lastNode?.nodeRole === 'user-action') {
+      currentPhase = 'reaction';
+    } else if (lastNode?.nodeRole === 'opponent-action') {
+      // After an opponent reacts, user can do follow-ups. 
+      // If we're past the first exchange, allow follow-ups and finishers
+      currentPhase = 'followup';
+    }
   }
 
   const availableMoves = useMemo(() => {
     if (isComplete) return [];
-    // User can end the game if an opening presents itself
     if (currentPhase === 'followup') {
        return [...getMovesByPhase('followup'), ...getMovesByPhase('finisher')];
     }
@@ -70,18 +139,21 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
     } else if (isComplete && !hasPlayedEndSound) {
        if (isUserWin) {
          playWin();
+         // Update score
+         if (onScoreUpdate) onScoreUpdate('user');
        } else if (isOpponentWin) {
          playLoss();
          document.body.classList.add('shake-animation');
          setTimeout(() => {
            document.body.classList.remove('shake-animation');
          }, 400);
+         if (onScoreUpdate) onScoreUpdate('ai');
        }
        setHasPlayedEndSound(true);
     }
-  }, [isComplete, isUserWin, isOpponentWin, hasPlayedEndSound]);
+  }, [isComplete, isUserWin, isOpponentWin, hasPlayedEndSound, onScoreUpdate]);
 
-  // For Mistake Calculation, we use `activePlayNodes` so we safely ignore Selectors!
+  // For Mistake Calculation
   const oppReactionNode = (activePlayNodes.length >= 2 && lastNode?.nodeRole === 'user-action') ? activePlayNodes[activePlayNodes.length - 2]?.data : lastNode?.nodeRole === 'opponent-action' ? lastNode : null;
   const userActionData = lastNode?.nodeRole === 'user-action' && activePlayNodes.length > 1 ? getMoveById(lastNode.moveId) : null;
   const oppReactionData = oppReactionNode ? getMoveById(oppReactionNode.moveId) : null;
@@ -96,8 +168,8 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
     if (isGerman) {
        if (oppTags.includes('Strong') && userTags.includes('Weak')) commentaryContext = 'feedback_german_weak_vs_strong';
        else if (oppTags.includes('Winden') && !userTags.includes('Winden')) commentaryContext = 'feedback_german_winden';
-       else if (oppTags.includes('Strong')) commentaryContext = 'commentary_crown';
-       else if (oppTags.includes('Retreat')) commentaryContext = 'commentary_retreats';
+       else if (oppTags.includes('Kron')) commentaryContext = 'commentary_crown';
+       else if (oppTags.includes('Retreat') || oppTags.includes('Abzug')) commentaryContext = 'commentary_retreats';
        else commentaryContext = 'commentary_generic';
     } else {
        if (oppTags.includes('Zogho Largo') && userTags.includes('Zogho Stretto')) commentaryContext = 'feedback_italian_largo_vs_stretto';
@@ -106,31 +178,42 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
     }
   }
 
+  // AI Opponent Logic with Difficulty & Personality
   useEffect(() => {
     if (isOpponentTurn && isAiMode && recommendedMoves.length > 0 && !isMistake) {
       setAiThinking(true);
+      const difficulty = AI_DIFFICULTY[aiDifficulty];
+      const personality = AI_PROFILES[aiPersonality];
+
       const timer = setTimeout(() => {
         let scoredMoves = recommendedMoves.map((move) => {
-          let score = Math.random() * 3;
+          // Base random component scaled by difficulty
+          let score = Math.random() * difficulty.randomWeight;
           const aiTags = move.tags || [];
           const userTags = lastNode?.tags || [];
 
+          // Core HEMA principles (always active)
           if (userTags.includes('Strong')) {
-            if (aiTags.includes('Winden') || aiTags.includes('Weak') || aiTags.includes('Retreat')) score += 10;
+            if (aiTags.includes('Winden') || aiTags.includes('Weak') || aiTags.includes('Retreat') || aiTags.includes('Abzug')) score += 10;
             if (aiTags.includes('Strong')) score -= 5;
           }
           if (userTags.includes('Zogho Largo') || userTags.includes('Largo')) {
             if (aiTags.includes('Zogho Stretto') || aiTags.includes('Stretto')) score += 8;
           }
-          if (userTags.includes('Retreat') || aiTags.includes('Abzug')) {
+          if (userTags.includes('Retreat') || userTags.includes('Abzug')) {
             if (aiTags.includes('Nachreisen')) score += 10;
+          }
+
+          // Apply personality bias
+          if (personality && personality.bias) {
+            score += personality.bias(move, userTags);
           }
           
           return { ...move, score };
         });
 
         scoredMoves.sort((a, b) => b.score - a.score);
-        const topN = Math.min(3, scoredMoves.length);
+        const topN = Math.min(difficulty.topN, scoredMoves.length);
         const bestMove = scoredMoves[Math.floor(Math.random() * topN)];
 
         onAddNode({
@@ -146,11 +229,12 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
         });
         playClash();
         setAiThinking(false);
-      }, 1000);
+      }, difficulty.thinkTime);
       return () => clearTimeout(timer);
     }
-  }, [isOpponentTurn, isAiMode, recommendedMoves, onAddNode, nodes.length, currentPhase, isMistake, lastNode]);
+  }, [isOpponentTurn, isAiMode, recommendedMoves, onAddNode, nodes.length, currentPhase, isMistake, lastNode, aiDifficulty, aiPersonality]);
 
+  // Mistake punishment
   useEffect(() => {
     if (isMistake && isOpponentTurn && isAiMode) {
       const timer = setTimeout(() => {
@@ -171,23 +255,21 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
     }
   }, [isOpponentTurn, isAiMode, isMistake, onAddNode, nodes.length, oppReactionData, commentaryContext]);
 
-  // Reactive Spawning of SelectorNodes to avoid stale closures
+  // Reactive Spawning of SelectorNodes
   useEffect(() => {
     if (!lastNode || lastNodeRendered?.isSelector || isComplete) return;
 
-    // After AI acts, or if manual Opponent wants to act, we need a Selector
-    if (lastNode.nodeRole === 'opponent-action' && currentPhase !== 'finisher') {
-       // Sprout User Selector
+    if (lastNode.nodeRole === 'opponent-action') {
+       // Sprout User Selector — multi-exchange: always allow user to pick next move
        const timer = setTimeout(() => onAddNode({ isSelector: true, nodeRole: 'user-action' }), 500);
        return () => clearTimeout(timer);
     }
 
     if (!isAiMode && lastNode.nodeRole === 'user-action') {
-       // Sprout Opponent Selector (Manual Mode)
        const timer = setTimeout(() => onAddNode({ isSelector: true, nodeRole: 'opponent-action' }), 300);
        return () => clearTimeout(timer);
     }
-  }, [lastNode, lastNodeRendered, isComplete, currentPhase, isAiMode, onAddNode]);
+  }, [lastNode, lastNodeRendered, isComplete, isAiMode, onAddNode]);
 
   const handleMoveSelect = useCallback((move) => {
     if (!move) return;
@@ -210,17 +292,20 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
            setLiveFeedback({ type: 'bad', text: t('feedback_german_weak_vs_strong'), master: 'Liechtenauer' });
         } else if (aiTags.includes('Kron') && !move.tags?.includes('Unterhau')) {
            setLiveFeedback({ type: 'warning', text: t('commentary_crown').replace('{oppMove}', oppReactionData?.name), master: 'Meyer' });
-        } else if (aiTags.includes('Abzug') && !move.tags?.includes('Nachreisen')) {
+        } else if ((aiTags.includes('Abzug') || aiTags.includes('Retreat')) && !move.tags?.includes('Nachreisen')) {
            setLiveFeedback({ type: 'warning', text: t('commentary_retreats').replace('{oppMove}', oppReactionData?.name), master: 'Historical Principle' });
         } else if (!isMistake) {
-           setLiveFeedback({ type: 'good', text: 'Taktik başarıyla işliyor. Rakibin zayıf noktası bulundu.', master: 'Combat Flow' });
+           setLiveFeedback({ type: 'good', text: t('feedback_good'), master: 'Combat Flow' });
         }
     } else {
-       setLiveFeedback({ type: 'neutral', text: `Yeni form: ${t(move.nameKey)}. Rakip tepkisi bekleniyor...`, master: 'Combat Flow' });
+       setLiveFeedback({ type: 'neutral', text: t('feedback_neutral').replace('{moveName}', t(move.nameKey)), master: 'Combat Flow' });
     }
 
     playClash();
   }, [nodes.length, onAddNode, isAiMode, isOpponentTurn, oppReactionData, isMistake, t]);
+
+  const matchWon = userScore >= maxScore;
+  const matchLost = aiScore >= maxScore;
 
   return (
     <>
@@ -234,7 +319,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
            <div className="w-12 h-1 bg-[var(--color-ink-faded)] rounded-full"></div>
         </div>
 
-        {/* Header API */}
+        {/* Header */}
         <div 
           className="px-5 py-3 border-b-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)] flex justify-between items-center cursor-pointer md:cursor-default"
           onClick={() => {
@@ -258,7 +343,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
             <button
                onClick={handleToggleMute}
                className={`text-lg px-2 flex items-center justify-center rounded transition-all hover:bg-[var(--color-parchment)] ${isMutedLocal ? 'opacity-50 grayscale' : 'opacity-100'}`}
-               title={isMutedLocal ? "Sesi Aç" : "Sesi Kapat"}
+               title={isMutedLocal ? t('mute_on') : t('mute_off')}
             >
                {isMutedLocal ? '🔇' : '🔊'}
             </button>
@@ -275,16 +360,61 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
           </div>
         </div>
 
-        {/* Combat Tracker (First Blood Points) */}
-        {!isComplete && (
+        {/* AI Settings Row (only when AI mode active) */}
+        {isAiMode && (
+          <div className="px-5 py-2 flex items-center gap-3 bg-[var(--color-parchment-dark)] border-b-[2px] border-[var(--color-ink-black)] flex-wrap">
+            {/* Difficulty */}
+            <div className="flex items-center gap-1">
+              <span className="text-[9px] uppercase font-bold text-[var(--color-ink-black)] tracking-widest">{t('ai_difficulty')}:</span>
+              <div className="flex bg-[var(--color-parchment)] border border-[var(--color-ink-black)]">
+                {['novice', 'adept', 'master'].map((diff) => (
+                  <button
+                    key={diff}
+                    onClick={() => setAiDifficulty(diff)}
+                    className={`px-2 py-1 text-[9px] font-bold uppercase tracking-wider transition-all min-h-[28px] ${
+                      aiDifficulty === diff
+                        ? 'bg-[var(--color-ink-black)] text-[var(--color-parchment-light)]'
+                        : 'text-[var(--color-ink-black)] hover:bg-[var(--color-parchment-dark)]'
+                    }`}
+                  >
+                    {t(`ai_${diff}`)}
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Personality */}
+            <div className="flex items-center gap-1">
+              <select
+                value={aiPersonality}
+                onChange={(e) => setAiPersonality(e.target.value)}
+                className="bg-[var(--color-parchment)] border border-[var(--color-ink-black)] text-[9px] font-bold uppercase tracking-wider px-2 py-1 text-[var(--color-ink-black)] focus:outline-none focus:border-[var(--color-ink-red)] min-h-[28px] cursor-pointer"
+              >
+                {Object.keys(AI_PROFILES).map((key) => (
+                  <option key={key} value={key}>{t(AI_PROFILES[key].nameKey)}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+
+        {/* Combat Tracker (Score Counter) */}
+        {!matchWon && !matchLost && (
             <div className="px-5 py-2 flex justify-center items-center gap-6 bg-[var(--color-parchment)] border-b-[2px] border-[var(--color-ink-black)]">
                <div className="flex items-center gap-2">
                  <span className="text-[10px] uppercase font-bold text-[var(--color-ink-black)] tracking-widest leading-none">{t('you')}</span>
-                 <div className="w-3 h-3 bg-[var(--color-ink-black)] rounded-full"></div>
+                 <div className="flex gap-1">
+                   {Array.from({length: maxScore}).map((_, i) => (
+                     <div key={`u-${i}`} className={`w-3 h-3 rounded-full border border-[var(--color-ink-black)] transition-all duration-300 ${i < userScore ? 'bg-[var(--color-gold)] scale-110' : 'bg-[var(--color-parchment-dark)]'}`}></div>
+                   ))}
+                 </div>
                </div>
                <div className="text-xs font-display text-[var(--color-ink-red)] italic opacity-60">vs</div>
                <div className="flex items-center gap-2">
-                 <div className="w-3 h-3 bg-[var(--color-ink-pinstripe)] rounded-full border border-black"></div>
+                 <div className="flex gap-1">
+                   {Array.from({length: maxScore}).map((_, i) => (
+                     <div key={`a-${i}`} className={`w-3 h-3 rounded-full border border-[var(--color-ink-black)] transition-all duration-300 ${i < aiScore ? 'bg-[var(--color-ink-red)] scale-110' : 'bg-[var(--color-parchment-dark)]'}`}></div>
+                   ))}
+                 </div>
                  <span className="text-[10px] uppercase font-bold text-[var(--color-ink-black)] tracking-widest leading-none">AI</span>
                </div>
             </div>
@@ -309,7 +439,16 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
 
         {/* Scrollable Body Container */}
         <div className="p-4 md:p-5 max-h-[30vh] md:max-h-none overflow-y-auto scrollbar-thin">
-          {isComplete ? (
+          {/* Match Won/Lost Banner (full match result) */}
+          {(matchWon || matchLost) ? (
+            <div className="text-center py-4 animate-fade-in">
+              <span className="text-6xl filter drop-shadow-md block mb-4">{matchWon ? '🏆' : '💀'}</span>
+              <h3 className={`text-2xl font-bold font-display tracking-wide uppercase mb-2 ${matchWon ? 'text-[var(--color-gold)]' : 'text-[var(--color-ink-red)]'}`}>
+                {matchWon ? t('score_match_won') : t('score_match_lost')}
+              </h3>
+              <p className="text-lg font-display text-[var(--color-ink-black)] mb-4">{userScore} — {aiScore}</p>
+            </div>
+          ) : isComplete ? (
             <div className="text-center py-2 animate-fade-in relative z-10">
               <div className="mb-4">
                 {isUserWin ? (
@@ -321,11 +460,21 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
               <h3 className={`text-2xl font-bold font-display tracking-wide uppercase mb-2 ${isUserWin ? 'text-[var(--color-gold)]' : 'text-[var(--color-ink-red)]'}`}>
                 {isUserWin ? t('duel_win_title') : t('duel_loss_title')}
               </h3>
-              <p className="text-sm text-[var(--color-ink-black)] leading-relaxed mb-6 font-medium italic">
+              <p className="text-sm text-[var(--color-ink-black)] leading-relaxed mb-4 font-medium italic">
                 {isUserWin ? t('duel_win_desc') : t('duel_loss_prefix')}
               </p>
 
-              {/* TARIHI YAPAY ZEKA COACHING */}
+              {/* Next Round Button */}
+              {!matchWon && !matchLost && (
+                <button
+                  onClick={onClear}
+                  className="mt-2 px-6 py-3 bg-[var(--color-ink-black)] text-[var(--color-gold)] font-bold text-sm uppercase tracking-widest border-[2px] border-[var(--color-gold)] shadow-[4px_4px_0_0_var(--color-gold)] hover:bg-[var(--color-gold)] hover:text-[var(--color-ink-black)] transition-all active:translate-y-[2px] active:translate-x-[2px] active:shadow-none"
+                >
+                  {t('score_next_round')} →
+                </button>
+              )}
+
+              {/* Historical AI Coaching */}
               {isOpponentWin && lastNode?.descKey && (
                 <div className="bg-[var(--color-parchment-light)] border-[3px] border-[var(--color-ink-red)] p-5 text-left shadow-[6px_6px_0_0_var(--color-ink-red)] mb-4 mt-8 relative">
                   <div className="text-sm text-[var(--color-ink-red)] uppercase font-display font-bold tracking-widest mb-3 flex items-center gap-2 border-b-2 border-dashed border-[var(--color-ink-red)] pb-2">
@@ -376,6 +525,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
        onSelectMove={handleMoveSelect}
        recommendedMoves={recommendedMoves}
        isAiMode={isAiMode}
+       currentPhase={currentPhase}
     />
     </>
   );

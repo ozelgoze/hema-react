@@ -188,6 +188,46 @@ export default {
   // ── Language ──
   language: 'Language',
 
+  // ── UI Strings (previously hardcoded) ──
+  steps_count: '{count} Steps',
+  delete_combo: 'Delete',
+  search_results: '🔍 Results',
+  no_search_results: 'The martial art you seek is not found in the records...',
+  feedback_good: 'The tactic is working. The opponent\'s weak point has been found.',
+  feedback_neutral: 'New form: {moveName}. Awaiting opponent reaction...',
+  mute_on: 'Unmute Sound',
+  mute_off: 'Mute Sound',
+  download_image: 'Download as High Quality Image',
+  download_btn: 'Download Combo',
+  toast_combo_saved: '{name} saved!',
+  toast_combo_deleted: 'Combo deleted!',
+
+  // ── Chronicle Log ──
+  chronicle_title: 'Battle Chronicle',
+  chronicle_open: '📜 Chronicle',
+  chronicle_empty: 'The ink awaits... History will be written when you strike the first blow.',
+  chronicle_narrator_opening: 'The duel was ignited as our knight resolutely employed the {moveName} technique. The steel song of swords had begun.',
+  chronicle_narrator_opponent: 'The adversary responded not with fear, but with a masterful counter — the {moveName} — to mount their resistance.',
+  chronicle_narrator_user: 'But our swordsman did not hesitate; sensing the rival\'s intent, they instantly seized the initiative with {moveName}.',
+  chronicle_narrator_win: 'At last, the opponent\'s weak moment was seized, and with the ruthless precision of {moveName}, an undisputed absolute victory was claimed on the battlefield!',
+  chronicle_narrator_loss: 'History does not forgive... A moment of hesitation or a misaligned blade resulted in the adversary\'s merciless {moveName}. Our blood met the earth.',
+
+  // ── Score Counter ──
+  score_label: 'Score',
+  score_first_to: 'First to {n}',
+  score_match_won: '🏆 MATCH WON!',
+  score_match_lost: '💀 MATCH LOST!',
+  score_next_round: 'Next Round',
+
+  // ── AI Difficulty & Personality ──
+  ai_difficulty: 'AI Difficulty',
+  ai_novice: 'Novice',
+  ai_adept: 'Adept',
+  ai_master: 'Master',
+  ai_personality_liechtenauer: 'Liechtenauer Style',
+  ai_personality_fiore: 'Fiore Style',
+  ai_personality_meyer: 'Meyer Style',
+
   // ── Manuscript Notes (📜 Historical source references) ──
   ms_label: 'Source',
 

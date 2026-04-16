@@ -189,6 +189,46 @@ export default {
   // ── Language ──
   language: 'Sprache',
 
+  // ── UI Strings (previously hardcoded) ──
+  steps_count: '{count} Schritte',
+  delete_combo: 'Löschen',
+  search_results: '🔍 Ergebnisse',
+  no_search_results: 'Die gesuchte Kampfkunst wurde in den Aufzeichnungen nicht gefunden...',
+  feedback_good: 'Die Taktik funktioniert. Die Schwachstelle des Gegners wurde gefunden.',
+  feedback_neutral: 'Neue Form: {moveName}. Warten auf Gegnerreaktion...',
+  mute_on: 'Ton einschalten',
+  mute_off: 'Ton ausschalten',
+  download_image: 'Als hochauflösendes Bild herunterladen',
+  download_btn: 'Combo herunterladen',
+  toast_combo_saved: '{name} gespeichert!',
+  toast_combo_deleted: 'Combo gelöscht!',
+
+  // ── Chronicle Log ──
+  chronicle_title: 'Schlachtchronik',
+  chronicle_open: '📜 Chronik',
+  chronicle_empty: 'Die Tinte wartet... Wenn Ihr den ersten Hieb führt, wird Geschichte geschrieben.',
+  chronicle_narrator_opening: 'Das Duell entflammte, als unser Ritter entschlossen die {moveName}-Technik einsetzte. Das stählerne Lied der Schwerter hatte begonnen.',
+  chronicle_narrator_opponent: 'Der Widersacher antwortete nicht mit Furcht, sondern mit einer meisterhaften Gegenwehr — dem {moveName} — um Widerstand zu leisten.',
+  chronicle_narrator_user: 'Doch unser Schwertmeister zögerte nicht; die Absicht des Rivalen erkennend, ergriff er sofort die Initiative mit {moveName}.',
+  chronicle_narrator_win: 'Endlich wurde der schwache Moment des Gegners erfasst, und mit der gnadenlosen Präzision des {moveName} wurde ein unanfechtbarer Sieg auf dem Schlachtfeld errungen!',
+  chronicle_narrator_loss: 'Die Geschichte vergibt nicht... Ein Moment des Zögerns oder eine falsch geführte Klinge endete in der gnadenlosen {moveName}-Brutalität des Feindes. Unser Blut traf die Erde.',
+
+  // ── Score Counter ──
+  score_label: 'Punktestand',
+  score_first_to: 'Erstes bis {n}',
+  score_match_won: '🏆 KAMPF GEWONNEN!',
+  score_match_lost: '💀 KAMPF VERLOREN!',
+  score_next_round: 'Nächste Runde',
+
+  // ── AI Difficulty & Personality ──
+  ai_difficulty: 'KI-Schwierigkeit',
+  ai_novice: 'Neuling',
+  ai_adept: 'Adept',
+  ai_master: 'Meister',
+  ai_personality_liechtenauer: 'Liechtenauer-Stil',
+  ai_personality_fiore: 'Fiore-Stil',
+  ai_personality_meyer: 'Meyer-Stil',
+
   // ── Manuskript-Notizen ──
   ms_label: 'Quelle',
   ms_zornhau: '📜 Hs. 3227a (Döbringer, ca. 1389), Fol. 23r — „Der Zornhau bricht alle Oberhau." Einer der fünf geheimen Meisterhau der Liechtenauer-Tradition.',

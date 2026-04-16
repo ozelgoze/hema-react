@@ -11,6 +11,7 @@ import {
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { toPng } from 'html-to-image';
+import { useTranslation } from '../i18n/LanguageContext';
 
 import ActionNode from './nodes/ActionNode';
 import InkEdge from './nodes/InkEdge';
@@ -20,13 +21,15 @@ import ChronicleLog from './ChronicleLog';
 const nodeTypes = { actionNode: ActionNode };
 const edgeTypes = { inkEdge: InkEdge };
 
-function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onUndo, onClear, currentStep, activeNodeId, setActiveNodeId, isMoveModalOpen, setIsMoveModalOpen }) {
+function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onUndo, onClear, currentStep, activeNodeId, setActiveNodeId, isMoveModalOpen, setIsMoveModalOpen, userScore, aiScore, onScoreUpdate, maxScore }) {
+  const { t } = useTranslation();
+  
   const handleDownloadImage = useCallback(() => {
     const flowElement = document.querySelector('.react-flow');
     if (!flowElement) return;
 
     toPng(flowElement, { 
-      backgroundColor: '#020617', // Matches dark background
+      backgroundColor: '#020617',
       quality: 1,
       pixelRatio: 2,
     }).then((dataUrl) => {
@@ -101,6 +104,10 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
         isMoveModalOpen={isMoveModalOpen}
         setIsMoveModalOpen={setIsMoveModalOpen}
         activeNodeId={activeNodeId}
+        userScore={userScore}
+        aiScore={aiScore}
+        onScoreUpdate={onScoreUpdate}
+        maxScore={maxScore}
       />
 
       <ChronicleLog nodes={nodes} />
@@ -108,15 +115,15 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
       <button
         onClick={handleDownloadImage}
         className="absolute top-20 right-4 md:top-auto md:bottom-6 md:right-6 z-50 glass-panel px-3 py-2 md:px-4 md:py-3 rounded-full text-[10px] md:text-xs font-bold text-amber-300 uppercase tracking-widest border border-amber-500/30 hover:border-amber-400 hover:bg-amber-500/20 hover:scale-105 transition-all shadow-[0_0_20px_rgba(245,158,11,0.15)] flex items-center gap-1 md:gap-2 cursor-pointer"
-        title="Tuvali Yüksek Kaliteli Resim Olarak İndir"
+        title={t('download_image')}
       >
-        <span className="text-sm md:text-lg filter grayscale opacity-80">📸</span> <span className="hidden md:inline">Komboyu İndir</span>
+        <span className="text-sm md:text-lg filter grayscale opacity-80">📸</span> <span className="hidden md:inline">{t('download_btn')}</span>
       </button>
     </div>
   );
 }
 
-export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange }) {
+export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange, userScore, aiScore, onScoreUpdate, maxScore }) {
   const [nodes, setNodes, onNodesChange] = useNodesState(externalNodes || []);
   const [edges, setEdges, onEdgesChange] = useEdgesState(externalEdges || []);
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
@@ -124,12 +131,11 @@ export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange 
     externalNodes && externalNodes.length > 0 ? externalNodes[externalNodes.length - 1].id : null
   );
 
-  // Sync when external data loads (e.g. from sidebar)
-  const lastExternalRef = useRef(null);
-  if (externalNodes && externalNodes !== lastExternalRef.current) {
-    lastExternalRef.current = externalNodes;
-    // Use setTimeout to avoid calling setState during render
-    setTimeout(() => {
+  // Sync when external data loads (e.g. from sidebar) — using useEffect instead of setState during render
+  const lastExternalRef = useRef(externalNodes);
+  useEffect(() => {
+    if (externalNodes && externalNodes !== lastExternalRef.current) {
+      lastExternalRef.current = externalNodes;
       setNodes(externalNodes);
       setEdges(externalEdges || []);
       if (externalNodes.length > 0) {
@@ -137,8 +143,8 @@ export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange 
       } else {
         setActiveNodeId(null);
       }
-    }, 0);
-  }
+    }
+  }, [externalNodes, externalEdges, setNodes, setEdges]);
 
 
   const activeNode = nodes.find(n => n.id === activeNodeId);
@@ -300,6 +306,10 @@ export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange 
         setActiveNodeId={setActiveNodeId}
         isMoveModalOpen={isMoveModalOpen}
         setIsMoveModalOpen={setIsMoveModalOpen}
+        userScore={userScore}
+        aiScore={aiScore}
+        onScoreUpdate={onScoreUpdate}
+        maxScore={maxScore}
       />
     </ReactFlowProvider>
   );

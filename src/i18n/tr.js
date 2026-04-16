@@ -212,6 +212,46 @@ export default {
   // ── Language ──
   language: 'Dil',
 
+  // ── UI Strings (previously hardcoded) ──
+  steps_count: '{count} Adım',
+  delete_combo: 'Sil',
+  search_results: '🔍 Sonuçlar',
+  no_search_results: 'Aradığınız savaş sanatı kayıtlarda yok...',
+  feedback_good: 'Taktik başarıyla işliyor. Rakibin zayıf noktası bulundu.',
+  feedback_neutral: 'Yeni form: {moveName}. Rakip tepkisi bekleniyor...',
+  mute_on: 'Sesi Aç',
+  mute_off: 'Sesi Kapat',
+  download_image: 'Tuvali Yüksek Kaliteli Resim Olarak İndir',
+  download_btn: 'Komboyu İndir',
+  toast_combo_saved: '{name} kaydedildi!',
+  toast_combo_deleted: 'Kombo silindi!',
+
+  // ── Chronicle Log ──
+  chronicle_title: 'Savaş Günlüğü',
+  chronicle_open: '📜 Kronika',
+  chronicle_empty: 'Mürekkep beklemede... İlk darbeyi vurduğunuzda tarih yazılmaya başlanacak.',
+  chronicle_narrator_opening: 'Müsabaka, şövalyemizin kararlı bir biçimde {moveName} tekniğine başvurmasıyla alevlendi. Kılıçların çelikten şarkısı başlamıştı.',
+  chronicle_narrator_opponent: 'Hasım bu atılıma karşılık tırsarak değil, bilakis ustaca bir karşı koyuşla, {moveName} hamlesiyle mukavemet göstermeye yeltendi.',
+  chronicle_narrator_user: 'Fakat kılıçşörümüz duraksamadı; rakibinin niyetini sezip anında {moveName} ile inisiyatifi yeniden kılıcının ucuna aldı.',
+  chronicle_narrator_win: 'Nihayet rakibin zayıf anı yakalandı ve {moveName} hamlesinin acımasız kesinliğiyle savaş meydanında tartışılmaz bir mutlak zafer kazanıldı!',
+  chronicle_narrator_loss: 'Tarih affetmez... Bir anlık tereddüt veya yanlış bağlanan kılıç, hasmın amansız {moveName} vahşetiyle sonuçlandı. Kanımız toprakla buluştu.',
+
+  // ── Score Counter ──
+  score_label: 'Skor',
+  score_first_to: 'İlk {n} puan',
+  score_match_won: '🏆 MAÇ KAZANILDI!',
+  score_match_lost: '💀 MAÇ KAYBEDİLDİ!',
+  score_next_round: 'Sonraki Raunt',
+
+  // ── AI Difficulty & Personality ──
+  ai_difficulty: 'AI Zorluk',
+  ai_novice: 'Çırak',
+  ai_adept: 'Kalfa',
+  ai_master: 'Usta',
+  ai_personality_liechtenauer: 'Liechtenauer Tarzı',
+  ai_personality_fiore: 'Fiore Tarzı',
+  ai_personality_meyer: 'Meyer Tarzı',
+
   // ── Manuscript Notes ──
   ms_label: 'Kaynak',
   ms_zornhau: '📜 Hs. 3227a (Döbringer, y.1389), föl. 23r — "Zornhau tüm Oberhau\'ları kırar." Liechtenauer geleneğinin beş gizli Meisterhau\'undan (Usta Kesişler) ilki.',

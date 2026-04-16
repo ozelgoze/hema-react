@@ -54,8 +54,12 @@ export default function ChronicleLog({ nodes }) {
     if (index === 0) {
       return (
         <span className="block mb-2">
-          <span className="drop-cap text-3xl font-display text-[var(--color-ink-red)] float-left leading-none pr-1">M</span>
-          <span className="leading-relaxed">üsabaka, şövalyemizin kararlı bir biçimde <strong>{moveName}</strong> tekniğine başvurmasıyla alevlendi. Kılıçların çelikten şarkısı başlamıştı.</span>
+          <span className="drop-cap text-3xl font-display text-[var(--color-ink-red)] float-left leading-none pr-1">
+            {t('chronicle_narrator_opening').charAt(0)}
+          </span>
+          <span className="leading-relaxed">
+            {t('chronicle_narrator_opening').slice(1).replace('{moveName}', moveName)}
+          </span>
           {renderQuote()}
         </span>
       );
@@ -64,7 +68,7 @@ export default function ChronicleLog({ nodes }) {
     if (role === 'opponent-action') {
       return (
         <span className="block mb-2 mt-4 text-[var(--color-ink-black)] italic border-l-2 border-[var(--color-ink-faded)] pl-3">
-          Hasım bu atılıma karşılık tırsarak değil, bilakis ustaca bir karşı koyuşla, <strong>{moveName}</strong> hamlesiyle mukavemet göstermeye yeltendi.
+          {t('chronicle_narrator_opponent').replace('{moveName}', moveName)}
           {renderQuote()}
         </span>
       );
@@ -73,7 +77,7 @@ export default function ChronicleLog({ nodes }) {
     if (role === 'user-action') {
       return (
         <span className="block mb-2 mt-4">
-          Fakat kılıçşörümüz duraksamadı; rakibinin niyetini sezip anında <strong>{moveName}</strong> ile inisiyatifi yeniden kılıcının ucuna aldı.
+          {t('chronicle_narrator_user').replace('{moveName}', moveName)}
           {renderQuote()}
         </span>
       );
@@ -83,7 +87,7 @@ export default function ChronicleLog({ nodes }) {
       return (
         <span className="block mt-6 p-3 bg-[var(--color-gold)] border border-[var(--color-ink-black)] shadow-[4px_4px_0_0_var(--color-ink-black)]">
           <strong className="font-display uppercase tracking-widest block mb-1">Finis Coronat Opus</strong>
-          Nihayet rakibin zayıf anı yakalandı ve <strong>{moveName}</strong> hamlesinin acımasız kesinliğiyle savaş meydanında tartışılmaz bir mutlak zafer kazanıldı!
+          {t('chronicle_narrator_win').replace('{moveName}', moveName)}
         </span>
       );
     }
@@ -92,7 +96,7 @@ export default function ChronicleLog({ nodes }) {
       return (
         <span className="block mt-6 p-3 bg-[var(--color-ink-red)] text-[var(--color-parchment-light)] border border-[var(--color-ink-black)] shadow-[4px_4px_0_0_var(--color-ink-black)]">
           <strong className="font-display uppercase tracking-widest block mb-1">Mors Certa</strong>
-          Tarih affetmez... Bir anlık tereddüt veya yanlış bağlanan kılıç, hasmın amansız <strong>{moveName}</strong> vahşetiyle sonuçlandı. Kanımız toprakla buluştu.
+          {t('chronicle_narrator_loss').replace('{moveName}', moveName)}
         </span>
       );
     }
@@ -111,7 +115,7 @@ export default function ChronicleLog({ nodes }) {
           onClick={() => setIsOpen(true)}
           className="bg-[var(--color-parchment-dark)] border-2 border-[var(--color-ink-black)] border-r-0 md:border-r-2 text-[var(--color-ink-black)] font-display font-bold px-3 py-2 text-sm uppercase tracking-widest shadow-[inset_0_0_10px_rgba(42,37,34,0.1)] shadow-[-4px_4px_0_0_var(--color-ink-black)] md:shadow-[4px_4px_0_0_var(--color-ink-black)] hover:bg-[var(--color-ink-black)] hover:text-[var(--color-parchment)] transition-all rounded-l-md md:rounded-none"
         >
-          📜 Kronika
+          {t('chronicle_open')}
         </button>
       )}
 
@@ -123,7 +127,7 @@ export default function ChronicleLog({ nodes }) {
       >
         <div className="flex justify-between items-center bg-[var(--color-ink-black)] text-[var(--color-parchment-light)] px-4 py-3 border-b-2 border-[var(--color-ink-black)]">
           <h2 className="font-display text-lg uppercase tracking-widest text-[var(--color-gold)] flex items-center gap-2">
-            <span className="text-xl filter grayscale drop-shadow-md">📜</span> Savaş Günlüğü
+            <span className="text-xl filter grayscale drop-shadow-md">📜</span> {t('chronicle_title')}
           </h2>
           <button 
             onClick={() => setIsOpen(false)}
@@ -141,7 +145,7 @@ export default function ChronicleLog({ nodes }) {
           {nodes.length === 0 ? (
             <div className="h-full flex flex-col items-center justify-center opacity-40 italic text-center">
               <span className="text-4xl mb-2 grayscale">✒️</span>
-              <p>Mürekkep beklemede... İlk darbeyi vurduğunuzda tarih yazılmaya başlanacak.</p>
+              <p>{t('chronicle_empty')}</p>
             </div>
           ) : (
             <div className="space-y-2 pb-6">

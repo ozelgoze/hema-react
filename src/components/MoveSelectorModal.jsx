@@ -1,13 +1,13 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
-import { hemaMoves } from '../data/hemaMoves';
+import { hemaMoves, getMovesByPhase } from '../data/hemaMoves';
 
-export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recommendedMoves, isAiMode }) {
+export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recommendedMoves, isAiMode, currentPhase }) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [traditionFilter, setTraditionFilter] = useState(null);
 
-  // Focus search input on open
+  // Reset filters on open/close
   useEffect(() => {
     if (!isOpen) {
       setSearchTerm('');
@@ -16,7 +16,20 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
   }, [isOpen]);
 
   const availableMoves = useMemo(() => {
-    let moves = hemaMoves;
+    // Phase-filter: only show moves relevant to the current phase 
+    let moves;
+    if (searchTerm) {
+      // When searching, search across ALL moves so the user can find anything
+      moves = hemaMoves;
+    } else if (currentPhase === 'followup') {
+      // In follow-up phase, also show finishers as valid options
+      moves = [...getMovesByPhase('followup'), ...getMovesByPhase('finisher')];
+    } else if (currentPhase) {
+      moves = getMovesByPhase(currentPhase);
+    } else {
+      moves = hemaMoves;
+    }
+
     if (traditionFilter) {
       moves = moves.filter((m) => m.tradition === traditionFilter);
     }
@@ -34,7 +47,7 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
        moves = moves.filter(m => !recIds.includes(m.id));
     }
     return moves;
-  }, [traditionFilter, searchTerm, t, recommendedMoves]);
+  }, [traditionFilter, searchTerm, t, recommendedMoves, currentPhase]);
 
   if (!isOpen) return null;
 
@@ -46,7 +59,7 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
         <div className="flex justify-between items-center p-4 border-b-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)]">
           <div>
             <h2 className="text-xl font-display font-bold text-[var(--color-ink-red)] uppercase tracking-widest leading-none block">{t('wizard_you')}</h2>
-            <span className="text-xs font-bold text-[var(--color-ink-faded)] uppercase tracking-[0.2em]">{t('wizard_select') || "HAMLE SEÇ"}</span>
+            <span className="text-xs font-bold text-[var(--color-ink-faded)] uppercase tracking-[0.2em]">{t('wizard_select')}</span>
           </div>
           <button onClick={onClose} className="w-10 h-10 flex items-center justify-center border-2 border-[var(--color-ink-black)] bg-[var(--color-parchment-light)] hover:bg-[var(--color-ink-red)] hover:text-white transition-colors shadow-[2px_2px_0_0_var(--color-ink-black)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none font-bold text-xl">
             ✕
@@ -130,7 +143,7 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
 
           {/* All Moves Section */}
           <h3 className="text-[10px] uppercase font-display text-[var(--color-ink-faded)] font-bold tracking-widest px-1 mb-3">
-             {searchTerm ? '🔍 Sonuçlar' : t('wizard_other')}
+             {searchTerm ? t('search_results') : t('wizard_other')}
           </h3>
           <div className="grid grid-cols-1 gap-2">
             {availableMoves.map((move) => (
@@ -145,7 +158,7 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
             ))}
             {availableMoves.length === 0 && (
               <div className="px-4 py-8 text-sm italic text-[var(--color-ink-faded)] text-center font-body border-2 border-dashed border-[var(--color-ink-faded)]">
-                Aradığınız savaş sanatı kayıtlarda yok...
+                {t('no_search_results')}
               </div>
             )}
           </div>

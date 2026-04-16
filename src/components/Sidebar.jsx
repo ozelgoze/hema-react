@@ -42,7 +42,7 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
       setSavedCombos([...savedCombos, combo]);
       setComboName('');
       setIsSaveExpanded(false);
-      showToast(t('toast_combo_saved')?.replace('{name}', combo.name) || `${combo.name} kaydedildi!`);
+      showToast(t('toast_combo_saved')?.replace('{name}', combo.name) || `${combo.name} saved!`);
     });
   };
 
@@ -52,11 +52,10 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
     setIsOpen(false);
   };
 
-  const handleDelete = (id, e) => {
-    e.stopPropagation();
+  const handleDelete = (id) => {
     storageService.deleteCombo(id).then(() => {
       setSavedCombos(savedCombos.filter(c => c.id !== id));
-      showToast(t('toast_combo_deleted') || 'Kombo silindi!');
+      showToast(t('toast_combo_deleted'));
     });
   };
 
@@ -192,7 +191,7 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
                             {combo.name}
                           </span>
                           <span className="text-[10px] bg-[var(--color-parchment-dark)] text-[var(--color-ink-black)] px-1.5 border border-[var(--color-ink-black)]">
-                            {combo.nodes.length} Adım
+                            {t('steps_count').replace('{count}', combo.nodes.length)}
                           </span>
                         </div>
                         <div className="flex gap-2">
@@ -203,10 +202,10 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
                             {t('btn_load')}
                           </button>
                           <button
-                            onClick={() => handleDelete(combo.id)}
+                            onClick={(e) => { e.stopPropagation(); handleDelete(combo.id); }}
                             className="px-3 py-1.5 bg-[var(--color-parchment)] text-[var(--color-ink-red)] border-[2px] border-[var(--color-ink-red)] text-[10px] font-bold uppercase hover:bg-[var(--color-ink-red)] hover:text-white transition-colors"
                           >
-                            Sil
+                            {t('delete_combo')}
                           </button>
                         </div>
                       </div>

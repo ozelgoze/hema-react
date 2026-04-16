@@ -189,6 +189,46 @@ export default {
   // ── Language ──
   language: "Lingua",
 
+  // ── UI Strings (previously hardcoded) ──
+  steps_count: '{count} Passi',
+  delete_combo: 'Elimina',
+  search_results: '🔍 Risultati',
+  no_search_results: "L'arte marziale cercata non è stata trovata nelle cronache...",
+  feedback_good: 'La tattica funziona. Il punto debole dell\'avversario è stato trovato.',
+  feedback_neutral: 'Nuova forma: {moveName}. In attesa della reazione avversaria...',
+  mute_on: 'Attiva Audio',
+  mute_off: 'Disattiva Audio',
+  download_image: 'Scarica come Immagine di Alta Qualità',
+  download_btn: 'Scarica Combo',
+  toast_combo_saved: '{name} salvato!',
+  toast_combo_deleted: 'Combo eliminata!',
+
+  // ── Chronicle Log ──
+  chronicle_title: 'Cronaca di Battaglia',
+  chronicle_open: '📜 Cronaca',
+  chronicle_empty: "L'inchiostro attende... La storia sarà scritta quando porterete il primo colpo.",
+  chronicle_narrator_opening: 'Il duello si accese quando il nostro cavaliere impiegò risolutamente la tecnica {moveName}. Il canto d\'acciaio delle spade era iniziato.',
+  chronicle_narrator_opponent: "L'avversario rispose non con paura, ma con un magistrale contrasto — il {moveName} — per opporre resistenza.",
+  chronicle_narrator_user: 'Ma il nostro spadaccino non esitò; percependo l\'intento del rivale, colse istantaneamente l\'iniziativa con {moveName}.',
+  chronicle_narrator_win: 'Infine, il momento debole dell\'avversario fu colto, e con la spietata precisione del {moveName}, una vittoria assoluta e indiscutibile fu conquistata sul campo di battaglia!',
+  chronicle_narrator_loss: 'La storia non perdona... Un momento di esitazione o una lama mal allineata si concluse nella brutale {moveName} del nemico. Il nostro sangue incontrò la terra.',
+
+  // ── Score Counter ──
+  score_label: 'Punteggio',
+  score_first_to: 'Primo a {n}',
+  score_match_won: '🏆 INCONTRO VINTO!',
+  score_match_lost: '💀 INCONTRO PERSO!',
+  score_next_round: 'Prossimo Round',
+
+  // ── AI Difficulty & Personality ──
+  ai_difficulty: 'Difficoltà IA',
+  ai_novice: 'Novizio',
+  ai_adept: 'Adepto',
+  ai_master: 'Maestro',
+  ai_personality_liechtenauer: 'Stile Liechtenauer',
+  ai_personality_fiore: 'Stile Fiore',
+  ai_personality_meyer: 'Stile Meyer',
+
   // ── Note Manoscritte ──
   ms_label: 'Fonte',
   ms_zornhau: '📜 Hs. 3227a (Döbringer, c.1389), fol. 23r — "Lo Zornhau rompe tutti gli Oberhau." Uno dei cinque segreti Meisterhau (Colpi del Maestro) della tradizione di Liechtenauer.',
