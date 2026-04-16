@@ -147,6 +147,7 @@ export default {
   move_abzug: 'Abzug (Withdrawal)',
   move_contra_taglio: 'Contra Taglio (Counter-Cut)',
   move_ritirata: 'Ritirata (Withdrawal)',
+  move_colpo_punta: 'Colpo di Punta (Counter-Thrust)',
 
   // ── Move descriptions ──
   desc_zornhau: 'A powerful diagonal cut from the dominant shoulder, the first of the five Master Cuts.',
@@ -192,6 +193,7 @@ export default {
   desc_abzug: 'Stepping back to reset the engagement when facing an unrecognized or overwhelming technique. Yields initiative but creates safe distance.',
   desc_contra_taglio: 'Answering the opponent\'s attack with a counter-cut of equal force, binding the blades together in Zogho Stretto. The true fight begins here.',
   desc_ritirata: 'A measured withdrawal to break the engagement and reset to a safe distance. Sacrifices initiative but denies the opponent\'s momentum.',
+  desc_colpo_punta: 'Setting your point against a reckless pursuer. As Fiore teaches: "Who chases me will find my point." The attacker\'s own momentum drives them onto your blade.',
 
   // ── Language ──
   language: 'Language',

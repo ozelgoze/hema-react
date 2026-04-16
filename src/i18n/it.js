@@ -148,6 +148,7 @@ export default {
   move_abzug: 'Abzug (Ritirata)',
   move_contra_taglio: 'Contra Taglio (Contro-taglio)',
   move_ritirata: 'Ritirata (Ritiro)',
+  move_colpo_punta: 'Colpo di Punta (Contro-stoccata)',
 
   // ── Move descriptions ──
   desc_zornhau: "Un potente taglio diagonale dalla spalla dominante, il primo dei cinque colpi del maestro.",
@@ -193,6 +194,7 @@ export default {
   desc_abzug: 'Fare un passo indietro per resettare l\'ingaggio di fronte a una tecnica sconosciuta o travolgente. Cede l\'iniziativa ma crea una distanza sicura.',
   desc_contra_taglio: 'Rispondere all\'attacco dell\'avversario con un contro-taglio di forza uguale, legando le lame in Zogho Stretto. Il vero combattimento inizia qui.',
   desc_ritirata: 'Un ritiro misurato per rompere l\'ingaggio e tornare a distanza sicura. Sacrifica l\'iniziativa ma nega lo slancio dell\'avversario.',
+  desc_colpo_punta: 'Porre la punta contro un inseguitore sconsiderato. Come insegna Fiore: "Chi mi segue, trova la mia punta." Lo slancio dell\'attaccante lo porta sulla vostra lama.',
 
   // ── Language ──
   language: "Lingua",

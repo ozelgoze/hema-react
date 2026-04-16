@@ -173,7 +173,7 @@ export const german_longsword = [
     type: 'counter',
     tags: ['Nach', 'Strong', 'Bind'],
     phase: 'reaction',
-    follows: ['g-zornhau', 'g-oberhau', 'g-unterhau', 'g-zwerchhau', 'g-schielhau', 'g-scheitelhau', 'g-krumphau', 'g-nachreisen', 'g-mutieren', 'i-fendente', 'i-sottano', 'i-mezzano', 'i-colpo-di-villano', 'i-colpo-di-mezz'],
+    follows: ['g-zornhau', 'g-oberhau', 'g-unterhau', 'g-zwerchhau', 'g-schielhau', 'g-scheitelhau', 'g-krumphau', 'g-mutieren', 'i-fendente', 'i-sottano', 'i-mezzano', 'i-colpo-di-villano', 'i-colpo-di-mezz'],
   },
   // ── Withdrawal / Reset ──
   {
@@ -433,7 +433,20 @@ export const italian_longsword = [
     type: 'counter',
     tags: ['Zogho Stretto', 'Strong', 'Bind'],
     phase: 'reaction',
-    follows: ['i-fendente', 'i-sottano', 'i-mezzano', 'i-colpo-di-villano', 'i-colpo-di-mezz', 'g-zornhau', 'g-oberhau', 'g-unterhau', 'g-zwerchhau', 'g-schielhau', 'g-scheitelhau', 'g-krumphau', 'g-nachreisen', 'g-mutieren'],
+    follows: ['i-fendente', 'i-sottano', 'i-mezzano', 'i-colpo-di-villano', 'i-colpo-di-mezz', 'g-zornhau', 'g-oberhau', 'g-unterhau', 'g-zwerchhau', 'g-schielhau', 'g-scheitelhau', 'g-krumphau', 'g-mutieren'],
+  },
+  // ── Counter-Time Thrust (Fiore's answer to chasers) ──
+  {
+    id: 'i-colpo-di-punta',
+    name: 'Colpo di Punta (Counter-Thrust)',
+    nameKey: 'move_colpo_punta',
+    descKey: 'desc_colpo_punta',
+    master: 'Fiore',
+    tradition: 'italian',
+    type: 'thrust',
+    tags: ['Zogho Stretto', 'Strong', 'Vor'],
+    phase: 'reaction',
+    follows: ['g-nachreisen', 'g-abzug', 'i-ritirata', 'i-rebattere', 'i-colpo-di-mezz'],
   },
   // ── Withdrawal / Reset (Italian) ──
   {
@@ -461,7 +474,7 @@ export const italian_longsword = [
     type: 'grapple',
     tags: ['Zogho Stretto'],
     phase: 'followup',
-    follows: ['i-parry-strong', 'i-opponent-covers', 'g-crown-parry', 'g-opponent-pushes-strong'],
+    follows: ['i-parry-strong', 'i-opponent-covers', 'g-crown-parry', 'g-opponent-pushes-strong', 'i-colpo-di-punta', 'i-contra-taglio', 'g-gegenhau'],
   },
   {
     id: 'i-volta-stabile',
@@ -473,7 +486,7 @@ export const italian_longsword = [
     type: 'counter',
     tags: ['Zogho Stretto'],
     phase: 'followup',
-    follows: ['i-parry-strong', 'i-break-thrust', 'g-crown-parry', 'g-opponent-winds'],
+    follows: ['i-parry-strong', 'i-break-thrust', 'g-crown-parry', 'g-opponent-winds', 'i-colpo-di-punta', 'i-contra-taglio', 'g-gegenhau'],
   },
   {
     id: 'i-rebattere',
@@ -511,7 +524,7 @@ export const italian_longsword = [
     type: 'finisher',
     tags: ['Zogho Stretto'],
     phase: 'finisher',
-    follows: ['i-opponent-covers', 'i-break-thrust', 'i-exchange-thrust', 'g-opponent-pushes-strong', 'g-opponent-weak'],
+    follows: ['i-opponent-covers', 'i-break-thrust', 'i-exchange-thrust', 'i-colpo-di-punta', 'g-opponent-pushes-strong', 'g-opponent-weak'],
   },
   {
     id: 'i-thrust-finish',
@@ -523,7 +536,7 @@ export const italian_longsword = [
     type: 'finisher',
     tags: ['Zogho Stretto'],
     phase: 'finisher',
-    follows: ['i-volta-stabile', 'i-colpo-di-mezz', 'i-exchange-thrust', 'g-opponent-winds', 'g-winden'],
+    follows: ['i-volta-stabile', 'i-colpo-di-mezz', 'i-exchange-thrust', 'i-colpo-di-punta', 'g-opponent-winds', 'g-winden'],
   },
   {
     id: 'i-disarm',

@@ -148,6 +148,7 @@ export default {
   move_abzug: 'Abzug (Rückzug)',
   move_contra_taglio: 'Contra Taglio (Gegenschnitt)',
   move_ritirata: 'Ritirata (Rückzug)',
+  move_colpo_punta: 'Colpo di Punta (Gegenstich)',
 
   // ── Move descriptions ──
   desc_zornhau: 'Ein kraftvoller diagonaler Schnitt von der dominanten Schulter, der erste der fünf Meisterschnitte.',
@@ -193,6 +194,7 @@ export default {
   desc_abzug: 'Zurückweichen um das Gefecht zurückzusetzen, wenn man einer unbekannten oder überwältigenden Technik gegenübersteht. Gibt die Initiative auf, schafft aber sichere Distanz.',
   desc_contra_taglio: 'Den Angriff des Gegners mit einem gleichstarken Gegenschnitt beantworten und die Klingen im Zogho Stretto binden. Der wahre Kampf beginnt hier.',
   desc_ritirata: 'Ein gemäßigter Rückzug um das Gefecht abzubrechen und auf sichere Distanz zurückzukehren. Opfert die Initiative, verweigert aber den Schwung des Gegners.',
+  desc_colpo_punta: 'Die Spitze gegen einen rücksichtslosen Verfolger setzen. Wie Fiore lehrt: "Wer mir folgt, findet meine Spitze." Der Schwung des Angreifers treibt ihn auf eure Klinge.',
 
   // ── Language ──
   language: 'Sprache',

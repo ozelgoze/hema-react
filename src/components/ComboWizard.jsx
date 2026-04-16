@@ -40,6 +40,13 @@ const AI_PROFILES = {
       if (userTags.includes('Zogho Largo')) score += 8;
       if (aiTags.includes('Weak')) score -= 8; // Fiore never shows weakness
       if (aiTags.includes('Retreat') || aiTags.includes('Abzug')) score -= 12;
+      // Fiore's core: "Chi mi segue, trova la mia punta"
+      // Against chasers, ALWAYS thrust — never cut or retreat
+      if (userTags.includes('Nachreisen')) {
+        if (move.type === 'thrust') score += 20;
+        if (move.id === 'i-colpo-di-punta') score += 25; // Strongest preference
+        if (aiTags.includes('Retreat')) score -= 20; // Never retreat from a chaser
+      }
       return score;
     },
   },

@@ -171,6 +171,7 @@ export default {
   move_abzug: 'Abzug (Geri Çekilme)',
   move_contra_taglio: 'Contra Taglio (Karşı Kesiş)',
   move_ritirata: 'Ritirata (Geri Çekilme)',
+  move_colpo_punta: 'Colpo di Punta (Karşı Bıçak)',
 
   // ── Move descriptions ──
   desc_zornhau: 'Baskın omuzdan güçlü çapraz bir kesiş, beş Usta Kesişin ilki.',
@@ -216,6 +217,7 @@ export default {
   desc_abzug: 'Tanınmayan veya bunaltıcı bir teknikle karşılaşıldığında angajmanı sıfırlamak için geri adım atmak. İnisiyatifi verir ama güvenli mesafe oluşturur.',
   desc_contra_taglio: 'Rakibin saldırısına eşit güçte bir karşı kesişle cevap vererek kılıçları Zogho Stretto\'da bağlamak. Asil dövüş burada başlar.',
   desc_ritirata: 'Angajmanı kırıp güvenli mesafeye dönmek için ölçülü bir geri çekilme. İnisiyatifi feda eder ama rakibin ivmesini kırar.',
+  desc_colpo_punta: 'Pervasız bir takipçiye karşı ucunu ayarlamak. Fiore\'nin öğretisi: "Beni kovalayan ucumu bulur." Saldırganın kendi ivmesi onu kılıcına sürükler.',
 
   // ── Language ──
   language: 'Dil',
