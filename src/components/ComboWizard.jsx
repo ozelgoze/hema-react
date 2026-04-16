@@ -76,8 +76,10 @@ const AI_PROFILES = {
         if (aiTags.includes('Meisterhau')) score += 18; // Zwerchhau-type angles
         if (move.id === 'g-gegenhau') score += 12; // Still values counter-cuts
         if (aiTags.includes('Bind')) score += 10; // Create a bind to control
-        // Meyer would retreat tactically if needed, unlike Liechtenauer
+        if (aiTags.includes('Retreat') || aiTags.includes('Abzug')) score -= 10; // Retreat less preferred against chasers
       }
+      // Meyer is technical, not cowardly — moderate retreat penalty
+      if (aiTags.includes('Retreat') || aiTags.includes('Abzug')) score -= 6;
       return score;
     },
   },
@@ -295,6 +297,13 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
           if (aiDifficulty === 'master') {
             const followupDepth = hemaMoves.filter(m => m.phase === 'followup' && m.follows?.includes(move.id)).length;
             score += followupDepth * 5;
+          }
+
+          // ── Fallback penalty ──
+          // Withdrawal/retreat moves marked as fallback should only be used
+          // when no better tactical option exists
+          if (move.isFallback) {
+            score -= 25;
           }
           
           return { ...move, score };
