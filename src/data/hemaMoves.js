@@ -162,6 +162,33 @@ export const german_longsword = [
     phase: 'reaction',
     follows: ['g-zwerchhau', 'g-schielhau', 'g-krumphau', 'g-winden', 'g-abnehmen', 'g-nachreisen', 'i-punta', 'i-mezzano'],
   },
+  // ── Counter-Attack (creates bind) ──
+  {
+    id: 'g-gegenhau',
+    name: 'Gegenhau (Counter-Cut)',
+    nameKey: 'move_gegenhau',
+    descKey: 'desc_gegenhau',
+    master: 'Liechtenauer',
+    tradition: 'german',
+    type: 'counter',
+    tags: ['Nach', 'Strong', 'Bind'],
+    phase: 'reaction',
+    follows: ['g-zornhau', 'g-oberhau', 'g-unterhau', 'g-zwerchhau', 'g-schielhau', 'g-scheitelhau', 'g-krumphau', 'g-nachreisen', 'g-abnehmen', 'g-zucken', 'g-mutieren', 'g-durchwechseln', 'i-fendente', 'i-sottano', 'i-mezzano', 'i-colpo-di-villano', 'i-rebattere', 'i-colpo-di-mezz'],
+  },
+  // ── Withdrawal / Reset ──
+  {
+    id: 'g-abzug',
+    name: 'Abzug (Withdrawal)',
+    nameKey: 'move_abzug',
+    descKey: 'desc_abzug',
+    master: 'Liechtenauer',
+    tradition: 'german',
+    type: 'counter',
+    tags: ['Nach', 'Retreat', 'Abzug'],
+    phase: 'reaction',
+    isFallback: true, // marks as universal fallback
+    follows: ['g-zornhau', 'g-oberhau', 'g-unterhau', 'g-zwerchhau', 'g-schielhau', 'g-scheitelhau', 'g-krumphau', 'g-zucken', 'g-abnehmen', 'g-nachreisen', 'g-durchwechseln', 'g-winden', 'g-mutieren', 'i-fendente', 'i-sottano', 'i-mezzano', 'i-punta', 'i-colpo-di-villano', 'i-ligadura-sottana', 'i-volta-stabile', 'i-rebattere', 'i-colpo-di-mezz'],
+  },
 
   // ── FOLLOW-UP MOVES ──
   {
@@ -174,7 +201,7 @@ export const german_longsword = [
     type: 'counter',
     tags: ['Vor', 'Weak'],
     phase: 'followup',
-    follows: ['g-crown-parry', 'g-opponent-pushes-strong'],
+    follows: ['g-crown-parry', 'g-opponent-pushes-strong', 'i-parry-strong', 'i-exchange-thrust', 'i-opponent-covers', 'g-gegenhau', 'i-contra-taglio'],
   },
   {
     id: 'g-abnehmen',
@@ -186,7 +213,7 @@ export const german_longsword = [
     type: 'counter',
     tags: ['Vor', 'Strong'],
     phase: 'followup',
-    follows: ['g-opponent-pushes-strong', 'g-opponent-winds'],
+    follows: ['g-opponent-pushes-strong', 'g-opponent-winds', 'i-parry-strong', 'i-exchange-thrust', 'g-gegenhau', 'i-contra-taglio'],
   },
   {
     id: 'g-nachreisen',
@@ -198,7 +225,7 @@ export const german_longsword = [
     type: 'attack',
     tags: ['Vor', 'Nachreisen'],
     phase: 'followup',
-    follows: ['g-opponent-retreats'],
+    follows: ['g-opponent-retreats', 'g-abzug', 'i-ritirata'],
   },
   {
     id: 'g-durchwechseln',
@@ -210,7 +237,7 @@ export const german_longsword = [
     type: 'counter',
     tags: ['Vor', 'Weak'],
     phase: 'followup',
-    follows: ['g-opponent-weak', 'g-opponent-pushes-strong'],
+    follows: ['g-opponent-weak', 'g-opponent-pushes-strong', 'i-break-thrust', 'i-exchange-thrust', 'g-gegenhau', 'i-contra-taglio'],
   },
   {
     id: 'g-winden',
@@ -222,7 +249,7 @@ export const german_longsword = [
     type: 'counter',
     tags: ['Vor', 'Strong', 'Winden'],
     phase: 'followup',
-    follows: ['g-opponent-pushes-strong', 'g-opponent-weak'],
+    follows: ['g-opponent-pushes-strong', 'g-opponent-weak', 'i-parry-strong', 'i-opponent-covers', 'g-gegenhau', 'i-contra-taglio'],
   },
   {
     id: 'g-mutieren',
@@ -234,7 +261,7 @@ export const german_longsword = [
     type: 'attack',
     tags: ['Vor', 'Weak'],
     phase: 'followup',
-    follows: ['g-opponent-winds', 'g-opponent-pushes-strong'],
+    follows: ['g-opponent-winds', 'g-opponent-pushes-strong', 'i-parry-strong', 'i-exchange-thrust', 'g-gegenhau', 'i-contra-taglio'],
   },
 
   // ── FINISHERS ──
@@ -248,7 +275,7 @@ export const german_longsword = [
     type: 'finisher',
     tags: ['Vor', 'Strong', 'Meisterhau'],
     phase: 'finisher',
-    follows: ['g-opponent-retreats', 'g-opponent-winds', 'g-opponent-weak'],
+    follows: ['g-opponent-retreats', 'g-opponent-winds', 'g-opponent-weak', 'i-break-thrust', 'i-opponent-covers'],
   },
   {
     id: 'g-thrust-finish',
@@ -260,7 +287,7 @@ export const german_longsword = [
     type: 'finisher',
     tags: ['Vor', 'Weak'],
     phase: 'finisher',
-    follows: ['g-opponent-pushes-strong', 'g-opponent-weak', 'g-opponent-winds'],
+    follows: ['g-opponent-pushes-strong', 'g-opponent-weak', 'g-opponent-winds', 'i-parry-strong', 'i-exchange-thrust'],
   },
   {
     id: 'g-schnitt',
@@ -272,7 +299,7 @@ export const german_longsword = [
     type: 'finisher',
     tags: ['Vor', 'Strong'],
     phase: 'finisher',
-    follows: ['g-opponent-pushes-strong', 'g-opponent-retreats'],
+    follows: ['g-opponent-pushes-strong', 'g-opponent-retreats', 'i-opponent-covers'],
   },
   {
     id: 'g-pommel-strike',
@@ -284,7 +311,7 @@ export const german_longsword = [
     type: 'finisher',
     tags: ['Vor', 'Strong'],
     phase: 'finisher',
-    follows: ['g-zucken', 'g-abnehmen'],
+    follows: ['g-zucken', 'g-abnehmen', 'i-ligadura-sottana', 'i-volta-stabile'],
   },
 ];
 
@@ -395,6 +422,33 @@ export const italian_longsword = [
     phase: 'reaction',
     follows: ['i-fendente', 'i-sottano', 'i-colpo-di-villano', 'i-ligadura-sottana', 'i-colpo-di-mezz', 'g-oberhau', 'g-unterhau', 'g-zornhau', 'g-nachreisen', 'g-abnehmen'],
   },
+  // ── Counter-Attack (creates bind) ──
+  {
+    id: 'i-contra-taglio',
+    name: 'Contra Taglio (Counter-Cut)',
+    nameKey: 'move_contra_taglio',
+    descKey: 'desc_contra_taglio',
+    master: 'Fiore',
+    tradition: 'italian',
+    type: 'counter',
+    tags: ['Zogho Stretto', 'Strong', 'Bind'],
+    phase: 'reaction',
+    follows: ['i-fendente', 'i-sottano', 'i-mezzano', 'i-colpo-di-villano', 'i-rebattere', 'i-colpo-di-mezz', 'g-zornhau', 'g-oberhau', 'g-unterhau', 'g-zwerchhau', 'g-schielhau', 'g-scheitelhau', 'g-krumphau', 'g-nachreisen', 'g-abnehmen', 'g-zucken', 'g-mutieren', 'g-durchwechseln'],
+  },
+  // ── Withdrawal / Reset (Italian) ──
+  {
+    id: 'i-ritirata',
+    name: 'Ritirata (Withdrawal)',
+    nameKey: 'move_ritirata',
+    descKey: 'desc_ritirata',
+    master: 'Fiore',
+    tradition: 'italian',
+    type: 'counter',
+    tags: ['Nach', 'Retreat'],
+    phase: 'reaction',
+    isFallback: true,
+    follows: ['i-fendente', 'i-sottano', 'i-mezzano', 'i-punta', 'i-colpo-di-villano', 'i-ligadura-sottana', 'i-volta-stabile', 'i-rebattere', 'i-colpo-di-mezz', 'g-zornhau', 'g-oberhau', 'g-unterhau', 'g-zwerchhau', 'g-schielhau', 'g-scheitelhau', 'g-krumphau', 'g-zucken', 'g-abnehmen', 'g-nachreisen', 'g-durchwechseln', 'g-winden', 'g-mutieren'],
+  },
 
   // ── FOLLOW-UP MOVES ──
   {
@@ -407,7 +461,7 @@ export const italian_longsword = [
     type: 'grapple',
     tags: ['Zogho Stretto'],
     phase: 'followup',
-    follows: ['i-parry-strong', 'i-opponent-covers'],
+    follows: ['i-parry-strong', 'i-opponent-covers', 'g-crown-parry', 'g-opponent-pushes-strong'],
   },
   {
     id: 'i-volta-stabile',
@@ -419,7 +473,7 @@ export const italian_longsword = [
     type: 'counter',
     tags: ['Zogho Stretto'],
     phase: 'followup',
-    follows: ['i-parry-strong', 'i-break-thrust'],
+    follows: ['i-parry-strong', 'i-break-thrust', 'g-crown-parry', 'g-opponent-winds'],
   },
   {
     id: 'i-rebattere',
@@ -431,7 +485,7 @@ export const italian_longsword = [
     type: 'counter',
     tags: ['Zogho Largo'],
     phase: 'followup',
-    follows: ['i-opponent-covers'],
+    follows: ['i-opponent-covers', 'g-opponent-pushes-strong', 'g-opponent-weak'],
   },
   {
     id: 'i-colpo-di-mezz',
@@ -443,7 +497,7 @@ export const italian_longsword = [
     type: 'attack',
     tags: ['Zogho Stretto'],
     phase: 'followup',
-    follows: ['i-break-thrust', 'i-opponent-covers'],
+    follows: ['i-break-thrust', 'i-opponent-covers', 'g-opponent-weak', 'g-opponent-retreats'],
   },
 
   // ── FINISHERS ──
@@ -457,7 +511,7 @@ export const italian_longsword = [
     type: 'finisher',
     tags: ['Zogho Stretto'],
     phase: 'finisher',
-    follows: ['i-opponent-covers', 'i-break-thrust', 'i-exchange-thrust'],
+    follows: ['i-opponent-covers', 'i-break-thrust', 'i-exchange-thrust', 'g-opponent-pushes-strong', 'g-opponent-weak'],
   },
   {
     id: 'i-thrust-finish',
@@ -469,7 +523,7 @@ export const italian_longsword = [
     type: 'finisher',
     tags: ['Zogho Stretto'],
     phase: 'finisher',
-    follows: ['i-volta-stabile', 'i-colpo-di-mezz', 'i-exchange-thrust'],
+    follows: ['i-volta-stabile', 'i-colpo-di-mezz', 'i-exchange-thrust', 'g-opponent-winds', 'g-winden'],
   },
   {
     id: 'i-disarm',
@@ -481,7 +535,7 @@ export const italian_longsword = [
     type: 'finisher',
     tags: ['Zogho Stretto'],
     phase: 'finisher',
-    follows: ['i-ligadura-sottana', 'i-parry-strong'],
+    follows: ['i-ligadura-sottana', 'i-parry-strong', 'g-crown-parry', 'g-opponent-pushes-strong'],
   },
   {
     id: 'i-throw',
@@ -493,7 +547,7 @@ export const italian_longsword = [
     type: 'finisher',
     tags: ['Zogho Stretto'],
     phase: 'finisher',
-    follows: ['i-ligadura-sottana', 'i-parry-strong'],
+    follows: ['i-ligadura-sottana', 'i-parry-strong', 'g-crown-parry', 'g-opponent-pushes-strong'],
   },
 ];
 

@@ -143,7 +143,11 @@ export default {
   move_pommel_it: "Colpo di Pomolo",
   move_punta_finish: "Punta al Viso",
   move_disarm: "Dislocazione (Disarmo)",
-  move_throw: "Proiettare (Proiezione)",
+  move_throw: 'Proiettare (Lancio)',
+  move_gegenhau: 'Gegenhau (Contro-taglio)',
+  move_abzug: 'Abzug (Ritirata)',
+  move_contra_taglio: 'Contra Taglio (Contro-taglio)',
+  move_ritirata: 'Ritirata (Ritiro)',
 
   // ── Move descriptions ──
   desc_zornhau: "Un potente taglio diagonale dalla spalla dominante, il primo dei cinque colpi del maestro.",
@@ -184,7 +188,11 @@ export default {
   desc_pommel_it: "Un colpo di pomolo a distanza ravvicinata, marchio di fabbrica dei giochi Zogho Stretto di Fiore.",
   desc_punta_finish: "Una stoccata a distanza ravvicinata diretta al viso per il punto decisivo.",
   desc_disarm: "Una tecnica di disarmo che usa la leva per strappare l'arma dell'avversario.",
-  desc_throw: "Una tecnica di proiezione dal legame, portando l'avversario a terra.",
+  desc_throw: 'Una tecnica di proiezione dalla legatura, portando l\'avversario a terra.',
+  desc_gegenhau: 'Rispondere al taglio dell\'avversario con il proprio taglio, creando una forte legatura al punto di incrocio. Da questa legatura si aprono molteplici opzioni.',
+  desc_abzug: 'Fare un passo indietro per resettare l\'ingaggio di fronte a una tecnica sconosciuta o travolgente. Cede l\'iniziativa ma crea una distanza sicura.',
+  desc_contra_taglio: 'Rispondere all\'attacco dell\'avversario con un contro-taglio di forza uguale, legando le lame in Zogho Stretto. Il vero combattimento inizia qui.',
+  desc_ritirata: 'Un ritiro misurato per rompere l\'ingaggio e tornare a distanza sicura. Sacrifica l\'iniziativa ma nega lo slancio dell\'avversario.',
 
   // ── Language ──
   language: "Lingua",

@@ -201,7 +201,33 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
   // AI Opponent Logic — Strategic Reaction Selection
   // ═══════════════════════════════════════════════════════════
   useEffect(() => {
-    if (isOpponentTurn && isAiMode && recommendedMoves.length > 0 && !isMistake) {
+    if (isOpponentTurn && isAiMode && !isMistake) {
+      // If no recommended moves exist, AI uses a fallback (withdrawal/reset)
+      if (recommendedMoves.length === 0) {
+        setAiThinking(true);
+        const timer = setTimeout(() => {
+          const personalityTradition = aiPersonality === 'fiore' ? 'italian' : 'german';
+          const fallbackId = personalityTradition === 'italian' ? 'i-ritirata' : 'g-abzug';
+          const fallbackMove = getMoveById(fallbackId);
+          if (fallbackMove) {
+            onAddNode({
+              moveId: fallbackMove.id,
+              moveName: fallbackMove.name,
+              nameKey: fallbackMove.nameKey,
+              nodeRole: 'opponent-action',
+              phase: currentPhase,
+              step: nodes.length + 1,
+              tradition: fallbackMove.tradition,
+              tags: fallbackMove.tags,
+              master: fallbackMove.master,
+            });
+            playClash();
+          }
+          setAiThinking(false);
+        }, difficulty.thinkTime);
+        return () => clearTimeout(timer);
+      }
+
       setAiThinking(true);
       const personality = AI_PROFILES[aiPersonality];
 

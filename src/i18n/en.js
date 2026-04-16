@@ -143,6 +143,10 @@ export default {
   move_punta_finish: 'Punta to Face',
   move_disarm: 'Dislocazione (Disarm)',
   move_throw: 'Proiettare (Throw)',
+  move_gegenhau: 'Gegenhau (Counter-Cut)',
+  move_abzug: 'Abzug (Withdrawal)',
+  move_contra_taglio: 'Contra Taglio (Counter-Cut)',
+  move_ritirata: 'Ritirata (Withdrawal)',
 
   // ── Move descriptions ──
   desc_zornhau: 'A powerful diagonal cut from the dominant shoulder, the first of the five Master Cuts.',
@@ -184,6 +188,10 @@ export default {
   desc_punta_finish: 'A close-range thrust directed at the face to score the decisive point.',
   desc_disarm: 'A disarming technique using leverage to strip the opponent\'s weapon.',
   desc_throw: 'A throwing technique from the bind, taking the opponent to the ground.',
+  desc_gegenhau: 'Meeting the opponent\'s cut with your own cut, creating a strong bind at the crossing point. From this bind, multiple options open up.',
+  desc_abzug: 'Stepping back to reset the engagement when facing an unrecognized or overwhelming technique. Yields initiative but creates safe distance.',
+  desc_contra_taglio: 'Answering the opponent\'s attack with a counter-cut of equal force, binding the blades together in Zogho Stretto. The true fight begins here.',
+  desc_ritirata: 'A measured withdrawal to break the engagement and reset to a safe distance. Sacrifices initiative but denies the opponent\'s momentum.',
 
   // ── Language ──
   language: 'Language',
