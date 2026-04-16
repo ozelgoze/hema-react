@@ -117,7 +117,6 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
               </div>
             </div>
           </div>
-          </div>
         </div>
 
         {/* Tabs */}
