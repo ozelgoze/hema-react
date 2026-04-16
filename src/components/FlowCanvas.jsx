@@ -283,6 +283,8 @@ export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange 
         currentStep={currentStep}
         activeNodeId={activeNodeId}
         setActiveNodeId={setActiveNodeId}
+        isMoveModalOpen={isMoveModalOpen}
+        setIsMoveModalOpen={setIsMoveModalOpen}
       />
     </ReactFlowProvider>
   );
