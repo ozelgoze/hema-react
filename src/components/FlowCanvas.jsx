@@ -146,10 +146,10 @@ export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange 
 
   const handleAddNode = useCallback(
     (moveData, isUpdate = false) => {
-      // If we are UPDATING an existing selector node (User picked a move)
       if (isUpdate && activeNodeId) {
-        setNodes(ns => ns.map(n => n.id === activeNodeId ? { ...n, data: { ...n.data, ...moveData, isSelector: false } } : n));
-        if (onFlowChange) onFlowChange(nodes, edges);
+        const newNodes = nodes.map(n => n.id === activeNodeId ? { ...n, data: { ...n.data, ...moveData, isSelector: false } } : n);
+        setNodes(newNodes);
+        if (onFlowChange) onFlowChange(newNodes, edges);
         setIsMoveModalOpen(false);
         return;
       }
