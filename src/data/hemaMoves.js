@@ -339,7 +339,7 @@ export const italian_longsword = [
     type: 'parry',
     tags: ['Zogho Stretto'],
     phase: 'reaction',
-    follows: ['i-punta', 'i-fendente', 'i-mezzano'],
+    follows: ['i-punta', 'i-fendente', 'i-mezzano', 'i-ligadura-sottana', 'i-colpo-di-mezz'],
   },
   {
     id: 'i-exchange-thrust',
@@ -351,7 +351,7 @@ export const italian_longsword = [
     type: 'counter',
     tags: ['Zogho Stretto'],
     phase: 'reaction',
-    follows: ['i-punta', 'i-colpo-di-mezz', 'i-rebattere'],
+    follows: ['i-punta', 'i-colpo-di-mezz', 'i-rebattere', 'i-ligadura-sottana'],
   },
   {
     id: 'i-break-thrust',
@@ -363,7 +363,7 @@ export const italian_longsword = [
     type: 'parry',
     tags: ['Zogho Largo'],
     phase: 'reaction',
-    follows: ['i-punta', 'i-sottano', 'i-volta-stabile'],
+    follows: ['i-punta', 'i-sottano', 'i-volta-stabile', 'i-ligadura-sottana'],
   },
   {
     id: 'i-opponent-covers',
@@ -439,7 +439,7 @@ export const italian_longsword = [
     type: 'finisher',
     tags: ['Zogho Stretto'],
     phase: 'finisher',
-    follows: ['i-ligadura-sottana', 'i-rebattere', 'i-volta-stabile'],
+    follows: ['i-opponent-covers', 'i-break-thrust', 'i-exchange-thrust'],
   },
   {
     id: 'i-thrust-finish',
