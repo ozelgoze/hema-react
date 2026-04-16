@@ -1,0 +1,197 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap');
+
+/* ═══════════════════════════════════════════════════════════
+   HEMA Longsword Decision Tree — PENTIMENT (MANUSCRIPT)
+   ═══════════════════════════════════════════════════════════ */
+
+@theme {
+  --font-display: 'Uncial Antiqua', serif;
+  --font-body: 'Cormorant Garamond', serif;
+
+  /* Pentiment Manuscript Colors */
+  --color-parchment-light: #f4ecd8;
+  --color-parchment: #e8dcc4;
+  --color-parchment-dark: #d5c4a1;
+  --color-ink-black: #2a2522;
+  --color-ink-red: #8B0000;
+  --color-ink-faded: #4a443f;
+  --color-gold: #c5a059;
+}
+
+/* ── Base ── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  font-family: var(--font-body);
+  
+  /* Aged Parchment Background */
+  background-color: var(--color-parchment);
+  background-image: 
+    radial-gradient(circle at center, transparent 0%, rgba(139, 69, 19, 0.1) 100%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+  
+  color: var(--color-ink-black);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Custom Utilities: The Woodcut / Manuscript Cards ── */
+.glass-panel {
+  /* Replacing "glass" with "paper/woodcut" */
+  background-color: var(--color-parchment-light);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  border: 2px solid var(--color-ink-black);
+  box-shadow: 4px 4px 0px 0px var(--color-ink-black);
+  border-radius: 4px; /* Slightly sharper edges for older feel */
+}
+
+/* Specific ink panels */
+.panel-ink-black {
+  background-color: var(--color-ink-black);
+  color: var(--color-parchment-light);
+  border: 2px solid var(--color-ink-black);
+  box-shadow: 4px 4px 0px 0px rgba(42, 37, 34, 0.5);
+}
+
+.panel-ink-red {
+  background-color: var(--color-ink-red);
+  color: var(--color-parchment-light);
+  border: 2px solid var(--color-ink-black);
+  box-shadow: 4px 4px 0px 0px var(--color-ink-black);
+}
+
+.panel-interactive {
+  transition: all 0.2s ease-in-out;
+}
+.panel-interactive:hover:not(:disabled) {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0px 0px var(--color-ink-black);
+}
+.panel-interactive:active:not(:disabled) {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0px 0px var(--color-ink-black);
+}
+
+.text-shadow-glow {
+  text-shadow: none; /* No neon glows in the 16th century */
+}
+
+/* ── Typographic Utilities ── */
+.font-display {
+  font-family: var(--font-display);
+}
+
+.heading-rubric {
+  color: var(--color-ink-red);
+  font-family: var(--font-display);
+  font-weight: normal;
+  letter-spacing: 0.05em;
+}
+
+/* Decorative Initial (Drop Cap) */
+.drop-cap::first-letter {
+  font-family: var(--font-display);
+  font-size: 2.5em;
+  color: var(--color-ink-red);
+  float: left;
+  line-height: 0.8;
+  margin-right: 8px;
+  margin-top: 4px;
+}
+
+/* ── React Flow overrides (Parchment Theme) ── */
+.react-flow {
+  background: transparent !important;
+}
+
+.react-flow__node {
+  cursor: grab;
+}
+
+.react-flow__node:active {
+  cursor: grabbing;
+}
+
+.react-flow__edge-path {
+  stroke: var(--color-ink-black) !important;
+  stroke-width: 3 !important;
+  stroke-linecap: square !important; /* Ink pen look */
+}
+
+.react-flow__attribution {
+  display: none !important;
+}
+
+/* ── Scrollbar ── */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-ink-faded) var(--color-parchment-dark);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: var(--color-parchment-dark);
+  border-left: 1px solid var(--color-ink-faded);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--color-ink-faded);
+  border-radius: 0;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-black);
+}
+
+/* ── Animations ── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}
+
+/* Screen Shake / Damage Feedback */
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+.shake-animation {
+  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+/* Ink drawing animation for SVG paths */
+.ink-draw-animation {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: ink-draw 0.5s ease-out forwards;
+}
+
+@keyframes ink-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
