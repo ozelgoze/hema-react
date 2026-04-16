@@ -228,6 +228,15 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
             score += personality.bias(move, userTags);
           }
 
+          // ── Tradition preference ── 
+          // AI strongly prefers moves from its personality's tradition
+          const personalityTradition = aiPersonality === 'fiore' ? 'italian' : 'german';
+          if (move.tradition === personalityTradition) {
+            score += 15; // Heavy bonus for matching tradition
+          } else {
+            score -= 5; // Penalty for cross-tradition
+          }
+
           // ── Anti-finisher scoring (difficulty-scaled) ──
           // Higher difficulty AI picks reactions that expose FEWER finisher paths
           const finisherPaths = countFinisherPaths(move.id);

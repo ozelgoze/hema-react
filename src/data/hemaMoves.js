@@ -112,7 +112,7 @@ export const german_longsword = [
     type: 'parry',
     tags: ['Nach', 'Strong', 'Kron'],
     phase: 'reaction',
-    follows: ['g-zornhau', 'g-oberhau', 'g-scheitelhau', 'g-durchwechseln'],
+    follows: ['g-zornhau', 'g-oberhau', 'g-scheitelhau', 'g-durchwechseln', 'i-fendente', 'i-colpo-di-villano'],
   },
   {
     id: 'g-opponent-pushes-strong',
@@ -124,7 +124,7 @@ export const german_longsword = [
     type: 'counter',
     tags: ['Nach', 'Strong'],
     phase: 'reaction',
-    follows: ['g-zornhau', 'g-oberhau', 'g-unterhau', 'g-krumphau', 'g-zucken', 'g-mutieren', 'g-abnehmen', 'g-nachreisen'],
+    follows: ['g-zornhau', 'g-oberhau', 'g-unterhau', 'g-krumphau', 'g-zucken', 'g-mutieren', 'g-abnehmen', 'g-nachreisen', 'i-fendente', 'i-sottano', 'i-mezzano', 'i-colpo-di-villano'],
   },
   {
     id: 'g-opponent-weak',
@@ -136,7 +136,7 @@ export const german_longsword = [
     type: 'counter',
     tags: ['Nach', 'Weak'],
     phase: 'reaction',
-    follows: ['g-zornhau', 'g-oberhau', 'g-unterhau', 'g-winden', 'g-zucken', 'g-nachreisen'],
+    follows: ['g-zornhau', 'g-oberhau', 'g-unterhau', 'g-winden', 'g-zucken', 'g-nachreisen', 'i-fendente', 'i-sottano', 'i-mezzano'],
   },
   {
     id: 'g-opponent-retreats',
@@ -148,7 +148,7 @@ export const german_longsword = [
     type: 'counter',
     tags: ['Nach', 'Retreat', 'Abzug'],
     phase: 'reaction',
-    follows: ['g-oberhau', 'g-unterhau', 'g-zwerchhau', 'g-nachreisen', 'g-mutieren', 'g-abnehmen'],
+    follows: ['g-oberhau', 'g-unterhau', 'g-zwerchhau', 'g-nachreisen', 'g-mutieren', 'g-abnehmen', 'i-fendente', 'i-mezzano', 'i-colpo-di-villano'],
   },
   {
     id: 'g-opponent-winds',
@@ -160,7 +160,7 @@ export const german_longsword = [
     type: 'counter',
     tags: ['Nach', 'Winden'],
     phase: 'reaction',
-    follows: ['g-zwerchhau', 'g-schielhau', 'g-krumphau', 'g-winden', 'g-abnehmen', 'g-nachreisen'],
+    follows: ['g-zwerchhau', 'g-schielhau', 'g-krumphau', 'g-winden', 'g-abnehmen', 'g-nachreisen', 'i-punta', 'i-mezzano'],
   },
 
   // ── FOLLOW-UP MOVES ──
@@ -357,7 +357,7 @@ export const italian_longsword = [
     type: 'parry',
     tags: ['Zogho Stretto'],
     phase: 'reaction',
-    follows: ['i-punta', 'i-fendente', 'i-mezzano', 'i-ligadura-sottana', 'i-colpo-di-mezz'],
+    follows: ['i-punta', 'i-fendente', 'i-mezzano', 'i-ligadura-sottana', 'i-colpo-di-mezz', 'g-zornhau', 'g-oberhau', 'g-scheitelhau', 'g-zwerchhau', 'g-krumphau'],
   },
   {
     id: 'i-exchange-thrust',
@@ -369,7 +369,7 @@ export const italian_longsword = [
     type: 'counter',
     tags: ['Zogho Stretto'],
     phase: 'reaction',
-    follows: ['i-punta', 'i-colpo-di-mezz', 'i-rebattere', 'i-ligadura-sottana'],
+    follows: ['i-punta', 'i-colpo-di-mezz', 'i-rebattere', 'i-ligadura-sottana', 'g-schielhau', 'g-krumphau', 'g-zucken', 'g-mutieren'],
   },
   {
     id: 'i-break-thrust',
@@ -381,7 +381,7 @@ export const italian_longsword = [
     type: 'parry',
     tags: ['Zogho Largo'],
     phase: 'reaction',
-    follows: ['i-punta', 'i-sottano', 'i-volta-stabile', 'i-ligadura-sottana'],
+    follows: ['i-punta', 'i-sottano', 'i-volta-stabile', 'i-ligadura-sottana', 'g-unterhau', 'g-durchwechseln'],
   },
   {
     id: 'i-opponent-covers',
@@ -393,7 +393,7 @@ export const italian_longsword = [
     type: 'parry',
     tags: ['Zogho Stretto'],
     phase: 'reaction',
-    follows: ['i-fendente', 'i-sottano', 'i-colpo-di-villano', 'i-ligadura-sottana', 'i-colpo-di-mezz'],
+    follows: ['i-fendente', 'i-sottano', 'i-colpo-di-villano', 'i-ligadura-sottana', 'i-colpo-di-mezz', 'g-oberhau', 'g-unterhau', 'g-zornhau', 'g-nachreisen', 'g-abnehmen'],
   },
 
   // ── FOLLOW-UP MOVES ──
