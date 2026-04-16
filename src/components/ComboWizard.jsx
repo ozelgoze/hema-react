@@ -496,7 +496,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
                              setIsSearchOpen(true);
                           }}
                           onFocus={() => setIsSearchOpen(true)}
-                          className="w-full bg-[var(--color-parchment-light)] px-3 py-3 md:py-2 border-[2px] border-[var(--color-ink-black)] rounded-none text-xs font-body text-[var(--color-ink-black)] focus:outline-none focus:border-[var(--color-ink-red)] transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)]"
+                          className="w-full bg-[var(--color-parchment-light)] px-4 py-3 md:py-2 border-[2px] border-[var(--color-ink-black)] rounded-none text-sm font-body font-bold text-[var(--color-ink-black)] outline-none focus:ring-2 focus:ring-[var(--color-ink-red)] focus:border-[var(--color-ink-red)] transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] cursor-pointer"
                        />
                        {searchTerm && (
                           <button 
@@ -509,7 +509,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
                      </div>
 
                      {isSearchOpen && (
-                       <div className="absolute top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-[var(--color-parchment-light)] border-[2px] border-[var(--color-ink-black)] shadow-[4px_4px_0_0_var(--color-ink-black)] z-[100] scrollbar-thin">
+                       <div className="absolute top-[100%] left-0 right-0 mt-1 max-h-[250px] overflow-y-auto bg-[var(--color-parchment-light)] border-[2px] border-[var(--color-ink-black)] shadow-[4px_4px_10px_rgba(0,0,0,0.3)] z-[9999] scrollbar-thin">
                          {otherMoves
                            .filter(move => {
                              if(!searchTerm) return true;
@@ -526,9 +526,9 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
                                  setSearchTerm(t(move.nameKey));
                                  setIsSearchOpen(false);
                                }}
-                               className={`w-full text-left px-3 py-3 border-b border-dashed border-[var(--color-ink-faded)] last:border-b-0 text-xs font-body hover:bg-[var(--color-ink-black)] hover:text-[var(--color-parchment-light)] transition-colors ${selectedMove === move.id ? 'bg-[var(--color-ink-red)] text-white' : 'text-[var(--color-ink-black)]'}`}
+                               className={`w-full text-left px-4 py-3 min-h-[44px] border-b border-[var(--color-ink-faded)]/30 last:border-b-0 text-xs font-body hover:bg-[var(--color-ink-black)] hover:text-[var(--color-parchment-light)] transition-colors ${selectedMove === move.id ? 'bg-[var(--color-ink-red)] text-white' : 'text-[var(--color-ink-black)] bg-[var(--color-parchment)]'}`}
                              >
-                               <span className="font-bold">{t(move.nameKey)}</span> <span className="opacity-70 text-[10px]"> — {move.master} [{move.tags?.join(', ')}]</span>
+                               <span className="font-bold text-sm">{t(move.nameKey)}</span> <span className="opacity-70 text-[10px] ml-1 block mt-1"> {move.master} [{move.tags?.join(', ')}]</span>
                              </button>
                            ))}
                            {otherMoves.filter(move => {
