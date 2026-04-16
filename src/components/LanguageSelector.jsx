@@ -9,7 +9,7 @@ export default function LanguageSelector() {
         <button
           key={l}
           onClick={() => setLang(l)}
-          className={`flex-1 py-2 md:px-2 md:py-1 text-[11px] font-bold uppercase tracking-widest transition-all
+          className={`flex-1 py-3 text-[11px] font-bold uppercase tracking-widest transition-all
             ${lang === l 
               ? 'bg-[var(--color-ink-black)] text-[var(--color-parchment-light)] border border-[var(--color-ink-black)]' 
               : 'text-[var(--color-ink-faded)] hover:text-[var(--color-ink-red)] hover:bg-[var(--color-parchment)] border border-transparent'}
