@@ -11,60 +11,72 @@ import MoveSelectorModal from './MoveSelectorModal';
 const AI_PROFILES = {
   liechtenauer: {
     nameKey: 'ai_personality_liechtenauer',
-    preferTags: ['Vor', 'Strong', 'Winden'],
-    avoidTags: ['Weak'],
     style: 'aggressive',
+    finisherBlockStrength: 0.6,
     bias: (move, userTags) => {
       let score = 0;
       const aiTags = move.tags || [];
-      // Liechtenauer: pressure with Vor, exploit Strong/Weak balance
-      if (aiTags.includes('Strong')) score += 4;
-      if (aiTags.includes('Winden')) score += 6;
-      if (userTags.includes('Weak')) score += 8; // Punish weakness aggressively
-      if (aiTags.includes('Retreat') || aiTags.includes('Abzug')) score -= 5; // Never retreat
+      // Liechtenauer: relentless Vor pressure, exploit Strong/Weak imbalance
+      if (aiTags.includes('Strong')) score += 6;
+      if (aiTags.includes('Winden')) score += 8;
+      if (userTags.includes('Weak')) score += 12;
+      if (aiTags.includes('Retreat') || aiTags.includes('Abzug')) score -= 10;
+      if (move.type === 'counter') score += 5;
       return score;
     },
   },
   fiore: {
     nameKey: 'ai_personality_fiore',
-    preferTags: ['Zogho Stretto', 'Strong'],
-    avoidTags: ['Zogho Largo'],
     style: 'grappling',
+    finisherBlockStrength: 0.9, // Fiore fights long — very hard to finish quickly
     bias: (move, userTags) => {
       let score = 0;
       const aiTags = move.tags || [];
-      // Fiore: close distance, grapple, bind
-      if (aiTags.includes('Zogho Stretto')) score += 8;
-      if (move.type === 'grapple') score += 10;
-      if (aiTags.includes('Strong')) score += 3;
-      if (userTags.includes('Zogho Largo')) score += 6; // Exploit open distance
+      // Fiore: close distance aggressively, bind, control, grapple
+      if (aiTags.includes('Zogho Stretto')) score += 10;
+      if (aiTags.includes('Strong')) score += 8;
+      if (move.type === 'grapple') score += 15;
+      if (move.type === 'counter') score += 6;
+      if (userTags.includes('Zogho Largo')) score += 8;
+      if (aiTags.includes('Weak')) score -= 8; // Fiore never shows weakness
+      if (aiTags.includes('Retreat') || aiTags.includes('Abzug')) score -= 12;
       return score;
     },
   },
   meyer: {
     nameKey: 'ai_personality_meyer',
-    preferTags: ['Meisterhau', 'Vor'],
-    avoidTags: [],
     style: 'technical',
+    finisherBlockStrength: 0.7,
     bias: (move, userTags) => {
       let score = 0;
       const aiTags = move.tags || [];
-      // Meyer: technical brilliance, Meisterhau preference, varied attacks
-      if (aiTags.includes('Meisterhau')) score += 10;
-      if (aiTags.includes('Vor')) score += 3;
-      if (move.type === 'counter') score += 4; // Likes clever counters
-      // Meyer is unpredictable — add more noise
-      score += Math.random() * 6;
+      // Meyer: technical brilliance, Meisterhau preference, varied patterns
+      if (aiTags.includes('Meisterhau')) score += 12;
+      if (aiTags.includes('Vor')) score += 4;
+      if (move.type === 'counter') score += 6;
+      if (aiTags.includes('Winden')) score += 8;
+      score += Math.random() * 4;
       return score;
     },
   },
 };
 
-// AI Difficulty multipliers
+// AI Difficulty — controls how optimally the AI plays
 const AI_DIFFICULTY = {
-  novice: { randomWeight: 10, topN: 5, thinkTime: 600 },
-  adept: { randomWeight: 3, topN: 3, thinkTime: 1000 },
-  master: { randomWeight: 0.5, topN: 1, thinkTime: 1400 },
+  novice: { randomWeight: 10, topN: 5, thinkTime: 600, minStepsForFinisher: 1, finisherBlockMult: 0 },
+  adept: { randomWeight: 3, topN: 3, thinkTime: 1000, minStepsForFinisher: 3, finisherBlockMult: 0.5 },
+  master: { randomWeight: 0.5, topN: 1, thinkTime: 1400, minStepsForFinisher: 5, finisherBlockMult: 1.0 },
+};
+
+// Calculate how many finisher paths are available from a given reaction
+const countFinisherPaths = (reactionId) => {
+  const directFinishers = hemaMoves.filter(m => m.phase === 'finisher' && m.follows?.includes(reactionId));
+  const followups = hemaMoves.filter(m => m.phase === 'followup' && m.follows?.includes(reactionId));
+  let indirectFinishers = 0;
+  followups.forEach(fu => {
+    indirectFinishers += hemaMoves.filter(m => m.phase === 'finisher' && m.follows?.includes(fu.id)).length;
+  });
+  return directFinishers.length + indirectFinishers;
 };
 
 export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onClear, isMoveModalOpen, setIsMoveModalOpen, userScore, aiScore, onScoreUpdate, maxScore }) {
@@ -117,13 +129,20 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
     }
   }
 
+  // Difficulty gates finisher access
+  const difficulty = AI_DIFFICULTY[aiDifficulty];
+  const canShowFinishers = activePlayNodes.length >= difficulty.minStepsForFinisher;
+
   const availableMoves = useMemo(() => {
     if (isComplete) return [];
     if (currentPhase === 'followup') {
-       return [...getMovesByPhase('followup'), ...getMovesByPhase('finisher')];
+       if (canShowFinishers) {
+         return [...getMovesByPhase('followup'), ...getMovesByPhase('finisher')];
+       }
+       return getMovesByPhase('followup');
     }
     return getMovesByPhase(currentPhase);
-  }, [currentPhase, isComplete]);
+  }, [currentPhase, isComplete, canShowFinishers]);
 
   const recommendedMoves = useMemo(() => {
     if (!lastNode) return [];
@@ -178,21 +197,21 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
     }
   }
 
-  // AI Opponent Logic with Difficulty & Personality
+  // ═══════════════════════════════════════════════════════════
+  // AI Opponent Logic — Strategic Reaction Selection
+  // ═══════════════════════════════════════════════════════════
   useEffect(() => {
     if (isOpponentTurn && isAiMode && recommendedMoves.length > 0 && !isMistake) {
       setAiThinking(true);
-      const difficulty = AI_DIFFICULTY[aiDifficulty];
       const personality = AI_PROFILES[aiPersonality];
 
       const timer = setTimeout(() => {
         let scoredMoves = recommendedMoves.map((move) => {
-          // Base random component scaled by difficulty
           let score = Math.random() * difficulty.randomWeight;
           const aiTags = move.tags || [];
           const userTags = lastNode?.tags || [];
 
-          // Core HEMA principles (always active)
+          // ── Core HEMA principles (always active) ──
           if (userTags.includes('Strong')) {
             if (aiTags.includes('Winden') || aiTags.includes('Weak') || aiTags.includes('Retreat') || aiTags.includes('Abzug')) score += 10;
             if (aiTags.includes('Strong')) score -= 5;
@@ -204,9 +223,21 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
             if (aiTags.includes('Nachreisen')) score += 10;
           }
 
-          // Apply personality bias
+          // ── Personality bias ──
           if (personality && personality.bias) {
             score += personality.bias(move, userTags);
+          }
+
+          // ── Anti-finisher scoring (difficulty-scaled) ──
+          // Higher difficulty AI picks reactions that expose FEWER finisher paths
+          const finisherPaths = countFinisherPaths(move.id);
+          const blockStrength = (personality?.finisherBlockStrength || 0.5) * difficulty.finisherBlockMult;
+          score -= finisherPaths * blockStrength * 8;
+
+          // ── Master-specific: prefer deeper exchanges ──
+          if (aiDifficulty === 'master') {
+            const followupDepth = hemaMoves.filter(m => m.phase === 'followup' && m.follows?.includes(move.id)).length;
+            score += followupDepth * 5;
           }
           
           return { ...move, score };
