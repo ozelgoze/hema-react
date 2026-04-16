@@ -173,7 +173,7 @@ export const german_longsword = [
     type: 'counter',
     tags: ['Nach', 'Strong', 'Bind'],
     phase: 'reaction',
-    follows: ['g-zornhau', 'g-oberhau', 'g-unterhau', 'g-zwerchhau', 'g-schielhau', 'g-scheitelhau', 'g-krumphau', 'g-nachreisen', 'g-abnehmen', 'g-zucken', 'g-mutieren', 'g-durchwechseln', 'i-fendente', 'i-sottano', 'i-mezzano', 'i-colpo-di-villano', 'i-rebattere', 'i-colpo-di-mezz'],
+    follows: ['g-zornhau', 'g-oberhau', 'g-unterhau', 'g-zwerchhau', 'g-schielhau', 'g-scheitelhau', 'g-krumphau', 'g-nachreisen', 'g-mutieren', 'i-fendente', 'i-sottano', 'i-mezzano', 'i-colpo-di-villano', 'i-colpo-di-mezz'],
   },
   // ── Withdrawal / Reset ──
   {
@@ -396,7 +396,7 @@ export const italian_longsword = [
     type: 'counter',
     tags: ['Zogho Stretto'],
     phase: 'reaction',
-    follows: ['i-punta', 'i-colpo-di-mezz', 'i-rebattere', 'i-ligadura-sottana', 'g-schielhau', 'g-krumphau', 'g-zucken', 'g-mutieren'],
+    follows: ['i-punta', 'i-colpo-di-mezz', 'i-rebattere', 'i-ligadura-sottana', 'g-schielhau', 'g-krumphau', 'g-mutieren'],
   },
   {
     id: 'i-break-thrust',
@@ -420,7 +420,7 @@ export const italian_longsword = [
     type: 'parry',
     tags: ['Zogho Stretto'],
     phase: 'reaction',
-    follows: ['i-fendente', 'i-sottano', 'i-colpo-di-villano', 'i-ligadura-sottana', 'i-colpo-di-mezz', 'g-oberhau', 'g-unterhau', 'g-zornhau', 'g-nachreisen', 'g-abnehmen'],
+    follows: ['i-fendente', 'i-sottano', 'i-colpo-di-villano', 'i-ligadura-sottana', 'i-colpo-di-mezz', 'g-oberhau', 'g-unterhau', 'g-zornhau', 'g-nachreisen'],
   },
   // ── Counter-Attack (creates bind) ──
   {
@@ -433,7 +433,7 @@ export const italian_longsword = [
     type: 'counter',
     tags: ['Zogho Stretto', 'Strong', 'Bind'],
     phase: 'reaction',
-    follows: ['i-fendente', 'i-sottano', 'i-mezzano', 'i-colpo-di-villano', 'i-rebattere', 'i-colpo-di-mezz', 'g-zornhau', 'g-oberhau', 'g-unterhau', 'g-zwerchhau', 'g-schielhau', 'g-scheitelhau', 'g-krumphau', 'g-nachreisen', 'g-abnehmen', 'g-zucken', 'g-mutieren', 'g-durchwechseln'],
+    follows: ['i-fendente', 'i-sottano', 'i-mezzano', 'i-colpo-di-villano', 'i-colpo-di-mezz', 'g-zornhau', 'g-oberhau', 'g-unterhau', 'g-zwerchhau', 'g-schielhau', 'g-scheitelhau', 'g-krumphau', 'g-nachreisen', 'g-mutieren'],
   },
   // ── Withdrawal / Reset (Italian) ──
   {
