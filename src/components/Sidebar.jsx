@@ -123,7 +123,7 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
               </div>
             </div>
           </div>
-          <div className="mt-3 flex items-center justify-between border-t border-dashed border-[var(--color-ink-faded)] pt-3">
+          <div className="mt-3 flex flex-col md:flex-row md:items-center justify-between border-t border-dashed border-[var(--color-ink-faded)] pt-3 gap-2">
              <span className="text-[10px] uppercase font-bold text-[var(--color-ink-black)] tracking-widest leading-none">{t('language')}:</span>
              <LanguageSelector />
           </div>
