@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { historicalCombos } from '../data/historicalCombos';
-import LanguageSelector from './LanguageSelector';
-
+import { historicalCombos } from '../data/historicalCombos';
 const STORAGE_KEY = 'hema-saved-combos';
 
 function getSavedCombos() {
@@ -123,9 +122,6 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
               </div>
             </div>
           </div>
-          <div className="mt-3 flex flex-col justify-start border-t border-dashed border-[var(--color-ink-faded)] pt-3 gap-2">
-             <span className="text-[10px] uppercase font-bold text-[var(--color-ink-black)] tracking-widest leading-none block">{t('language')}:</span>
-             <LanguageSelector />
           </div>
         </div>
 

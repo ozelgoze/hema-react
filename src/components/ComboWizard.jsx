@@ -1,12 +1,15 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { getMovesByPhase, getManuscriptKey, getMoveById } from '../data/hemaMoves';
+import LanguageSelector from './LanguageSelector';
 import { playClash, playWin, playLoss, setMuted, getMuted } from '../utils/audio';
 
 export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onClear }) {
   const { t } = useTranslation();
   const [selectedMove, setSelectedMove] = useState('');
   const [traditionFilter, setTraditionFilter] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAiMode, setIsAiMode] = useState(true);
   const [aiThinking, setAiThinking] = useState(false);
   const [isMutedLocal, setIsMutedLocal] = useState(getMuted());
@@ -271,9 +274,11 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
              </span>
           </div>
           <div className="flex items-center gap-2">
+            <LanguageSelector />
+            <div className="w-px h-6 bg-[var(--color-ink-faded)] mx-1"></div>
             <button
                onClick={handleToggleMute}
-               className={`text-lg px-2 py-1 rounded transition-all hover:bg-[var(--color-parchment)] ${isMutedLocal ? 'opacity-50 grayscale' : 'opacity-100'}`}
+               className={`text-lg px-2 flex items-center justify-center rounded transition-all hover:bg-[var(--color-parchment)] ${isMutedLocal ? 'opacity-50 grayscale' : 'opacity-100'}`}
                title={isMutedLocal ? "Sesi Aç" : "Sesi Kapat"}
             >
                {isMutedLocal ? '🔇' : '🔊'}
@@ -410,25 +415,34 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
                     <h3 className="text-[10px] uppercase font-display text-[var(--color-ink-red)] font-bold tracking-widest px-1">
                       {t('wizard_recommended')}
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                      {recommendedMoves.map((move) => (
-                        <button
-                          key={move.id}
-                          onClick={() => setSelectedMove(move.id)}
-                          className={`relative text-left p-3 border-[2px] transition-all duration-200 overflow-hidden group focus:outline-none
-                            ${selectedMove === move.id 
-                               ? 'bg-[var(--color-ink-black)] border-[var(--color-ink-black)] text-[var(--color-parchment-light)] shadow-[4px_4px_0_0_var(--color-ink-red)] -translate-y-1' 
-                               : 'bg-[var(--color-parchment)] border-[var(--color-ink-black)] text-[var(--color-ink-black)] shadow-[4px_4px_0_0_var(--color-ink-black)] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_var(--color-ink-black)]'
-                            }
-                          `}
-                        >
-                          <div className={`absolute top-0 right-0 w-6 h-6 border-l-[2px] border-b-[2px] ${selectedMove === move.id ? 'border-[var(--color-parchment-light)] bg-[var(--color-ink-red)]' : 'border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)]'} flex items-center justify-center`}>
-                             {selectedMove === move.id && <span className="text-white text-[10px]">✓</span>}
-                          </div>
-                          
-                          <h4 className="font-display font-bold text-sm tracking-wide block mb-1">
-                            {t(move.nameKey)}
-                          </h4>
+                    <div className="grid grid-cols-1 gap-3">
+                      {recommendedMoves.map((move, index) => {
+                        const isTopAiPick = index === 0 && isAiMode;
+                        return (
+                          <button
+                            key={move.id}
+                            onClick={() => setSelectedMove(move.id)}
+                            className={`relative text-left p-3 md:p-4 border-[2px] transition-all duration-200 overflow-hidden group focus:outline-none
+                              ${selectedMove === move.id 
+                                 ? (isTopAiPick ? 'bg-[var(--color-ink-black)] border-[var(--color-gold)] text-[var(--color-parchment-light)] shadow-[4px_4px_0_0_var(--color-gold)] -translate-y-1' : 'bg-[var(--color-ink-black)] border-[var(--color-ink-black)] text-[var(--color-parchment-light)] shadow-[4px_4px_0_0_var(--color-ink-red)] -translate-y-1')
+                                 : (isTopAiPick ? 'bg-[var(--color-parchment-light)] border-[var(--color-gold)] text-[var(--color-ink-black)] shadow-[4px_4px_0_0_var(--color-gold)] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_var(--color-gold)]' : 'bg-[var(--color-parchment)] border-[var(--color-ink-black)] text-[var(--color-ink-black)] shadow-[4px_4px_0_0_var(--color-ink-black)] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_var(--color-ink-black)]')
+                              }
+                            `}
+                          >
+                            {isTopAiPick && (
+                              <div className="absolute top-0 right-0 px-2 py-1 bg-[var(--color-gold)] border-l-[2px] border-b-[2px] border-[var(--color-ink-black)] flex items-center justify-center">
+                                 <span className="text-[var(--color-ink-black)] text-[8px] font-bold uppercase tracking-widest">🛡️ AI Suggestion</span>
+                              </div>
+                            )}
+                            {!isTopAiPick && (
+                              <div className={`absolute top-0 right-0 w-6 h-6 border-l-[2px] border-b-[2px] ${selectedMove === move.id ? 'border-[var(--color-parchment-light)] bg-[var(--color-ink-red)]' : 'border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)]'} flex items-center justify-center`}>
+                                 {selectedMove === move.id && <span className="text-white text-[10px]">✓</span>}
+                              </div>
+                            )}
+                            
+                            <h4 className={`font-display font-bold ${isTopAiPick ? 'text-lg text-[var(--color-ink-red)]' : 'text-sm'} tracking-wide block mb-1 mt-1`}>
+                              {t(move.nameKey)}
+                            </h4>
                           <span className={`text-[9px] uppercase tracking-widest font-bold opacity-80 block ${selectedMove === move.id ? 'text-[var(--color-parchment-light)]' : 'text-[var(--color-ink-faded)]'}`}>
                             {move.master}
                           </span>
@@ -455,7 +469,8 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
                              </div>
                           )}
                         </button>
-                      ))}
+                        );
+                      })}
                     </div>
                   </>
                 ) : (
@@ -464,24 +479,69 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
                   </div>
                 )}
                 
-                {/* Fallback Selection for Other Moves */}
+                {/* Fallback Selection for Other Moves (Searchable) */}
                 {otherMoves.length > 0 && (
-                   <div className="mt-4">
+                   <div className="mt-4 relative">
                      <h3 className="text-[10px] uppercase font-display text-[var(--color-ink-faded)] font-bold tracking-widest px-1 mb-2">
                         {t('wizard_other')}
                      </h3>
-                     <select
-                       value={otherMoves.some(m => m.id === selectedMove) ? selectedMove : ''}
-                       onChange={(e) => setSelectedMove(e.target.value)}
-                       className="w-full bg-[var(--color-parchment-light)] px-3 py-2 border-[2px] border-[var(--color-ink-black)] rounded-none text-xs font-body text-[var(--color-ink-black)] focus:outline-none focus:border-[var(--color-ink-red)] transition-all"
-                     >
-                       <option value="" disabled className="italic">{t('wizard_select')}</option>
-                       {otherMoves.map((move) => (
-                         <option key={move.id} value={move.id}>
-                           {t(move.nameKey)} — {move.master} [{move.tags?.join(', ')}]
-                         </option>
-                       ))}
-                     </select>
+                     
+                     <div className="relative">
+                       <input
+                          type="text"
+                          placeholder={t('wizard_select') + " [Search...]"}
+                          value={searchTerm}
+                          onChange={(e) => {
+                             setSearchTerm(e.target.value);
+                             setIsSearchOpen(true);
+                          }}
+                          onFocus={() => setIsSearchOpen(true)}
+                          className="w-full bg-[var(--color-parchment-light)] px-3 py-3 md:py-2 border-[2px] border-[var(--color-ink-black)] rounded-none text-xs font-body text-[var(--color-ink-black)] focus:outline-none focus:border-[var(--color-ink-red)] transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)]"
+                       />
+                       {searchTerm && (
+                          <button 
+                            onClick={() => { setSearchTerm(''); setIsSearchOpen(false); setSelectedMove(''); }}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-ink-faded)] hover:text-[var(--color-ink-red)]"
+                          >
+                             ✕
+                          </button>
+                       )}
+                     </div>
+
+                     {isSearchOpen && (
+                       <div className="absolute top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto bg-[var(--color-parchment-light)] border-[2px] border-[var(--color-ink-black)] shadow-[4px_4px_0_0_var(--color-ink-black)] z-[100] scrollbar-thin">
+                         {otherMoves
+                           .filter(move => {
+                             if(!searchTerm) return true;
+                             const search = searchTerm.toLowerCase();
+                             const moveName = t(move.nameKey).toLowerCase();
+                             const tags = move.tags?.join(' ').toLowerCase() || '';
+                             return moveName.includes(search) || tags.includes(search);
+                           })
+                           .map((move) => (
+                             <button
+                               key={move.id}
+                               onClick={() => {
+                                 setSelectedMove(move.id);
+                                 setSearchTerm(t(move.nameKey));
+                                 setIsSearchOpen(false);
+                               }}
+                               className={`w-full text-left px-3 py-3 border-b border-dashed border-[var(--color-ink-faded)] last:border-b-0 text-xs font-body hover:bg-[var(--color-ink-black)] hover:text-[var(--color-parchment-light)] transition-colors ${selectedMove === move.id ? 'bg-[var(--color-ink-red)] text-white' : 'text-[var(--color-ink-black)]'}`}
+                             >
+                               <span className="font-bold">{t(move.nameKey)}</span> <span className="opacity-70 text-[10px]"> — {move.master} [{move.tags?.join(', ')}]</span>
+                             </button>
+                           ))}
+                           {otherMoves.filter(move => {
+                             if(!searchTerm) return true;
+                             const search = searchTerm.toLowerCase();
+                             const moveName = t(move.nameKey).toLowerCase();
+                             const tags = move.tags?.join(' ').toLowerCase() || '';
+                             return moveName.includes(search) || tags.includes(search);
+                           }).length === 0 && (
+                             <div className="px-3 py-3 text-xs italic text-[var(--color-ink-faded)] text-center">Sonuç bulunamadı.</div>
+                           )}
+                       </div>
+                     )}
                    </div>
                 )}
               </div>

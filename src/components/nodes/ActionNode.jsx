@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { getManuscriptKey } from '../../data/hemaMoves';
@@ -36,6 +36,7 @@ const roleConfig = {
 
 function ActionNode({ data }) {
   const { t } = useTranslation();
+  const [isExpanded, setIsExpanded] = useState(false);
   const role = data.nodeRole || 'user-action';
   const config = roleConfig[role];
 
@@ -110,12 +111,29 @@ function ActionNode({ data }) {
         ))}
       </div>
 
-      {/* Manuscript Note */}
+      {/* Manuscript Note Toggle */}
       {data.moveId && getManuscriptKey(data.moveId) && (
-        <div className="border-t-[2px] border-dashed border-[var(--color-ink-faded)] p-4 bg-[var(--color-parchment-dark)] rounded-b-sm">
-          <p className="font-body italic text-base text-[var(--color-ink-black)] leading-relaxed">
-            "{t(getManuscriptKey(data.moveId))}"
-          </p>
+        <div className="border-t-[2px] border-dashed border-[var(--color-ink-faded)] bg-[var(--color-parchment-dark)] rounded-b-sm">
+          {!isExpanded ? (
+            <button 
+              onClick={() => setIsExpanded(true)}
+              className="w-full py-2 text-[10px] uppercase tracking-widest font-bold text-[var(--color-ink-faded)] hover:text-[var(--color-ink-black)] flex justify-center items-center gap-1 transition-colors outline-none focus:outline-none"
+            >
+              <span>{t('tactics_note') || 'Daha Fazla'}</span> <span>▼</span>
+            </button>
+          ) : (
+            <div className="p-4 animate-fade-in relative">
+              <button 
+                onClick={() => setIsExpanded(false)}
+                className="absolute top-1 max-w-[20px] right-2 text-[var(--color-ink-faded)] hover:text-[var(--color-ink-black)] font-bold text-xs"
+              >
+                ▲
+              </button>
+              <p className="font-body italic text-xs text-[var(--color-ink-black)] leading-relaxed mt-2 md:text-[13px]">
+                "{t(getManuscriptKey(data.moveId))}"
+              </p>
+            </div>
+          )}
         </div>
       )}
 
