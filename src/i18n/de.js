@@ -37,6 +37,14 @@ export default {
   wizard_recommended: '⭐ Empfohlen',
   wizard_other: 'Andere Optionen',
   wizard_tradition: 'Tradition',
+  duel_control: 'DUELL-KONTROLLE',
+  you: 'SIE',
+  warning: 'Warnung',
+  observation: 'Beobachtung',
+  master_notes: 'Notizen des Meisters',
+  combat_start: 'START: KAMPF BEGINNT',
+  your_turn: 'SIE SIND DRAN',
+  no_recommended_moves: 'Keine strategischen Züge empfohlen. Verwenden Sie Andere Optionen.',
 
   // ── AI Duel Mode & Outcomes ──
   toggle_ai: '⚔️ VS KI-Modus',

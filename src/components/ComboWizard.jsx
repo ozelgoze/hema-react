@@ -264,7 +264,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
           <div className="flex items-center gap-2">
              <h2 className="text-lg font-display text-[var(--color-ink-red)] flex items-center gap-2">
                <span className="text-xl filter grayscale drop-shadow-md">⚔️</span>
-               DÜELLO KONTROLÜ
+               {t('duel_control')}
              </h2>
              <span className="md:hidden text-[var(--color-ink-faded)] text-xs ml-1 flex">
                 {isExpanded ? '▼' : '▲'}
@@ -295,7 +295,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
         {!isComplete && (
             <div className="px-5 py-2 flex justify-center items-center gap-6 bg-[var(--color-parchment)] border-b-[2px] border-[var(--color-ink-black)]">
                <div className="flex items-center gap-2">
-                 <span className="text-[10px] uppercase font-bold text-[var(--color-ink-black)] tracking-widest leading-none">SİZ</span>
+                 <span className="text-[10px] uppercase font-bold text-[var(--color-ink-black)] tracking-widest leading-none">{t('you')}</span>
                  <div className="w-3 h-3 bg-[var(--color-ink-black)] rounded-full"></div>
                </div>
                <div className="text-xs font-display text-[var(--color-ink-red)] italic opacity-60">vs</div>
@@ -315,7 +315,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
                'bg-[var(--color-parchment-dark)] text-[var(--color-ink-black)] border-[var(--color-ink-black)]'
            }`}>
               <div className="text-[9px] uppercase font-bold tracking-widest opacity-80 mb-1 flex items-center gap-1">
-                 {liveFeedback.type === 'bad' || liveFeedback.type === 'warning' ? '⚠️ Uyarısı' : '📜 Gözlem'} — {liveFeedback.master}
+                 {liveFeedback.type === 'bad' || liveFeedback.type === 'warning' ? '⚠️ ' + t('warning') : '📜 ' + t('observation')} — {liveFeedback.master}
               </div>
               <p className="text-xs font-body font-medium italic leading-snug">
                  {liveFeedback.text}
@@ -345,7 +345,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
               {isOpponentWin && lastNode?.descKey && (
                 <div className="bg-[var(--color-parchment-dark)] border-2 border-[var(--color-ink-black)] p-4 text-left shadow-[4px_4px_0_0_var(--color-ink-black)] mb-6 relative">
                   <div className="text-[11px] text-[var(--color-ink-red)] uppercase font-bold tracking-widest mb-2 flex items-center gap-2">
-                    Ustadan Notlar 📜
+                    {t('master_notes')} 📜
                   </div>
                   <p className="text-sm font-body text-[var(--color-ink-black)] leading-relaxed italic">
                     "{t(lastNode.descKey)}"
@@ -366,7 +366,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
                   {t('wizard_undo')}
                 </button>
                 <button onClick={onClear} className="px-5 py-2 panel-ink-red rounded-none text-xs font-bold uppercase tracking-wider">
-                  YENİDEN BAŞLA
+                  {t('wizard_clear')}
                 </button>
               </div>
             </div>
@@ -382,7 +382,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
               {/* Turn Information */}
               <div className="text-center mb-6">
                 <p className="text-xs text-[var(--color-ink-red)] uppercase tracking-widest font-bold font-display mt-1">
-                   {currentPhase === 'starter' ? "BAŞLANGIÇ: MÜSABAKA BAŞLIYOR" : "HAMLE SİZDE"}
+                   {currentPhase === 'starter' ? t('combat_start') : t('your_turn')}
                 </p>
               </div>
 
@@ -460,7 +460,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
                   </>
                 ) : (
                   <div className="p-4 border border-dashed border-[var(--color-ink-faded)] text-center text-sm italic text-[var(--color-ink-faded)]">
-                    No strategic moves recommended in this context. Use Other Options.
+                    {t('no_recommended_moves')}
                   </div>
                 )}
                 
@@ -475,7 +475,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
                        onChange={(e) => setSelectedMove(e.target.value)}
                        className="w-full bg-[var(--color-parchment-light)] px-3 py-2 border-[2px] border-[var(--color-ink-black)] rounded-none text-xs font-body text-[var(--color-ink-black)] focus:outline-none focus:border-[var(--color-ink-red)] transition-all"
                      >
-                       <option value="" disabled className="italic">Geleneksel Listeden Seç...</option>
+                       <option value="" disabled className="italic">{t('wizard_select')}</option>
                        {otherMoves.map((move) => (
                          <option key={move.id} value={move.id}>
                            {t(move.nameKey)} — {move.master} [{move.tags?.join(', ')}]

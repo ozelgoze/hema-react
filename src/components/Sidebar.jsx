@@ -148,11 +148,11 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
               {/* Save Section */}
               <div className="mb-6 bg-[var(--color-parchment-light)] border-[2px] border-[var(--color-ink-black)] p-4 shadow-[4px_4px_0_0_var(--color-ink-black)]">
                 <h3 className="text-[11px] text-[var(--color-ink-red)] uppercase font-bold tracking-widest mb-3 font-display">
-                  {t('save_current_combo')}
+                  {t('save_combo')}
                 </h3>
                 <input
                   type="text"
-                  placeholder={t('combo_name_placeholder')}
+                  placeholder={t('save_combo_placeholder')}
                   value={comboName}
                   onChange={(e) => setComboName(e.target.value)}
                   className="w-full bg-[var(--color-parchment)] border-[2px] border-[var(--color-ink-black)] px-3 py-2 text-sm text-[var(--color-ink-black)] font-body font-bold mb-3 focus:outline-none focus:border-[var(--color-ink-red)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] placeholder:text-[var(--color-ink-faded)] placeholder:italic"

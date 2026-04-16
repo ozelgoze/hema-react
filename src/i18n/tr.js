@@ -35,6 +35,14 @@ export default {
   wizard_recommended: '⭐ Önerilenler',
   wizard_other: 'Diğer Seçenekler',
   wizard_tradition: 'Gelenek',
+  duel_control: 'DÜELLO KONTROLÜ',
+  you: 'SİZ',
+  warning: 'Uyarısı',
+  observation: 'Gözlem',
+  master_notes: 'Ustadan Notlar',
+  combat_start: 'BAŞLANGIÇ: MÜSABAKA BAŞLIYOR',
+  your_turn: 'HAMLE SİZDE',
+  no_recommended_moves: 'Bağlam dahilinde önerilen stratejik hamle yok. Diğer Seçenekleri kullanın.',
   
   // ── AI Duel Mode & Outcomes ──
   toggle_ai: '⚔️ Düello Modu',

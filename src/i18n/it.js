@@ -37,6 +37,14 @@ export default {
   wizard_recommended: '⭐ Consigliato',
   wizard_other: 'Altre Opzioni',
   wizard_tradition: "Tradizione",
+  duel_control: 'CONTROLLO DUELLO',
+  you: 'TU',
+  warning: 'Avvertimento',
+  observation: 'Osservazione',
+  master_notes: 'Note del Maestro',
+  combat_start: 'INIZIO: L\'INCONTRO INIZIA',
+  your_turn: 'TUO TURNO',
+  no_recommended_moves: 'Nessuna mossa strategica raccomandata. Usa Altre Opzioni.',
 
   // ── AI Duel Mode & Outcomes ──
   toggle_ai: '⚔️ Modalità VS IA',
