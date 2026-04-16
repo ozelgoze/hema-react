@@ -59,8 +59,16 @@ function ActionNode({ data }) {
         relative min-w-[300px] w-[340px]
         ${config.class}
         panel-interactive
+        transition-all duration-300
+        ${data.isActive ? 'ring-4 ring-[var(--color-gold)] shadow-[0_0_20px_var(--color-gold)] scale-[1.02]' : 'opacity-80 hover:opacity-100'}
       `}
     >
+      {/* Active Indicator Pin */}
+      {data.isActive && (
+        <div className="absolute -top-3 -right-3 z-20 animate-bounce">
+          <span className="text-2xl drop-shadow-md">👇</span>
+        </div>
+      )}
       {/* Target handle (top) */}
       {data.step > 1 && (
         <Handle

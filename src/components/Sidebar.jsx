@@ -1,31 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { historicalCombos } from '../data/historicalCombos';
-import { historicalCombos } from '../data/historicalCombos';
-const STORAGE_KEY = 'hema-saved-combos';
-
-function getSavedCombos() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveCombosToStorage(combos) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(combos));
-}
+import { storageService } from '../services/storageService';
 
 export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('my-combos');
-  const [savedCombos, setSavedCombos] = useState(getSavedCombos);
+  const [savedCombos, setSavedCombos] = useState([]);
   const [comboName, setComboName] = useState('');
   const [toast, setToast] = useState(null);
   const [isOpen, setIsOpen] = useState(false); // Mobile drawer state
   const [expandedTacticsId, setExpandedTacticsId] = useState(null);
   const [isSaveExpanded, setIsSaveExpanded] = useState(false);
+
+  useEffect(() => {
+    storageService.getCombos().then(combos => {
+      setSavedCombos(combos || []);
+    });
+  }, []);
 
   useEffect(() => {
     if (toast) {
@@ -43,13 +35,15 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
       name: comboName.trim(),
       nodes: currentNodes,
       edges: currentEdges,
-      createdAt: new Date().toISOString(),
+      date: new Date().toISOString()
     };
-    const updated = [...savedCombos, combo];
-    setSavedCombos(updated);
-    saveCombosToStorage(updated);
-    setComboName('');
-    showToast(t('combo_saved'));
+    
+    storageService.saveCombo(combo).then(() => {
+      setSavedCombos([...savedCombos, combo]);
+      setComboName('');
+      setIsSaveExpanded(false);
+      showToast(t('toast_combo_saved')?.replace('{name}', combo.name) || `${combo.name} kaydedildi!`);
+    });
   };
 
   const handleLoad = (combo) => {
@@ -58,11 +52,12 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
     setIsOpen(false);
   };
 
-  const handleDelete = (id) => {
-    const updated = savedCombos.filter((c) => c.id !== id);
-    setSavedCombos(updated);
-    saveCombosToStorage(updated);
-    showToast(t('combo_deleted'));
+  const handleDelete = (id, e) => {
+    e.stopPropagation();
+    storageService.deleteCombo(id).then(() => {
+      setSavedCombos(savedCombos.filter(c => c.id !== id));
+      showToast(t('toast_combo_deleted') || 'Kombo silindi!');
+    });
   };
 
   const handleLoadHistorical = (combo) => {

@@ -20,7 +20,7 @@ import ChronicleLog from './ChronicleLog';
 const nodeTypes = { actionNode: ActionNode };
 const edgeTypes = { inkEdge: InkEdge };
 
-function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onUndo, onRewindToStep, onClear, currentStep }) {
+function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onUndo, onClear, currentStep, activeNodeId, setActiveNodeId }) {
   const handleDownloadImage = useCallback(() => {
     const flowElement = document.querySelector('.react-flow');
     if (!flowElement) return;
@@ -62,6 +62,7 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
           animated: false,
         }}
         colorMode="light"
+        onNodeClick={(_, node) => setActiveNodeId(node.id)}
       >
         <Background
           variant={BackgroundVariant.Dots}
@@ -91,7 +92,6 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
         nodes={nodes}
         onAddNode={onAddNode}
         onUndo={onUndo}
-        onRewindToStep={onRewindToStep}
         onClear={onClear}
       />
 
@@ -111,7 +111,9 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
 export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange }) {
   const [nodes, setNodes, onNodesChange] = useNodesState(externalNodes || []);
   const [edges, setEdges, onEdgesChange] = useEdgesState(externalEdges || []);
-  const [currentStep, setCurrentStep] = useState(externalNodes?.length || 0);
+  const [activeNodeId, setActiveNodeId] = useState(
+    externalNodes && externalNodes.length > 0 ? externalNodes[externalNodes.length - 1].id : null
+  );
 
   // Sync when external data loads (e.g. from sidebar)
   const lastExternalRef = useRef(null);
@@ -121,31 +123,54 @@ export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange 
     setTimeout(() => {
       setNodes(externalNodes);
       setEdges(externalEdges || []);
-      setCurrentStep(externalNodes.length);
+      if (externalNodes.length > 0) {
+        setActiveNodeId(externalNodes[externalNodes.length - 1].id);
+      } else {
+        setActiveNodeId(null);
+      }
     }, 0);
   }
+
+  const activeNode = nodes.find(n => n.id === activeNodeId);
+  const currentStep = activeNode ? (activeNode.data?.step || 0) : 0;
 
   const handleAddNode = useCallback(
     (moveData) => {
       const newNodeId = `node-${Date.now()}`;
-      const yPos = currentStep * 170;
+      
+      let parentNode = nodes.find(n => n.id === activeNodeId);
+      if (!parentNode && nodes.length > 0) {
+        parentNode = nodes[nodes.length - 1]; // fallback to last
+      }
+
+      const step = parentNode ? (parentNode.data?.step || 0) + 1 : 1;
+      const yPos = step * 170;
+      
+      let xPos = 250;
+      if (parentNode) {
+        const siblings = nodes.filter(n => n.data?.parentId === parentNode.id);
+        const numSiblings = siblings.length;
+        const offset = Math.ceil(numSiblings / 2) * (numSiblings % 2 !== 0 ? 360 : -360);
+        xPos = parentNode.position.x + offset;
+      }
 
       const newNode = {
         id: newNodeId,
         type: 'actionNode',
-        position: { x: 250, y: yPos },
-        data: moveData,
+        position: { x: xPos, y: yPos },
+        data: { ...moveData, parentId: parentNode?.id || null, step, isActive: true },
       };
 
-      const newNodes = [...nodes, newNode];
+      // Reset isActive on old nodes
+      const baseNodes = nodes.map(n => ({ ...n, data: { ...n.data, isActive: false }}));
+      const newNodes = [...baseNodes, newNode];
       const newEdges = [...edges];
 
       // Connect to previous node
-      if (nodes.length > 0) {
-        const prevNode = nodes[nodes.length - 1];
+      if (parentNode) {
         newEdges.push({
-          id: `edge-${prevNode.id}-${newNodeId}`,
-          source: prevNode.id,
+          id: `edge-${parentNode.id}-${newNodeId}`,
+          source: parentNode.id,
           target: newNodeId,
           animated: true,
           style: {
@@ -165,40 +190,55 @@ export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange 
 
       setNodes(newNodes);
       setEdges(newEdges);
-      setCurrentStep((s) => s + 1);
+      setActiveNodeId(newNodeId);
 
       if (onFlowChange) {
         onFlowChange(newNodes, newEdges);
       }
     },
-    [nodes, edges, currentStep, setNodes, setEdges, onFlowChange],
+    [nodes, edges, activeNodeId, setNodes, setEdges, onFlowChange],
   );
 
   const handleUndo = useCallback(() => {
-    if (nodes.length === 0) return;
-    const newNodes = nodes.slice(0, -1);
-    const newEdges = edges.slice(0, -1);
-    setNodes(newNodes);
-    setEdges(newEdges);
-    setCurrentStep((s) => Math.max(0, s - 1));
-    if (onFlowChange) onFlowChange(newNodes, newEdges);
-  }, [nodes, edges, setNodes, setEdges, onFlowChange]);
+    if (!activeNodeId) return;
 
-  const handleRewindToStep = useCallback((stepIndex) => {
-    if (nodes.length === 0 || stepIndex >= nodes.length) return;
-    const newNodes = nodes.slice(0, stepIndex);
-    const edgesToKeep = stepIndex - 1 > 0 ? stepIndex - 1 : 0;
-    const newEdges = edges.slice(0, edgesToKeep);
+    // Prune the active node and all its descendants
+    const getDescendants = (nodeId, allNodes) => {
+      const children = allNodes.filter(n => n.data?.parentId === nodeId).map(n => n.id);
+      let desc = [...children];
+      children.forEach(childId => {
+        desc = [...desc, ...getDescendants(childId, allNodes)];
+      });
+      return desc;
+    };
+
+    const toDeleteIds = [activeNodeId, ...getDescendants(activeNodeId, nodes)];
+    
+    // Clear isActive flag generally
+    const newNodes = nodes
+      .filter(n => !toDeleteIds.includes(n.id))
+      .map(n => ({ ...n, data: { ...n.data, isActive: false }}));
+      
+    const newEdges = edges.filter(e => !toDeleteIds.includes(e.source) && !toDeleteIds.includes(e.target));
+    
     setNodes(newNodes);
     setEdges(newEdges);
-    setCurrentStep(stepIndex);
+    
+    if (newNodes.length > 0) {
+      const lastLeft = newNodes[newNodes.length - 1];
+      lastLeft.data.isActive = true;
+      setActiveNodeId(lastLeft.id);
+    } else {
+      setActiveNodeId(null);
+    }
+
     if (onFlowChange) onFlowChange(newNodes, newEdges);
-  }, [nodes, edges, setNodes, setEdges, onFlowChange]);
+  }, [activeNodeId, nodes, edges, setNodes, setEdges, onFlowChange]);
 
   const handleClear = useCallback(() => {
     setNodes([]);
     setEdges([]);
-    setCurrentStep(0);
+    setActiveNodeId(null);
     if (onFlowChange) onFlowChange([], []);
   }, [setNodes, setEdges, onFlowChange]);
 
@@ -211,9 +251,10 @@ export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange 
         onEdgesChange={onEdgesChange}
         onAddNode={handleAddNode}
         onUndo={handleUndo}
-        onRewindToStep={handleRewindToStep}
         onClear={handleClear}
         currentStep={currentStep}
+        activeNodeId={activeNodeId}
+        setActiveNodeId={setActiveNodeId}
       />
     </ReactFlowProvider>
   );
