@@ -22,7 +22,6 @@ function AppContent() {
 
   return (
     <div className="flex h-full w-full overflow-hidden absolute inset-0">
-      <LanguageSelector />
       <Sidebar
         currentNodes={flowNodes}
         currentEdges={flowEdges}

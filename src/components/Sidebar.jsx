@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { historicalCombos } from '../data/historicalCombos';
+import LanguageSelector from './LanguageSelector';
 
 const STORAGE_KEY = 'hema-saved-combos';
 
@@ -108,16 +109,22 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
 
         {/* Header */}
         <div className="p-5 border-b-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)]">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-4xl filter grayscale opacity-90 drop-shadow-md">📖</span>
-            <div>
-              <h1 className="text-lg font-bold text-[var(--color-ink-red)] leading-tight font-display drop-cap">
-                {t('app_title')}
-              </h1>
-              <p className="text-[11px] text-[var(--color-ink-black)] uppercase tracking-widest font-bold mt-1">
-                {t('app_subtitle')}
-              </p>
+          <div className="flex items-start justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <span className="text-4xl filter grayscale opacity-90 drop-shadow-md">📖</span>
+              <div>
+                <h1 className="text-lg font-bold text-[var(--color-ink-red)] leading-tight font-display drop-cap">
+                  {t('app_title')}
+                </h1>
+                <p className="text-[11px] text-[var(--color-ink-black)] uppercase tracking-widest font-bold mt-1">
+                  {t('app_subtitle')}
+                </p>
+              </div>
             </div>
+          </div>
+          <div className="mt-4 flex items-center justify-between border-t border-dashed border-[var(--color-ink-faded)] pt-3">
+             <span className="text-[10px] uppercase font-bold text-[var(--color-ink-black)] tracking-widest leading-none">{t('language')}:</span>
+             <LanguageSelector />
           </div>
         </div>
 
@@ -220,7 +227,7 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex-1">
                         <div className="text-[10px] text-[var(--color-ink-red)] font-bold uppercase mb-1 font-display">
-                          Usta: {combo.master} ({t('tradition_' + combo.tradition) || combo.tradition})
+                          {t('master_label')}: {combo.master} ({t('tradition_' + combo.tradition) || combo.tradition})
                         </div>
                         <h4 className="font-bold text-[var(--color-ink-black)] text-base font-display">
                           {t(combo.nameKey)}
@@ -235,11 +242,11 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
                     {expandedTacticsId === combo.id && (
                       <div className="mb-4 animate-fade-in border-t border-dashed border-[var(--color-ink-faded)] pt-3 pb-2 flex flex-col gap-3">
                          <div className="bg-[var(--color-parchment-dark)] p-3 border-l-2 border-[var(--color-ink-black)] shadow-[inset_0_0_10px_rgba(42,37,34,0.05)]">
-                           <h5 className="font-display font-bold text-[10px] uppercase text-[var(--color-ink-black)] mb-2 flex items-center gap-1">📜 Tarihi Analiz:</h5>
+                           <h5 className="font-display font-bold text-[10px] uppercase text-[var(--color-ink-black)] mb-2 flex items-center gap-1">📜 {t('historical_analysis')}</h5>
                            <p className="text-[12px] leading-relaxed text-justify font-body text-[var(--color-ink-black)]">{t(combo.historicalMetaKey)}</p>
                          </div>
                          <div className="bg-[var(--color-ink-black)] p-3 border-l-2 border-[var(--color-ink-red)] shadow-[2px_2px_0px_0px_var(--color-ink-red)]">
-                           <h5 className="font-display font-bold text-[10px] uppercase text-[var(--color-gold)] mb-2 flex items-center gap-1">⚔️ Modern Turnuva (Swordfish) Notu:</h5>
+                           <h5 className="font-display font-bold text-[10px] uppercase text-[var(--color-gold)] mb-2 flex items-center gap-1">⚔️ {t('modern_notes')}</h5>
                            <p className="text-[12px] leading-relaxed text-justify font-body text-[var(--color-parchment-light)] opacity-90">{t(combo.swordfishMetaKey)}</p>
                          </div>
                       </div>
@@ -256,7 +263,7 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
                          onClick={() => setExpandedTacticsId(expandedTacticsId === combo.id ? null : combo.id)}
                          className={`px-3 py-2 border-[2px] transition-colors font-display font-bold text-[10px] uppercase ${expandedTacticsId === combo.id ? 'bg-[var(--color-ink-red)] text-white border-[var(--color-ink-red)] shadow-none' : 'bg-transparent text-[var(--color-ink-red)] border-[var(--color-ink-red)] hover:bg-[var(--color-ink-red)] hover:text-white'}`}
                        >
-                         Taktik Notu
+                         {t('tactics_note')}
                        </button>
                     </div>
                   </div>
