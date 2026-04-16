@@ -140,14 +140,6 @@ export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange 
     }, 0);
   }
 
-  // Inject initial SelectorNode if canvas is completely empty
-  useEffect(() => {
-    if (nodes.length === 0) {
-      setTimeout(() => {
-        handleAddNode({ isSelector: true, nodeRole: 'user-action' });
-      }, 50);
-    }
-  }, [nodes.length]);
 
   const activeNode = nodes.find(n => n.id === activeNodeId);
   const currentStep = activeNode ? (activeNode.data?.step || 0) : 0;
@@ -224,6 +216,16 @@ export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange 
     },
     [nodes, edges, activeNodeId, setNodes, setEdges, onFlowChange],
   );
+
+  // Inject initial SelectorNode if canvas is completely empty
+  useEffect(() => {
+    if (nodes.length === 0) {
+      const timer = setTimeout(() => {
+        handleAddNode({ isSelector: true, nodeRole: 'user-action' });
+      }, 50);
+      return () => clearTimeout(timer);
+    }
+  }, [nodes.length, handleAddNode]);
 
   const handleUndo = useCallback(() => {
     if (!activeNodeId) return;
