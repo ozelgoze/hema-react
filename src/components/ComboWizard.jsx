@@ -340,9 +340,11 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
                 {t('ai_thinking')}
               </p>
             </div>
-          ) : (
+          ) : null}
+        </div>
+
         {/* Sticky Actions Footer (Undo / Clear only) */}
-        {!aiThinking && nodes.length > 0 && (
+        {(!aiThinking && nodes.length > 0) && (
           <div className="flex gap-3 px-4 py-3 bg-[var(--color-parchment)] border-t-[2px] border-[var(--color-ink-black)]">
             <button onClick={onUndo} disabled={nodes.length === 0} className="px-3 py-3 md:py-3 bg-[var(--color-parchment-dark)] border-[2px] border-[var(--color-ink-black)] hover:bg-[var(--color-ink-black)] hover:text-[var(--color-parchment-light)] text-[var(--color-ink-black)] text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 shadow-[4px_4px_0_0_var(--color-ink-black)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none min-h-[44px] min-w-0 shrink-0 flex items-center justify-center gap-2">
               ↩️ <span className="hidden md:inline">{t('wizard_undo')}</span>

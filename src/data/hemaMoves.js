@@ -480,6 +480,7 @@ export const italian_longsword = [
 ];
 
 export const allMoves = [...german_longsword, ...italian_longsword];
+export const hemaMoves = allMoves;
 
 // ═══════════════════════════════════════════════════════════
 // Manuscript Source Notes
