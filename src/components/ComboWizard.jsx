@@ -22,6 +22,13 @@ const AI_PROFILES = {
       if (userTags.includes('Weak')) score += 12;
       if (aiTags.includes('Retreat') || aiTags.includes('Abzug')) score -= 10;
       if (move.type === 'counter') score += 5;
+      // Liechtenauer's Zettel: "Wer auf dich stürmt, Zucken ihm droht"
+      // Against chasers: meet force with force — Gegenhau directly into the charge
+      if (userTags.includes('Nachreisen')) {
+        if (aiTags.includes('Bind') || aiTags.includes('Strong')) score += 15;
+        if (move.id === 'g-gegenhau') score += 20; // Preferred: head-on counter-cut
+        if (aiTags.includes('Retreat') || aiTags.includes('Abzug')) score -= 15; // Never yield ground
+      }
       return score;
     },
   },
@@ -63,6 +70,14 @@ const AI_PROFILES = {
       if (move.type === 'counter') score += 6;
       if (aiTags.includes('Winden')) score += 8;
       score += Math.random() * 4;
+      // Meyer's Kunst des Fechtens: use the Zwerchhau angle against a rusher
+      // Catch them from the side as they charge in — technical, not brute force
+      if (userTags.includes('Nachreisen')) {
+        if (aiTags.includes('Meisterhau')) score += 18; // Zwerchhau-type angles
+        if (move.id === 'g-gegenhau') score += 12; // Still values counter-cuts
+        if (aiTags.includes('Bind')) score += 10; // Create a bind to control
+        // Meyer would retreat tactically if needed, unlike Liechtenauer
+      }
       return score;
     },
   },
