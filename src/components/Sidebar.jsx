@@ -26,6 +26,7 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
   const [toast, setToast] = useState(null);
   const [isOpen, setIsOpen] = useState(false); // Mobile drawer state
   const [expandedTacticsId, setExpandedTacticsId] = useState(null);
+  const [isSaveExpanded, setIsSaveExpanded] = useState(false);
 
   useEffect(() => {
     if (toast) {
@@ -108,40 +109,40 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
         )}
 
         {/* Header */}
-        <div className="p-5 border-b-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)]">
-          <div className="flex items-start justify-between mb-2">
+        <div className="px-4 py-5 border-b-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)]">
+          <div className="flex items-start justify-between mb-1">
             <div className="flex items-center gap-3">
               <span className="text-4xl filter grayscale opacity-90 drop-shadow-md">📖</span>
               <div>
-                <h1 className="text-lg font-bold text-[var(--color-ink-red)] leading-tight font-display drop-cap">
+                <h1 className="text-lg md:text-xl font-bold text-[var(--color-ink-red)] leading-tight font-display drop-cap">
                   {t('app_title')}
                 </h1>
-                <p className="text-[11px] text-[var(--color-ink-black)] uppercase tracking-widest font-bold mt-1">
+                <p className="hidden md:block text-[11px] text-[var(--color-ink-black)] uppercase tracking-widest font-bold mt-1">
                   {t('app_subtitle')}
                 </p>
               </div>
             </div>
           </div>
-          <div className="mt-4 flex items-center justify-between border-t border-dashed border-[var(--color-ink-faded)] pt-3">
+          <div className="mt-3 flex items-center justify-between border-t border-dashed border-[var(--color-ink-faded)] pt-3">
              <span className="text-[10px] uppercase font-bold text-[var(--color-ink-black)] tracking-widest leading-none">{t('language')}:</span>
              <LanguageSelector />
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)] p-1">
+        <div className="flex border-b-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)]">
           <button
             onClick={() => setActiveTab('my-combos')}
-            className={`flex-1 py-3 text-xs font-bold font-display uppercase tracking-wider transition-all
-              ${activeTab === 'my-combos' ? 'bg-[var(--color-parchment)] text-[var(--color-ink-red)] border-[2px] border-b-0 border-[var(--color-ink-black)]' : 'text-[var(--color-ink-faded)] hover:text-[var(--color-ink-black)] border-[2px] border-transparent'}
+            className={`flex-1 py-4 text-xs font-bold font-display uppercase tracking-widest transition-all
+              ${activeTab === 'my-combos' ? 'bg-[var(--color-parchment)] text-[var(--color-ink-red)] border-b-0 border-r-[2px] border-r-transparent shadow-[inset_0_-4px_0_0_var(--color-ink-red)]' : 'text-[var(--color-ink-black)] hover:bg-[var(--color-parchment)]/50 border-r-[2px] border-r-[var(--color-ink-black)] opacity-70'}
             `}
           >
             {t('tab_my_combos')}
           </button>
           <button
             onClick={() => setActiveTab('historical')}
-            className={`flex-1 py-3 text-xs font-bold font-display uppercase tracking-wider transition-all
-              ${activeTab === 'historical' ? 'bg-[var(--color-parchment)] text-[var(--color-ink-red)] border-[2px] border-b-0 border-[var(--color-ink-black)]' : 'text-[var(--color-ink-faded)] hover:text-[var(--color-ink-black)] border-[2px] border-transparent'}
+            className={`flex-1 py-4 text-xs font-bold font-display uppercase tracking-widest transition-all
+              ${activeTab === 'historical' ? 'bg-[var(--color-parchment)] text-[var(--color-ink-red)] border-b-0 border-l-[2px] border-l-transparent shadow-[inset_0_-4px_0_0_var(--color-ink-red)]' : 'text-[var(--color-ink-black)] hover:bg-[var(--color-parchment)]/50 border-l-[2px] border-l-[var(--color-ink-black)] opacity-70'}
             `}
           >
             {t('tab_historical')}
@@ -149,33 +150,43 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto scrollbar-thin p-4 bg-[var(--color-parchment)]">
+        <div className="flex-1 overflow-y-auto scrollbar-thin p-4 md:p-5 bg-[var(--color-parchment)]">
           {activeTab === 'my-combos' && (
-            <div className="animate-fade-in flex flex-col h-full">
-              {/* Save Section */}
-              <div className="mb-6 bg-[var(--color-parchment-light)] border-[2px] border-[var(--color-ink-black)] p-4 shadow-[4px_4px_0_0_var(--color-ink-black)]">
-                <h3 className="text-[11px] text-[var(--color-ink-red)] uppercase font-bold tracking-widest mb-3 font-display">
-                  {t('save_combo')}
-                </h3>
-                <input
-                  type="text"
-                  placeholder={t('save_combo_placeholder')}
-                  value={comboName}
-                  onChange={(e) => setComboName(e.target.value)}
-                  className="w-full bg-[var(--color-parchment)] border-[2px] border-[var(--color-ink-black)] px-3 py-2 text-sm text-[var(--color-ink-black)] font-body font-bold mb-3 focus:outline-none focus:border-[var(--color-ink-red)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.1)] placeholder:text-[var(--color-ink-faded)] placeholder:italic"
-                />
-                <button
-                  onClick={handleSave}
-                  disabled={!comboName.trim() || !currentNodes || currentNodes.length === 0}
-                  className="w-full py-2 bg-[var(--color-ink-black)] text-[var(--color-gold)] font-bold text-xs uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed border-2 border-transparent active:border-[var(--color-ink-black)] active:bg-[var(--color-parchment)] active:text-[var(--color-ink-black)] transition-all"
+            <div className="animate-fade-in flex flex-col h-full gap-5">
+              {/* Save Section Accordion */}
+              <div className="bg-[var(--color-parchment-light)] border-[2px] border-[var(--color-ink-black)] shadow-[4px_4px_0_0_var(--color-ink-black)]">
+                <button 
+                  onClick={() => setIsSaveExpanded(!isSaveExpanded)}
+                  className="w-full text-left px-4 py-4 flex justify-between items-center transition-colors hover:bg-[var(--color-parchment-dark)] focus:outline-none"
                 >
-                  {t('btn_save')}
+                  <h3 className="text-[11px] text-[var(--color-ink-red)] uppercase font-bold tracking-widest font-display flex items-center gap-2">
+                     <span className="text-xl leading-none -mt-1">🔖</span> {t('save_combo')}
+                  </h3>
+                  <span className="text-xs opacity-70 text-[var(--color-ink-red)] font-bold">{isSaveExpanded ? '▼' : '▶'}</span>
                 </button>
+                {isSaveExpanded && (
+                  <div className="px-4 pb-4 border-t-2 border-dashed border-[var(--color-ink-faded)] pt-3 animate-fade-in">
+                    <input
+                      type="text"
+                      placeholder={t('save_combo_placeholder')}
+                      value={comboName}
+                      onChange={(e) => setComboName(e.target.value)}
+                      className="w-full bg-[var(--color-parchment)] border-[2px] border-[var(--color-ink-black)] px-3 py-3 text-sm text-[var(--color-ink-black)] font-body font-bold mb-3 focus:outline-none focus:border-[var(--color-ink-red)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] placeholder:text-[var(--color-ink-faded)] placeholder:italic"
+                    />
+                    <button
+                      onClick={handleSave}
+                      disabled={!comboName.trim() || !currentNodes || currentNodes.length === 0}
+                      className="w-full py-3 bg-[var(--color-ink-black)] text-[var(--color-gold)] font-bold text-xs uppercase tracking-widest disabled:opacity-40 disabled:cursor-not-allowed border-[2px] border-transparent active:border-[var(--color-ink-black)] active:bg-[var(--color-parchment)] active:text-[var(--color-ink-black)] transition-all shadow-[inset_0_0_0_1px_var(--color-parchment-light)]"
+                    >
+                      {t('save_btn')}
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Saved List */}
               <div className="flex-1">
-                <h3 className="text-[10px] text-[var(--color-ink-faded)] uppercase font-bold tracking-widest mb-3 border-b border-dashed border-[var(--color-ink-faded)] pb-2 font-display">
+                <h3 className="text-[12px] text-[var(--color-ink-black)] uppercase font-bold tracking-widest mb-3 pb-2 font-display">
                   {t('saved_combos')}
                 </h3>
                 {savedCombos.length === 0 ? (
@@ -218,10 +229,10 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
 
           {activeTab === 'historical' && (
             <div className="animate-fade-in">
-              <h3 className="text-[10px] text-[var(--color-ink-faded)] uppercase font-bold tracking-widest mb-4 border-b border-dashed border-[var(--color-ink-faded)] pb-2 font-display">
+              <h3 className="text-[12px] text-[var(--color-ink-black)] uppercase font-bold tracking-widest mb-4 pb-2 font-display">
                 {t('historical_masters')}
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-5">
                 {historicalCombos.map((combo) => (
                   <div key={combo.id} className="bg-[var(--color-parchment-light)] border-[2px] border-[var(--color-ink-black)] p-4 shadow-[4px_4px_0_0_var(--color-ink-black)] group">
                     <div className="flex justify-between items-start mb-2">
@@ -255,13 +266,13 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
                     <div className="flex gap-2">
                        <button
                          onClick={() => handleLoadHistorical(combo)}
-                         className="flex-1 py-2 bg-[var(--color-parchment-dark)] text-[var(--color-ink-black)] border-[2px] border-[var(--color-ink-black)] font-bold text-[10px] uppercase tracking-widest hover:bg-[var(--color-ink-black)] hover:text-[var(--color-gold)] transition-colors shadow-[2px_2px_0_0_var(--color-ink-black)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none"
+                         className="flex-1 py-3 bg-[var(--color-ink-black)] text-[var(--color-parchment-light)] border-[2px] border-[var(--color-ink-black)] font-bold text-[10px] uppercase tracking-widest hover:text-[var(--color-gold)] transition-colors shadow-[2px_2px_0_0_var(--color-ink-red)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none"
                        >
                          {t('btn_load_historical')}
                        </button>
                        <button
                          onClick={() => setExpandedTacticsId(expandedTacticsId === combo.id ? null : combo.id)}
-                         className={`px-3 py-2 border-[2px] transition-colors font-display font-bold text-[10px] uppercase ${expandedTacticsId === combo.id ? 'bg-[var(--color-ink-red)] text-white border-[var(--color-ink-red)] shadow-none' : 'bg-transparent text-[var(--color-ink-red)] border-[var(--color-ink-red)] hover:bg-[var(--color-ink-red)] hover:text-white'}`}
+                         className={`px-3 py-3 border-[2px] transition-colors font-display font-bold text-[10px] uppercase min-w-[44px] flex items-center justify-center ${expandedTacticsId === combo.id ? 'bg-[var(--color-ink-red)] text-white border-[var(--color-ink-red)] shadow-none' : 'bg-[var(--color-parchment-light)] text-[var(--color-ink-red)] border-[var(--color-ink-red)] shadow-[2px_2px_0_0_var(--color-ink-red)] hover:bg-[var(--color-ink-red)] hover:text-white'}`}
                        >
                          {t('tactics_note')}
                        </button>
