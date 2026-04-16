@@ -20,7 +20,7 @@ import ChronicleLog from './ChronicleLog';
 const nodeTypes = { actionNode: ActionNode };
 const edgeTypes = { inkEdge: InkEdge };
 
-function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onUndo, onClear, currentStep, activeNodeId, setActiveNodeId }) {
+function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onUndo, onClear, currentStep, activeNodeId, setActiveNodeId, isMoveModalOpen, setIsMoveModalOpen }) {
   const handleDownloadImage = useCallback(() => {
     const flowElement = document.querySelector('.react-flow');
     if (!flowElement) return;
@@ -62,7 +62,12 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
           animated: false,
         }}
         colorMode="light"
-        onNodeClick={(_, node) => setActiveNodeId(node.id)}
+        onNodeClick={(_, node) => {
+          setActiveNodeId(node.id);
+          if (node.data?.isSelector) {
+            setIsMoveModalOpen(true);
+          }
+        }}
       >
         <Background
           variant={BackgroundVariant.Dots}
@@ -93,6 +98,9 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
         onAddNode={onAddNode}
         onUndo={onUndo}
         onClear={onClear}
+        isMoveModalOpen={isMoveModalOpen}
+        setIsMoveModalOpen={setIsMoveModalOpen}
+        activeNodeId={activeNodeId}
       />
 
       <ChronicleLog nodes={nodes} />
@@ -111,6 +119,7 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
 export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange }) {
   const [nodes, setNodes, onNodesChange] = useNodesState(externalNodes || []);
   const [edges, setEdges, onEdgesChange] = useEdgesState(externalEdges || []);
+  const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
   const [activeNodeId, setActiveNodeId] = useState(
     externalNodes && externalNodes.length > 0 ? externalNodes[externalNodes.length - 1].id : null
   );
@@ -131,11 +140,28 @@ export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange 
     }, 0);
   }
 
+  // Inject initial SelectorNode if canvas is completely empty
+  useEffect(() => {
+    if (nodes.length === 0) {
+      setTimeout(() => {
+        handleAddNode({ isSelector: true, nodeRole: 'user-action' });
+      }, 50);
+    }
+  }, [nodes.length]);
+
   const activeNode = nodes.find(n => n.id === activeNodeId);
   const currentStep = activeNode ? (activeNode.data?.step || 0) : 0;
 
   const handleAddNode = useCallback(
-    (moveData) => {
+    (moveData, isUpdate = false) => {
+      // If we are UPDATING an existing selector node (User picked a move)
+      if (isUpdate && activeNodeId) {
+        setNodes(ns => ns.map(n => n.id === activeNodeId ? { ...n, data: { ...n.data, ...moveData, isSelector: false } } : n));
+        if (onFlowChange) onFlowChange(nodes, edges);
+        setIsMoveModalOpen(false);
+        return;
+      }
+
       const newNodeId = `node-${Date.now()}`;
       
       let parentNode = nodes.find(n => n.id === activeNodeId);

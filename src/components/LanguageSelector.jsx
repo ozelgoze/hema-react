@@ -14,9 +14,9 @@ export default function LanguageSelector() {
               ? 'bg-[var(--color-ink-red)] text-white border-[var(--color-ink-red)] shadow-none translate-y-[2px] translate-x-[2px]' 
               : 'bg-[var(--color-parchment-light)] text-[var(--color-ink-black)] border-[var(--color-ink-black)] hover:bg-[var(--color-ink-black)] hover:text-[var(--color-parchment-light)]'}
           `}
-          title={languageLabels[l].native}
+          title={languageLabels[l]}
         >
-          {languageLabels[l].short}
+          {l}
         </button>
       ))}
     </div>

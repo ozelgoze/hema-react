@@ -57,13 +57,21 @@ function ActionNode({ data }) {
       className={`
         action-node-wrap
         relative min-w-[300px] w-[340px]
-        ${config.class}
-        panel-interactive
+        ${data.isSelector ? 'glass-panel border-dashed border-[4px] border-[var(--color-ink-red)] hover:bg-[var(--color-ink-red)]/10 cursor-pointer flex flex-col items-center justify-center p-8' : config.class}
+        ${!data.isSelector && 'panel-interactive'}
         transition-all duration-300
         ${data.isActive ? 'ring-4 ring-[var(--color-gold)] shadow-[0_0_20px_var(--color-gold)] scale-[1.02]' : 'opacity-80 hover:opacity-100'}
       `}
     >
-      {/* Active Indicator Pin */}
+      {data.isSelector ? (
+        <div className="text-center animate-pulse">
+           <span className="text-5xl filter grayscale mb-3 block">⚔️</span>
+           <h2 className="text-xl font-display font-bold text-[var(--color-ink-red)] uppercase tracking-[0.2em]">{t('btn_load') || "HAMLE SEÇ"}</h2>
+           <p className="text-xs text-[var(--color-ink-black)]/70 uppercase tracking-widest mt-2">{t('wizard_you') || "Sıra Sende"}</p>
+        </div>
+      ) : (
+        <>
+          {/* Active Indicator Pin */}
       {data.isActive && (
         <div className="absolute -top-3 -right-3 z-20 animate-bounce">
           <span className="text-2xl drop-shadow-md">👇</span>
@@ -154,6 +162,8 @@ function ActionNode({ data }) {
             {role === 'scoring-point' ? "Finis Coronat Opus" : "Mors Certa"}
           </div>
         </div>
+      )}
+      </>
       )}
 
       {/* Source handle (bottom) */}

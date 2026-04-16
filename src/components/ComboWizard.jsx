@@ -1,15 +1,12 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
-import { getMovesByPhase, getManuscriptKey, getMoveById } from '../data/hemaMoves';
+import { getMovesByPhase, getMoveById, hemaMoves } from '../data/hemaMoves';
 import LanguageSelector from './LanguageSelector';
 import { playClash, playWin, playLoss, setMuted, getMuted } from '../utils/audio';
+import MoveSelectorModal from './MoveSelectorModal';
 
-export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onClear }) {
+export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onClear, isMoveModalOpen, setIsMoveModalOpen }) {
   const { t } = useTranslation();
-  const [selectedMove, setSelectedMove] = useState('');
-  const [traditionFilter, setTraditionFilter] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAiMode, setIsAiMode] = useState(true);
   const [aiThinking, setAiThinking] = useState(false);
   const [isMutedLocal, setIsMutedLocal] = useState(getMuted());
@@ -36,10 +33,6 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
   const isOpponentWin = lastNode?.nodeRole === 'opponent-point';
   const isComplete = isUserWin || isOpponentWin;
 
-  // Determine Turn and Phase Dynamically
-  // If no nodes: User Turn (Starter)
-  // If last node is User (user-action): Opponent Turn (Reaction)
-  // If last node is Opponent (opponent-action): User Turn (Followup / Finisher / Retreat)
   const isUserTurn = !lastNode || lastNode.nodeRole === 'opponent-action' || lastNode.nodeRole === 'opponent-point' || isComplete;
   const isOpponentTurn = lastNode && lastNode.nodeRole === 'user-action' && !isComplete;
 
@@ -51,31 +44,15 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
 
   const availableMoves = useMemo(() => {
     if (isComplete) return [];
-    
-    // For followup phase, also include finishers and retreats if they exist
-    if (currentPhase === 'followup') {
-       const followups = getMovesByPhase('followup', traditionFilter);
-       const finishers = getMovesByPhase('finisher', traditionFilter);
-       return [...followups, ...finishers];
-    }
-    return getMovesByPhase(currentPhase, traditionFilter);
-  }, [currentPhase, traditionFilter, isComplete]);
+    return getMovesByPhase(currentPhase);
+  }, [currentPhase, isComplete]);
 
   const recommendedMoves = useMemo(() => {
     if (!lastNode) return [];
     return availableMoves.filter((m) => m.follows?.includes(lastNode.moveId));
   }, [availableMoves, lastNode]);
 
-  const otherMoves = useMemo(() => {
-    if (!lastNode) return availableMoves;
-    return availableMoves.filter((m) => !m.follows?.includes(lastNode.moveId));
-  }, [availableMoves, lastNode]);
-
-  // AI Mistake Evaluation (TARIHI YAPAY ZEKA)
-  let mistakeReason = null;
   let commentaryContext = 'commentary_generic';
-  
-  // Track previous complete state to avoid playing sound repeatedly on render
   const [hasPlayedEndSound, setHasPlayedEndSound] = useState(false);
 
   useEffect(() => {
@@ -119,37 +96,22 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
     }
   }
 
-  // Auto-select Recommended
-  useEffect(() => {
-    if (recommendedMoves.length > 0) {
-      setSelectedMove(recommendedMoves[0].id);
-    } else {
-      setSelectedMove('');
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPhase, lastNode, traditionFilter]);
-
-  // AI Turn (Opponent Reacts)
   useEffect(() => {
     if (isOpponentTurn && isAiMode && recommendedMoves.length > 0 && !isMistake) {
       setAiThinking(true);
       const timer = setTimeout(() => {
-        // --- 🧠 TACTICAL AI WEIGHTING ALGORITHM (GOD MODE STOCHASTIC) ---
         let scoredMoves = recommendedMoves.map((move) => {
-          let score = Math.random() * 3; // base variance (luck factor)
+          let score = Math.random() * 3;
           const aiTags = move.tags || [];
           const userTags = lastNode?.tags || [];
 
-          // AI Counters "Strong" heavily
           if (userTags.includes('Strong')) {
             if (aiTags.includes('Winden') || aiTags.includes('Weak') || aiTags.includes('Retreat')) score += 10;
-            if (aiTags.includes('Strong')) score -= 5; // Direct clash is bad
+            if (aiTags.includes('Strong')) score -= 5;
           }
-          // Countering Largo
           if (userTags.includes('Zogho Largo') || userTags.includes('Largo')) {
             if (aiTags.includes('Zogho Stretto') || aiTags.includes('Stretto')) score += 8;
           }
-          // Countering Retreat
           if (userTags.includes('Retreat') || aiTags.includes('Abzug')) {
             if (aiTags.includes('Nachreisen')) score += 10;
           }
@@ -157,10 +119,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
           return { ...move, score };
         });
 
-        // Sort descending by score
         scoredMoves.sort((a, b) => b.score - a.score);
-
-        // Pick randomly from the Top 3 best answers (or fewer if not enough)
         const topN = Math.min(3, scoredMoves.length);
         const bestMove = scoredMoves[Math.floor(Math.random() * topN)];
 
@@ -177,12 +136,17 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
         });
         playClash();
         setAiThinking(false);
-      }, 1000); // Fast AI
+
+        if (currentPhase !== 'finisher') {
+          setTimeout(() => {
+            onAddNode({ isSelector: true, nodeRole: 'user-action' });
+          }, 300);
+        }
+      }, 1000);
       return () => clearTimeout(timer);
     }
   }, [isOpponentTurn, isAiMode, recommendedMoves, onAddNode, nodes.length, currentPhase, isMistake, lastNode]);
 
-  // AI Punish Mistake (Sudden Death)
   useEffect(() => {
     if (isMistake && isOpponentTurn && isAiMode) {
       const timer = setTimeout(() => {
@@ -190,7 +154,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
           moveId: null,
           moveName: 'Riposte',
           nameKey: 'opponent_finisher_name',
-          descKey: commentaryContext, // Store error context directly in descKey for the node!
+          descKey: commentaryContext,
           nodeRole: 'opponent-point',
           phase: 'finisher',
           step: nodes.length + 1,
@@ -203,12 +167,8 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
     }
   }, [isOpponentTurn, isAiMode, isMistake, onAddNode, nodes.length, oppReactionData, commentaryContext]);
 
-
-  const handleAdd = useCallback(() => {
-    if (!selectedMove) return;
-    const move = availableMoves.find((m) => m.id === selectedMove);
+  const handleMoveSelect = useCallback((move) => {
     if (!move) return;
-
     const nodeRole = move.type === 'finisher' ? 'scoring-point' : 'user-action';
 
     onAddNode({
@@ -216,14 +176,13 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
       moveName: move.name,
       nameKey: move.nameKey,
       nodeRole,
-      phase: move.type === 'finisher' ? 'finisher' : 'user-action', // simplified
+      phase: move.type === 'finisher' ? 'finisher' : 'user-action',
       step: nodes.length + 1,
       tradition: move.tradition,
       tags: move.tags,
       master: move.master,
-    });
+    }, true);
     
-    // Evaluate action for live feedback
     const aiTags = oppReactionData?.tags || [];
     if (isAiMode && isOpponentTurn) {
         if (move.tags?.includes('Weak') && aiTags.includes('Strong')) {
@@ -240,14 +199,13 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
     }
 
     playClash();
-    setSelectedMove('');
-  }, [selectedMove, availableMoves, nodes.length, onAddNode, isAiMode, isOpponentTurn, oppReactionData, isMistake, t]);
+  }, [nodes.length, onAddNode, isAiMode, isOpponentTurn, oppReactionData, isMistake, t]);
 
   return (
+    <>
     <div className={`fixed bottom-0 left-0 w-full md:absolute md:top-4 md:bottom-auto md:left-1/2 md:-translate-x-1/2 z-50 md:w-[420px] transition-transform duration-300 ease-in-out ${!isExpanded ? 'translate-y-[calc(100%-54px)] md:translate-y-0' : 'translate-y-0'}`}>
       <div className="bg-[var(--color-parchment-light)] rounded-t-xl md:rounded-sm border-t-[3px] md:border-[3px] border-[var(--color-ink-black)] shadow-[0_-10px_40px_rgba(42,37,34,0.2)] md:shadow-[6px_6px_0_0_var(--color-ink-black)] overflow-hidden relative transition-all duration-300">
         
-        {/* Mobile Pull Handle */}
         <div 
            className="md:hidden w-full h-[6px] bg-[var(--color-parchment-dark)] flex justify-center items-center py-2 border-b border-[var(--color-ink-faded)] cursor-pointer"
            onClick={() => setIsExpanded(!isExpanded)}
@@ -383,192 +341,27 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
               </p>
             </div>
           ) : (
-            <>
-              {/* Turn Information */}
-              <div className="text-center mb-6">
-                <p className="text-xs text-[var(--color-ink-red)] uppercase tracking-widest font-bold font-display mt-1">
-                   {currentPhase === 'starter' ? t('combat_start') : t('your_turn')}
-                </p>
-              </div>
-
-              {/* Master / Tradition Tabs */}
-              <div className="flex bg-[var(--color-parchment-dark)] border-[2px] border-[var(--color-ink-black)] p-0.5 mb-4">
-                {['all', 'german', 'italian'].map((trad) => (
-                  <button
-                    key={trad}
-                    onClick={() => { setTraditionFilter(trad === 'all' ? null : trad); setSelectedMove(''); }}
-                    className={`flex-1 px-3 py-2 text-xs font-bold uppercase tracking-wider transition-all duration-300 ${
-                      (traditionFilter === (trad === 'all' ? null : trad))
-                        ? 'bg-[var(--color-ink-black)] text-[var(--color-parchment-light)]'
-                        : 'bg-transparent text-[var(--color-ink-black)] hover:bg-[var(--color-parchment)]'
-                    }`}
-                  >
-                    {t(`wizard_${trad}`)}
-                  </button>
-                ))}
-              </div>
-
-              {/* Action Cards Grid (Destroyed the Select Box) */}
-              <div className="flex flex-col gap-3 mb-2">
-                {recommendedMoves.length > 0 ? (
-                  <>
-                    <h3 className="text-[10px] uppercase font-display text-[var(--color-ink-red)] font-bold tracking-widest px-1">
-                      {t('wizard_recommended')}
-                    </h3>
-                    <div className="grid grid-cols-1 gap-3">
-                      {recommendedMoves.map((move, index) => {
-                        const isTopAiPick = index === 0 && isAiMode;
-                        return (
-                          <button
-                            key={move.id}
-                            onClick={() => setSelectedMove(move.id)}
-                            className={`relative text-left p-3 md:p-4 border-[2px] transition-all duration-200 overflow-hidden group focus:outline-none
-                              ${selectedMove === move.id 
-                                 ? (isTopAiPick ? 'bg-[var(--color-ink-black)] border-[var(--color-gold)] text-[var(--color-parchment-light)] shadow-[4px_4px_0_0_var(--color-gold)] -translate-y-1' : 'bg-[var(--color-ink-black)] border-[var(--color-ink-black)] text-[var(--color-parchment-light)] shadow-[4px_4px_0_0_var(--color-ink-red)] -translate-y-1')
-                                 : (isTopAiPick ? 'bg-[var(--color-parchment-light)] border-[var(--color-gold)] text-[var(--color-ink-black)] shadow-[4px_4px_0_0_var(--color-gold)] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_var(--color-gold)]' : 'bg-[var(--color-parchment)] border-[var(--color-ink-black)] text-[var(--color-ink-black)] shadow-[4px_4px_0_0_var(--color-ink-black)] hover:-translate-y-1 hover:shadow-[6px_6px_0_0_var(--color-ink-black)]')
-                              }
-                            `}
-                          >
-                            {isTopAiPick && (
-                              <div className="absolute top-0 right-0 px-2 py-1 bg-[var(--color-gold)] border-l-[2px] border-b-[2px] border-[var(--color-ink-black)] flex items-center justify-center">
-                                 <span className="text-[var(--color-ink-black)] text-[8px] font-bold uppercase tracking-widest">🛡️ AI Suggestion</span>
-                              </div>
-                            )}
-                            {!isTopAiPick && (
-                              <div className={`absolute top-0 right-0 w-6 h-6 border-l-[2px] border-b-[2px] ${selectedMove === move.id ? 'border-[var(--color-parchment-light)] bg-[var(--color-ink-red)]' : 'border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)]'} flex items-center justify-center`}>
-                                 {selectedMove === move.id && <span className="text-white text-[10px]">✓</span>}
-                              </div>
-                            )}
-                            
-                            <h4 className={`font-display font-bold ${isTopAiPick ? 'text-lg text-[var(--color-ink-red)]' : 'text-sm'} tracking-wide block mb-1 mt-1`}>
-                              {t(move.nameKey)}
-                            </h4>
-                          <span className={`text-[9px] uppercase tracking-widest font-bold opacity-80 block ${selectedMove === move.id ? 'text-[var(--color-parchment-light)]' : 'text-[var(--color-ink-faded)]'}`}>
-                            {move.master}
-                          </span>
-                          
-                          {/* Tags Rendering */}
-                          <div className="flex flex-wrap gap-1 mt-2">
-                            {move.tags?.map(tag => (
-                              <span key={tag} className={`text-[8px] px-1.5 py-0.5 uppercase tracking-widest font-bold border ${selectedMove === move.id ? 'border-[var(--color-parchment-light)]/30' : 'border-[var(--color-ink-faded)]/40'}`}>
-                                {tag}
-                              </span>
-                            ))}
-                          </div>
-
-                          {/* Tactical Forecast */}
-                          {selectedMove === move.id && (
-                             <div className="mt-3 pt-2 border-t border-dashed border-[var(--color-parchment-light)]/30 text-[10px] italic !font-medium text-[var(--color-parchment-light)]/90 font-body">
-                                📜 {move.tags?.includes('Meisterhau') 
-                                    ? "Usta vuruşu. Doğru zamanda rakibin savunmasını parçalar." 
-                                 : move.tags?.includes('Parry')
-                                    ? "Pasif Savunma. İnisiyatifi ele geçirmek zor olabilir."
-                                 : move.tags?.includes('Winden')
-                                    ? "Bağlantıda kalarak kılıcı çevirir. Yüksek kontrol sağlar."
-                                 : "Temel hamle. Rakibin açıklığına göre etkilidir."}
-                             </div>
-                          )}
-                        </button>
-                        );
-                      })}
-                    </div>
-                  </>
-                ) : (
-                  <div className="p-4 border border-dashed border-[var(--color-ink-faded)] text-center text-sm italic text-[var(--color-ink-faded)]">
-                    {t('no_recommended_moves')}
-                  </div>
-                )}
-                
-                {/* Fallback Selection for Other Moves (Searchable) */}
-                {otherMoves.length > 0 && (
-                   <div className="mt-4 relative">
-                     <h3 className="text-[10px] uppercase font-display text-[var(--color-ink-faded)] font-bold tracking-widest px-1 mb-2">
-                        {t('wizard_other')}
-                     </h3>
-                     
-                     <div className="relative">
-                       <input
-                          type="text"
-                          placeholder={t('wizard_select') + " [Search...]"}
-                          value={searchTerm}
-                          onChange={(e) => {
-                             setSearchTerm(e.target.value);
-                             setIsSearchOpen(true);
-                          }}
-                          onFocus={() => setIsSearchOpen(true)}
-                          className="w-full bg-[var(--color-parchment-light)] px-4 py-3 md:py-2 border-[2px] border-[var(--color-ink-black)] rounded-none text-sm font-body font-bold text-[var(--color-ink-black)] outline-none focus:ring-2 focus:ring-[var(--color-ink-red)] focus:border-[var(--color-ink-red)] transition-all shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)] cursor-pointer"
-                       />
-                       {searchTerm && (
-                          <button 
-                            onClick={() => { setSearchTerm(''); setIsSearchOpen(false); setSelectedMove(''); }}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-ink-faded)] hover:text-[var(--color-ink-red)]"
-                          >
-                             ✕
-                          </button>
-                       )}
-                     </div>
-
-                     {isSearchOpen && (
-                       <div className="absolute top-[100%] left-0 right-0 mt-1 max-h-[250px] overflow-y-auto bg-[var(--color-parchment-light)] border-[2px] border-[var(--color-ink-black)] shadow-[4px_4px_10px_rgba(0,0,0,0.3)] z-[9999] scrollbar-thin">
-                         {otherMoves
-                           .filter(move => {
-                             if(!searchTerm) return true;
-                             const search = searchTerm.toLowerCase();
-                             const moveName = t(move.nameKey).toLowerCase();
-                             const tags = move.tags?.join(' ').toLowerCase() || '';
-                             return moveName.includes(search) || tags.includes(search);
-                           })
-                           .map((move) => (
-                             <button
-                               key={move.id}
-                               onClick={() => {
-                                 setSelectedMove(move.id);
-                                 setSearchTerm(t(move.nameKey));
-                                 setIsSearchOpen(false);
-                               }}
-                               className={`w-full text-left px-4 py-3 min-h-[44px] border-b border-[var(--color-ink-faded)]/30 last:border-b-0 text-xs font-body hover:bg-[var(--color-ink-black)] hover:text-[var(--color-parchment-light)] transition-colors ${selectedMove === move.id ? 'bg-[var(--color-ink-red)] text-white' : 'text-[var(--color-ink-black)] bg-[var(--color-parchment)]'}`}
-                             >
-                               <span className="font-bold text-sm">{t(move.nameKey)}</span> <span className="opacity-70 text-[10px] ml-1 block mt-1"> {move.master} [{move.tags?.join(', ')}]</span>
-                             </button>
-                           ))}
-                           {otherMoves.filter(move => {
-                             if(!searchTerm) return true;
-                             const search = searchTerm.toLowerCase();
-                             const moveName = t(move.nameKey).toLowerCase();
-                             const tags = move.tags?.join(' ').toLowerCase() || '';
-                             return moveName.includes(search) || tags.includes(search);
-                           }).length === 0 && (
-                             <div className="px-3 py-3 text-xs italic text-[var(--color-ink-faded)] text-center">Sonuç bulunamadı.</div>
-                           )}
-                       </div>
-                     )}
-                   </div>
-                )}
-              </div>
-            </>
-          )}
-        </div>
-
-        {/* Sticky Actions Footer */}
-        {(!isComplete && !aiThinking) && (
+        {/* Sticky Actions Footer (Undo / Clear only) */}
+        {!aiThinking && nodes.length > 0 && (
           <div className="flex gap-3 px-4 py-3 bg-[var(--color-parchment)] border-t-[2px] border-[var(--color-ink-black)]">
-            <button onClick={onUndo} disabled={nodes.length === 0} className="px-3 py-4 md:py-3 bg-[var(--color-parchment-dark)] border-[2px] border-[var(--color-ink-black)] hover:bg-[var(--color-ink-black)] hover:text-[var(--color-parchment-light)] text-[var(--color-ink-black)] text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 shadow-[4px_4px_0_0_var(--color-ink-black)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none min-h-[44px] min-w-0 shrink-0">
+            <button onClick={onUndo} disabled={nodes.length === 0} className="px-3 py-3 md:py-3 bg-[var(--color-parchment-dark)] border-[2px] border-[var(--color-ink-black)] hover:bg-[var(--color-ink-black)] hover:text-[var(--color-parchment-light)] text-[var(--color-ink-black)] text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 shadow-[4px_4px_0_0_var(--color-ink-black)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none min-h-[44px] min-w-0 shrink-0 flex items-center justify-center gap-2">
               ↩️ <span className="hidden md:inline">{t('wizard_undo')}</span>
             </button>
-            <button
-              onClick={handleAdd}
-              disabled={!selectedMove}
-              className={`flex-1 py-4 md:py-3 text-sm md:text-xs font-bold uppercase tracking-widest transition-all border-[2px] border-[var(--color-ink-black)] shadow-[4px_4px_0_0_var(--color-ink-black)] active:translate-y-[4px] active:translate-x-[4px] active:shadow-none min-h-[44px] min-w-0 truncate px-2 ${
-                selectedMove
-                  ? 'bg-[var(--color-ink-red)] text-[var(--color-parchment-light)] hover:bg-[var(--color-ink-black)]'
-                  : 'bg-[var(--color-parchment-dark)] text-[var(--color-ink-faded)] opacity-60 cursor-not-allowed shadow-none translate-y-[4px] translate-x-[4px]'
-              }`}
-            >
-              {t('wizard_add')}
+            <button onClick={onClear} disabled={nodes.length === 0} className="flex-1 py-3 bg-[var(--color-parchment)] text-[var(--color-ink-red)] border-[2px] border-[var(--color-ink-red)] font-bold text-xs uppercase hover:bg-[var(--color-ink-red)] hover:text-white transition-colors shadow-[4px_4px_0_0_var(--color-ink-red)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none min-h-[44px]">
+               {t('wizard_clear')}
             </button>
           </div>
         )}
       </div>
     </div>
+    
+    <MoveSelectorModal 
+       isOpen={isMoveModalOpen} 
+       onClose={() => setIsMoveModalOpen(false)} 
+       onSelectMove={handleMoveSelect}
+       recommendedMoves={recommendedMoves}
+       isAiMode={isAiMode}
+    />
+    </>
   );
 }
