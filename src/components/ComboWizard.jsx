@@ -136,12 +136,6 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
         });
         playClash();
         setAiThinking(false);
-
-        if (currentPhase !== 'finisher') {
-          setTimeout(() => {
-            onAddNode({ isSelector: true, nodeRole: 'user-action' });
-          }, 300);
-        }
       }, 1000);
       return () => clearTimeout(timer);
     }
@@ -167,6 +161,24 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
     }
   }, [isOpponentTurn, isAiMode, isMistake, onAddNode, nodes.length, oppReactionData, commentaryContext]);
 
+  // Reactive Spawning of SelectorNodes to avoid stale closures
+  useEffect(() => {
+    if (!lastNode || lastNode.isSelector || isComplete) return;
+
+    // After AI acts, or if manual Opponent wants to act, we need a Selector
+    if (lastNode.nodeRole === 'opponent-action' && currentPhase !== 'finisher') {
+       // Sprout User Selector
+       const timer = setTimeout(() => onAddNode({ isSelector: true, nodeRole: 'user-action' }), 500);
+       return () => clearTimeout(timer);
+    }
+
+    if (!isAiMode && lastNode.nodeRole === 'user-action') {
+       // Sprout Opponent Selector (Manual Mode)
+       const timer = setTimeout(() => onAddNode({ isSelector: true, nodeRole: 'opponent-action' }), 300);
+       return () => clearTimeout(timer);
+    }
+  }, [lastNode, isComplete, currentPhase, isAiMode, onAddNode]);
+
   const handleMoveSelect = useCallback((move) => {
     if (!move) return;
     const nodeRole = move.type === 'finisher' ? 'scoring-point' : 'user-action';
@@ -177,7 +189,6 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
       nameKey: move.nameKey,
       nodeRole,
       phase: move.type === 'finisher' ? 'finisher' : 'user-action',
-      step: nodes.length + 1,
       tradition: move.tradition,
       tags: move.tags,
       master: move.master,
