@@ -28,16 +28,21 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
   };
 
   // Evaluate Match Status
-  const lastNode = nodes?.length > 0 ? nodes[nodes.length - 1].data : null;
+  const lastNodeRendered = nodes?.length > 0 ? nodes[nodes.length - 1].data : null; // Strictly for UI checks like showing spinner
+  const activePlayNodes = nodes?.filter(n => !n.data?.isSelector) || [];
+  const lastNode = activePlayNodes.length > 0 ? activePlayNodes[activePlayNodes.length - 1].data : null;
+
   const isUserWin = lastNode?.nodeRole === 'scoring-point';
   const isOpponentWin = lastNode?.nodeRole === 'opponent-point';
   const isComplete = isUserWin || isOpponentWin;
 
   const isUserTurn = !lastNode || lastNode.nodeRole === 'opponent-action' || lastNode.nodeRole === 'opponent-point' || isComplete;
-  const isOpponentTurn = lastNode && lastNode.nodeRole === 'user-action' && !isComplete;
+  
+  // Is it the opponent's turn to React? (Only if the true last node is a user action, AND we are NOT currently waiting on a selector)
+  const isOpponentTurn = lastNode && lastNode.nodeRole === 'user-action' && !lastNodeRendered?.isSelector && !isComplete;
 
   let currentPhase = 'starter';
-  if (nodes.length > 0) {
+  if (activePlayNodes.length > 0) {
     if (lastNode?.nodeRole === 'user-action') currentPhase = 'reaction';
     else if (lastNode?.nodeRole === 'opponent-action') currentPhase = 'followup';
   }
@@ -72,8 +77,9 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
     }
   }, [isComplete, isUserWin, isOpponentWin, hasPlayedEndSound]);
 
-  const oppReactionNode = (nodes.length >= 2 && lastNode?.nodeRole === 'user-action') ? nodes[nodes.length - 2]?.data : lastNode?.nodeRole === 'opponent-action' ? lastNode : null;
-  const userActionData = lastNode?.nodeRole === 'user-action' && nodes.length > 1 ? getMoveById(lastNode.moveId) : null;
+  // For Mistake Calculation, we use `activePlayNodes` so we safely ignore Selectors!
+  const oppReactionNode = (activePlayNodes.length >= 2 && lastNode?.nodeRole === 'user-action') ? activePlayNodes[activePlayNodes.length - 2]?.data : lastNode?.nodeRole === 'opponent-action' ? lastNode : null;
+  const userActionData = lastNode?.nodeRole === 'user-action' && activePlayNodes.length > 1 ? getMoveById(lastNode.moveId) : null;
   const oppReactionData = oppReactionNode ? getMoveById(oppReactionNode.moveId) : null;
 
   const isMistake = !!(isOpponentTurn && oppReactionData && userActionData && !userActionData.follows?.includes(oppReactionData.id));
@@ -163,7 +169,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
 
   // Reactive Spawning of SelectorNodes to avoid stale closures
   useEffect(() => {
-    if (!lastNode || lastNode.isSelector || isComplete) return;
+    if (!lastNode || lastNodeRendered?.isSelector || isComplete) return;
 
     // After AI acts, or if manual Opponent wants to act, we need a Selector
     if (lastNode.nodeRole === 'opponent-action' && currentPhase !== 'finisher') {
@@ -177,7 +183,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
        const timer = setTimeout(() => onAddNode({ isSelector: true, nodeRole: 'opponent-action' }), 300);
        return () => clearTimeout(timer);
     }
-  }, [lastNode, isComplete, currentPhase, isAiMode, onAddNode]);
+  }, [lastNode, lastNodeRendered, isComplete, currentPhase, isAiMode, onAddNode]);
 
   const handleMoveSelect = useCallback((move) => {
     if (!move) return;
