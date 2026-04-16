@@ -106,7 +106,7 @@ export const german_longsword = [
     type: 'counter',
     tags: ['Nach', 'Strong'],
     phase: 'reaction',
-    follows: ['g-zornhau', 'g-oberhau', 'g-unterhau', 'g-krumphau', 'g-zucken', 'g-mutieren', 'g-abnehmen'],
+    follows: ['g-zornhau', 'g-oberhau', 'g-unterhau', 'g-krumphau', 'g-zucken', 'g-mutieren', 'g-abnehmen', 'g-nachreisen'],
   },
   {
     id: 'g-opponent-weak',
@@ -118,7 +118,7 @@ export const german_longsword = [
     type: 'counter',
     tags: ['Nach', 'Weak'],
     phase: 'reaction',
-    follows: ['g-zornhau', 'g-oberhau', 'g-unterhau', 'g-winden', 'g-zucken'],
+    follows: ['g-zornhau', 'g-oberhau', 'g-unterhau', 'g-winden', 'g-zucken', 'g-nachreisen'],
   },
   {
     id: 'g-opponent-retreats',
@@ -130,7 +130,7 @@ export const german_longsword = [
     type: 'counter',
     tags: ['Nach'],
     phase: 'reaction',
-    follows: ['g-oberhau', 'g-unterhau', 'g-zwerchhau', 'g-nachreisen', 'g-mutieren'],
+    follows: ['g-oberhau', 'g-unterhau', 'g-zwerchhau', 'g-nachreisen', 'g-mutieren', 'g-abnehmen'],
   },
   {
     id: 'g-opponent-winds',
@@ -142,7 +142,7 @@ export const german_longsword = [
     type: 'counter',
     tags: ['Nach', 'Winden'],
     phase: 'reaction',
-    follows: ['g-zwerchhau', 'g-schielhau', 'g-krumphau', 'g-winden', 'g-abnehmen'],
+    follows: ['g-zwerchhau', 'g-schielhau', 'g-krumphau', 'g-winden', 'g-abnehmen', 'g-nachreisen'],
   },
 
   // ── FOLLOW-UP MOVES ──
@@ -230,7 +230,7 @@ export const german_longsword = [
     type: 'finisher',
     tags: ['Vor', 'Strong', 'Meisterhau'],
     phase: 'finisher',
-    follows: ['g-nachreisen', 'g-winden'],
+    follows: ['g-opponent-retreats', 'g-opponent-winds', 'g-opponent-weak'],
   },
   {
     id: 'g-thrust-finish',
@@ -242,7 +242,7 @@ export const german_longsword = [
     type: 'finisher',
     tags: ['Vor', 'Weak'],
     phase: 'finisher',
-    follows: ['g-durchwechseln', 'g-mutieren', 'g-winden'],
+    follows: ['g-opponent-pushes-strong', 'g-opponent-weak', 'g-opponent-winds'],
   },
   {
     id: 'g-schnitt',
@@ -254,7 +254,7 @@ export const german_longsword = [
     type: 'finisher',
     tags: ['Vor', 'Strong'],
     phase: 'finisher',
-    follows: ['g-zucken', 'g-abnehmen'],
+    follows: ['g-opponent-pushes-strong', 'g-opponent-retreats'],
   },
   {
     id: 'g-pommel-strike',

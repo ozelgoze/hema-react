@@ -49,6 +49,10 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
 
   const availableMoves = useMemo(() => {
     if (isComplete) return [];
+    // User can end the game if an opening presents itself
+    if (currentPhase === 'followup') {
+       return [...getMovesByPhase('followup'), ...getMovesByPhase('finisher')];
+    }
     return getMovesByPhase(currentPhase);
   }, [currentPhase, isComplete]);
 
