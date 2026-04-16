@@ -110,17 +110,17 @@ function ActionNode({ data }) {
       </div>
 
       {/* Tags */}
-      <div className="flex flex-wrap gap-1 px-4 pb-4">
-        <span className={`text-[11px] px-1.5 py-0.5 bg-[var(--color-ink-faded)] text-[var(--color-parchment)] font-bold uppercase tracking-wider border border-[var(--color-ink-black)]`}>
+      <div className="flex flex-wrap gap-1.5 px-5 pb-5">
+        <span className={`text-xs px-2 py-0.5 bg-[var(--color-ink-faded)] text-[var(--color-parchment)] font-bold uppercase tracking-wider border-2 border-[var(--color-ink-black)]`}>
           {t(traditionKey)}
         </span>
-        <span className="text-[11px] px-1.5 py-0.5 bg-[var(--color-parchment-dark)] text-[var(--color-ink-black)] font-bold uppercase tracking-wider border border-[var(--color-ink-black)]">
+        <span className="text-xs px-2 py-0.5 bg-[var(--color-parchment-dark)] text-[var(--color-ink-black)] font-bold uppercase tracking-wider border-2 border-[var(--color-ink-black)] shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">
           {t(phaseKey)}
         </span>
         {data.tags?.map((tag) => (
           <span
             key={tag}
-            className="text-[11px] px-1.5 py-0.5 text-[var(--color-ink-black)] uppercase tracking-wider border border-dashed border-[var(--color-ink-faded)]"
+            className="text-xs px-2 py-0.5 text-[var(--color-ink-black)] bg-[var(--color-parchment)] font-bold uppercase tracking-widest border-2 border-[var(--color-ink-black)] shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]"
           >
             {tag}
           </span>
@@ -129,23 +129,26 @@ function ActionNode({ data }) {
 
       {/* Manuscript Note Toggle */}
       {data.moveId && getManuscriptKey(data.moveId) && (
-        <div className="border-t-[2px] border-dashed border-[var(--color-ink-faded)] bg-[var(--color-parchment-dark)] rounded-b-sm">
+        <div className="border-t-[3px] border-[var(--color-ink-black)] bg-[var(--color-parchment-light)] rounded-b-sm">
           {!isExpanded ? (
             <button 
               onClick={() => setIsExpanded(true)}
-              className="w-full py-2 text-[10px] uppercase tracking-widest font-bold text-[var(--color-ink-faded)] hover:text-[var(--color-ink-black)] flex justify-center items-center gap-1 transition-colors outline-none focus:outline-none"
+              className="w-full py-3 text-[11px] uppercase tracking-widest font-bold text-[var(--color-ink-black)] flex justify-center items-center gap-2 transition-colors outline-none focus:outline-none bg-[var(--color-parchment-dark)] hover:bg-[var(--color-ink-red)] hover:text-white"
             >
-              <span>{t('tactics_note') || 'Daha Fazla'}</span> <span>▼</span>
+              <span>{t('tactics_note') || 'Daha Fazla'}</span> <span className="text-[10px]">▼</span>
             </button>
           ) : (
-            <div className="p-4 animate-fade-in relative">
+            <div className="p-5 animate-fade-in relative bg-[var(--color-parchment-light)] shadow-[inset_0_4px_8px_rgba(0,0,0,0.05)] border-b-4 border-l-4 border-r-4 border-transparent">
               <button 
                 onClick={() => setIsExpanded(false)}
-                className="absolute top-1 max-w-[20px] right-2 text-[var(--color-ink-faded)] hover:text-[var(--color-ink-black)] font-bold text-xs"
+                className="absolute top-2 right-3 w-8 h-8 flex items-center justify-center text-[var(--color-ink-black)] hover:text-white hover:bg-[var(--color-ink-red)] border-2 border-transparent hover:border-[var(--color-ink-black)] font-bold text-sm transition-all"
               >
                 ▲
               </button>
-              <p className="font-body italic text-xs text-[var(--color-ink-black)] leading-relaxed mt-2 md:text-[13px]">
+              <div className="text-[10px] text-[var(--color-ink-red)] uppercase font-display font-bold tracking-widest mb-2 flex items-center gap-1.5 border-b-2 border-dashed border-[var(--color-ink-red)] pb-1 w-max">
+                📜 {t('tactics_note')}
+              </div>
+              <p className="font-body font-medium text-[13px] md:text-sm text-[var(--color-ink-black)] leading-relaxed mt-2 pr-4">
                 "{t(getManuscriptKey(data.moveId))}"
               </p>
             </div>

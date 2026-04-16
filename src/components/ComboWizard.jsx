@@ -317,32 +317,24 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
 
               {/* TARIHI YAPAY ZEKA COACHING */}
               {isOpponentWin && lastNode?.descKey && (
-                <div className="bg-[var(--color-parchment-dark)] border-2 border-[var(--color-ink-black)] p-4 text-left shadow-[4px_4px_0_0_var(--color-ink-black)] mb-6 relative">
-                  <div className="text-[11px] text-[var(--color-ink-red)] uppercase font-bold tracking-widest mb-2 flex items-center gap-2">
-                    {t('master_notes')} 📜
+                <div className="bg-[var(--color-parchment-light)] border-[3px] border-[var(--color-ink-red)] p-5 text-left shadow-[6px_6px_0_0_var(--color-ink-red)] mb-4 mt-8 relative">
+                  <div className="text-sm text-[var(--color-ink-red)] uppercase font-display font-bold tracking-widest mb-3 flex items-center gap-2 border-b-2 border-dashed border-[var(--color-ink-red)] pb-2">
+                    📜 {t('master_notes')}
                   </div>
-                  <p className="text-sm font-body text-[var(--color-ink-black)] leading-relaxed italic">
+                  <p className="text-base font-body text-[var(--color-ink-black)] font-medium leading-relaxed">
                     "{t(lastNode.descKey)}"
                   </p>
                   {/* Suggestion */}
                   {oppReactionData && (
-                      <div className="mt-4 pt-3 border-t-2 border-dashed border-[var(--color-ink-faded)]">
-                         <p className="text-sm font-body font-bold text-[var(--color-ink-black)]">
-                            Rubrica: <span className="font-normal italic">{t('duel_suggestion').replace('{oppMove}', t(oppReactionData.nameKey))}</span>
+                      <div className="mt-5 pt-4 border-t-[3px] border-[var(--color-ink-black)] bg-[var(--color-ink-black)] -mx-5 -mb-5 px-5 py-4">
+                         <p className="text-[13px] md:text-sm font-body text-[var(--color-parchment-light)]">
+                            <span className="text-[var(--color-gold)] font-display tracking-widest uppercase text-xs block mb-1">Rubrica:</span> 
+                            {t('duel_suggestion').replace('{oppMove}', t(oppReactionData.nameKey))}
                          </p>
                       </div>
                   )}
                 </div>
               )}
-
-              <div className="flex gap-3 justify-center">
-                <button onClick={onUndo} className="px-4 py-2 border-2 border-[var(--color-ink-black)] bg-[var(--color-parchment-light)] text-[var(--color-ink-black)] hover:bg-[var(--color-parchment-dark)] rounded-none text-xs font-bold uppercase tracking-wider transition-all shadow-[2px_2px_0_0_var(--color-ink-black)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none">
-                  {t('wizard_undo')}
-                </button>
-                <button onClick={onClear} className="px-5 py-2 panel-ink-red rounded-none text-xs font-bold uppercase tracking-wider">
-                  {t('wizard_clear')}
-                </button>
-              </div>
             </div>
           ) : aiThinking ? (
             <div className="py-10 text-center">
