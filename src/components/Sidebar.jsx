@@ -118,6 +118,7 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
                 {t('app_subtitle')}
               </p>
             </div>
+          </div>
         </div>
 
         {/* Tabs */}
