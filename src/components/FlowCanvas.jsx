@@ -230,7 +230,22 @@ export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange 
   const handleUndo = useCallback(() => {
     if (!activeNodeId) return;
 
-    // Prune the active node and all its descendants
+    // Find the last completed user decision by walking up the tree
+    let targetDeleteId = activeNodeId;
+    let currNode = nodes.find(n => n.id === targetDeleteId);
+
+    while (currNode && (currNode.data?.isSelector || currNode.data?.nodeRole !== 'user-action')) {
+       if (!currNode.data?.parentId) break; // Reached root
+       currNode = nodes.find(n => n.id === currNode.data.parentId);
+    }
+
+    if (currNode && currNode.data?.nodeRole === 'user-action' && !currNode.data?.isSelector) {
+        targetDeleteId = currNode.id;
+    } else if (currNode && currNode.data?.isSelector && !currNode.data?.parentId) {
+        return; // Nothing to undo, just the initial empty selector
+    }
+
+    // Prune the target node and all its descendants
     const getDescendants = (nodeId, allNodes) => {
       const children = allNodes.filter(n => n.data?.parentId === nodeId).map(n => n.id);
       let desc = [...children];
@@ -240,7 +255,7 @@ export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange 
       return desc;
     };
 
-    const toDeleteIds = [activeNodeId, ...getDescendants(activeNodeId, nodes)];
+    const toDeleteIds = [targetDeleteId, ...getDescendants(targetDeleteId, nodes)];
     
     // Clear isActive flag generally
     const newNodes = nodes
