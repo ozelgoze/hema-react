@@ -18,7 +18,7 @@ function saveCombosToStorage(combos) {
 }
 
 export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
-  const { t, lang, setLang, languageLabels, languages } = useTranslation();
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('my-combos');
   const [savedCombos, setSavedCombos] = useState(getSavedCombos);
   const [comboName, setComboName] = useState('');
@@ -118,27 +118,6 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
                 {t('app_subtitle')}
               </p>
             </div>
-          </div>
-
-          {/* Language Selector */}
-          <div className="mt-5 flex items-center justify-between gap-2 border-t border-dashed border-[var(--color-ink-faded)] pt-3">
-            <span className="text-[11px] font-body text-[var(--color-ink-black)] uppercase tracking-widest font-bold">
-              {t('language')}:
-            </span>
-            <div className="flex bg-[var(--color-parchment-light)] border border-[var(--color-ink-black)] p-0.5">
-              {languages.map((l) => (
-                <button
-                  key={l}
-                  onClick={() => setLang(l)}
-                  className={`px-3 py-1 text-[10px] font-bold uppercase tracking-wider transition-all
-                    ${lang === l ? 'bg-[var(--color-ink-black)] text-[var(--color-parchment-light)]' : 'text-[var(--color-ink-faded)] hover:bg-[var(--color-parchment)]'}
-                  `}
-                >
-                  {languageLabels[l].short}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Tabs */}

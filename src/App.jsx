@@ -2,6 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 import { LanguageProvider } from './i18n/LanguageContext';
 import FlowCanvas from './components/FlowCanvas';
 import Sidebar from './components/Sidebar';
+import LanguageSelector from './components/LanguageSelector';
 
 function AppContent() {
   const [flowNodes, setFlowNodes] = useState([]);
@@ -21,6 +22,7 @@ function AppContent() {
 
   return (
     <div className="flex h-full w-full overflow-hidden absolute inset-0">
+      <LanguageSelector />
       <Sidebar
         currentNodes={flowNodes}
         currentEdges={flowEdges}
