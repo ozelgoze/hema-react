@@ -205,8 +205,6 @@ export default {
   no_search_results: 'The martial art you seek is not found in the records...',
   feedback_good: 'The tactic is working. The opponent\'s weak point has been found.',
   feedback_neutral: 'New form: {moveName}. Awaiting opponent reaction...',
-  mute_on: 'Unmute Sound',
-  mute_off: 'Mute Sound',
   download_image: 'Download as High Quality Image',
   download_btn: 'Download Combo',
   toast_combo_saved: '{name} saved!',

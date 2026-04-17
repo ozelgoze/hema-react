@@ -229,8 +229,6 @@ export default {
   no_search_results: 'Aradığınız savaş sanatı kayıtlarda yok...',
   feedback_good: 'Taktik başarıyla işliyor. Rakibin zayıf noktası bulundu.',
   feedback_neutral: 'Yeni form: {moveName}. Rakip tepkisi bekleniyor...',
-  mute_on: 'Sesi Aç',
-  mute_off: 'Sesi Kapat',
   download_image: 'Tuvali Yüksek Kaliteli Resim Olarak İndir',
   download_btn: 'Komboyu İndir',
   toast_combo_saved: '{name} kaydedildi!',

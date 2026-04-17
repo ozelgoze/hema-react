@@ -2,7 +2,6 @@ import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { getMovesByPhase, getMoveById, hemaMoves } from '../data/hemaMoves';
 import LanguageSelector from './LanguageSelector';
-import { playClash, playWin, playLoss, setMuted, getMuted } from '../utils/audio';
 import MoveSelectorModal from './MoveSelectorModal';
 
 // ═══════════════════════════════════════════════════════════
@@ -107,7 +106,6 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
   const { t } = useTranslation();
   const [isAiMode, setIsAiMode] = useState(true);
   const [aiThinking, setAiThinking] = useState(false);
-  const [isMutedLocal, setIsMutedLocal] = useState(getMuted());
   const [isExpanded, setIsExpanded] = useState(true);
   const [liveFeedback, setLiveFeedback] = useState(null);
   const [aiDifficulty, setAiDifficulty] = useState('adept');
@@ -120,12 +118,6 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
       return () => clearTimeout(timer);
     }
   }, [liveFeedback]);
-
-  const handleToggleMute = () => {
-    const newMuted = !isMutedLocal;
-    setIsMutedLocal(newMuted);
-    setMuted(newMuted);
-  };
 
   // Evaluate Match Status
   const lastNodeRendered = nodes?.length > 0 ? nodes[nodes.length - 1].data : null;
@@ -174,27 +166,24 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
   }, [availableMoves, lastNode]);
 
   let commentaryContext = 'commentary_generic';
-  const [hasPlayedEndSound, setHasPlayedEndSound] = useState(false);
+  const [hasHandledEnd, setHasHandledEnd] = useState(false);
 
   useEffect(() => {
     if (!isComplete) {
-       setHasPlayedEndSound(false);
-    } else if (isComplete && !hasPlayedEndSound) {
+       setHasHandledEnd(false);
+    } else if (isComplete && !hasHandledEnd) {
        if (isUserWin) {
-         playWin();
-         // Update score
          if (onScoreUpdate) onScoreUpdate('user');
        } else if (isOpponentWin) {
-         playLoss();
          document.body.classList.add('shake-animation');
          setTimeout(() => {
            document.body.classList.remove('shake-animation');
          }, 400);
          if (onScoreUpdate) onScoreUpdate('ai');
        }
-       setHasPlayedEndSound(true);
+       setHasHandledEnd(true);
     }
-  }, [isComplete, isUserWin, isOpponentWin, hasPlayedEndSound, onScoreUpdate]);
+  }, [isComplete, isUserWin, isOpponentWin, hasHandledEnd, onScoreUpdate]);
 
   // For Mistake Calculation
   const oppReactionNode = (activePlayNodes.length >= 2 && lastNode?.nodeRole === 'user-action') ? activePlayNodes[activePlayNodes.length - 2]?.data : lastNode?.nodeRole === 'opponent-action' ? lastNode : null;
@@ -245,7 +234,6 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
               tags: fallbackMove.tags,
               master: fallbackMove.master,
             });
-            playClash();
           }
           setAiThinking(false);
         }, difficulty.thinkTime);
@@ -324,7 +312,6 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
           tags: bestMove.tags,
           master: bestMove.master,
         });
-        playClash();
         setAiThinking(false);
       }, difficulty.thinkTime);
       return () => clearTimeout(timer);
@@ -397,8 +384,6 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
     } else {
        setLiveFeedback({ type: 'neutral', text: t('feedback_neutral').replace('{moveName}', t(move.nameKey)), master: 'Combat Flow' });
     }
-
-    playClash();
   }, [nodes.length, onAddNode, isAiMode, isOpponentTurn, oppReactionData, isMistake, t]);
 
   const matchWon = userScore >= maxScore;
@@ -437,13 +422,6 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
           <div className="flex items-center gap-2">
             <LanguageSelector />
             <div className="w-px h-6 bg-[var(--color-ink-faded)] mx-1"></div>
-            <button
-               onClick={handleToggleMute}
-               className={`text-lg px-2 flex items-center justify-center rounded transition-all hover:bg-[var(--color-parchment)] ${isMutedLocal ? 'opacity-50 grayscale' : 'opacity-100'}`}
-               title={isMutedLocal ? t('mute_on') : t('mute_off')}
-            >
-               {isMutedLocal ? '🔇' : '🔊'}
-            </button>
             <button
               onClick={() => setIsAiMode(!isAiMode)}
               className={`px-3 py-1 text-xs rounded-none border-[2px] font-bold uppercase tracking-wider transition-all duration-300 ${

@@ -206,8 +206,6 @@ export default {
   no_search_results: "L'arte marziale cercata non è stata trovata nelle cronache...",
   feedback_good: 'La tattica funziona. Il punto debole dell\'avversario è stato trovato.',
   feedback_neutral: 'Nuova forma: {moveName}. In attesa della reazione avversaria...',
-  mute_on: 'Attiva Audio',
-  mute_off: 'Disattiva Audio',
   download_image: 'Scarica come Immagine di Alta Qualità',
   download_btn: 'Scarica Combo',
   toast_combo_saved: '{name} salvato!',

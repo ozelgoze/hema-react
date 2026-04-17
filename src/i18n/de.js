@@ -206,8 +206,6 @@ export default {
   no_search_results: 'Die gesuchte Kampfkunst wurde in den Aufzeichnungen nicht gefunden...',
   feedback_good: 'Die Taktik funktioniert. Die Schwachstelle des Gegners wurde gefunden.',
   feedback_neutral: 'Neue Form: {moveName}. Warten auf Gegnerreaktion...',
-  mute_on: 'Ton einschalten',
-  mute_off: 'Ton ausschalten',
   download_image: 'Als hochauflösendes Bild herunterladen',
   download_btn: 'Combo herunterladen',
   toast_combo_saved: '{name} gespeichert!',
