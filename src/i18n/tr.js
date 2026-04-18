@@ -6,6 +6,7 @@ export default {
   // ── Sidebar ──
   tab_my_combos: 'Kombolarım',
   tab_historical: 'Tarihi Metinler',
+  tab_masters: 'Tarihi Ustalar',
   historical_masters: 'Tarihi Ustalar',
   master_label: 'Usta',
   historical_analysis: 'Tarihi Analiz:',

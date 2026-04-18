@@ -52,7 +52,7 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)]">
           <div>
-            <h2 className="text-xl font-display font-bold text-[var(--color-ink-red)] uppercase tracking-widest leading-none block">{t('wizard_you')}</h2>
+            <h2 className="text-xl font-display font-bold text-[var(--color-ink-red)] uppercase tracking-widest leading-none block">{t('you')}</h2>
             <span className="text-xs font-bold text-[var(--color-ink-faded)] uppercase tracking-[0.2em]">{t('wizard_select')}</span>
           </div>
           <button onClick={onClose} className="w-10 h-10 flex items-center justify-center border-2 border-[var(--color-ink-black)] bg-[var(--color-parchment-light)] hover:bg-[var(--color-ink-red)] hover:text-white transition-colors shadow-[2px_2px_0_0_var(--color-ink-black)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none font-bold text-xl">

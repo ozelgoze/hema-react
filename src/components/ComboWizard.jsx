@@ -96,6 +96,47 @@ const pickDescKey = (move, cleanProb) => {
   return Math.random() < cleanProb ? move.descKey : `${move.descKey}_sloppy`;
 };
 
+// ═══════════════════════════════════════════════════════════
+// HEMA Attack Doctrine — based on instructor's "Basit Atak Diyagramı"
+// Root: probe → read reaction → branch.
+//   A. Reacts + holds centerline (Strong+Bind) → pacify & pressure (Grapple / Counter+Thrust / Wind)
+//   B. Reacts + breaks centerline (own Wind or NoBind-Thrust) → RETREAT next
+//   C. No reaction + can hit → strike with Counter+Thrust or committed Cut, return to sword
+//   D. No reaction + can't hit → approach (not encoded — UI-level hint only)
+// Returns an additive score. Applied on top of personality + core-principle scoring.
+// ═══════════════════════════════════════════════════════════
+const applyDoctrine = ({ aiTags = [], userTags = [], prevOwnTags = [] }) => {
+  let score = 0;
+
+  // B. "Merkez çizgisini bozuyor → Abnemen/Zucken/Durchwechsel/Winding sonrasında uzaklaş."
+  // If the actor just broke the line (Wind, or NoBind-Thrust disengage), the NEXT move should retreat or re-bind.
+  const brokeLineLastTurn =
+    prevOwnTags.includes('Wind') ||
+    (prevOwnTags.includes('NoBind') && prevOwnTags.includes('Thrust'));
+  if (brokeLineLastTurn) {
+    if (aiTags.includes('Retreat')) score += 8;
+    if (aiTags.includes('Bind')) score += 3;
+    if (aiTags.includes('Cut') && !aiTags.includes('Counter')) score -= 4;
+  }
+
+  // A. "Merkez çizgisinde kalıyor, eller arkada → güreş / kılıcı pasifize edip sapla veya kes."
+  // Against a passive Strong+Bind opponent, favor pacify-then-thrust, grapple, or sword-manipulation (Wind).
+  if (userTags.includes('Strong') && userTags.includes('Bind')) {
+    if (aiTags.includes('Grapple')) score += 6;
+    if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += 5;
+    if (aiTags.includes('Wind')) score += 3;
+  }
+
+  // C. "Reaksiyon vermiyor, vurabilirim → saplama/kesiş + rakibin kılıcına git ya da uzaklaş."
+  // After a passive retreat from the user, a committed Counter+Thrust is the cleanest finish.
+  if (userTags.includes('Retreat')) {
+    if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += 6;
+    if (aiTags.includes('Cut') && aiTags.includes('NoBind')) score += 3;
+  }
+
+  return score;
+};
+
 // Calculate how many finisher paths are available from a given reaction
 const countFinisherPaths = (reactionId) => {
   const directFinishers = hemaMoves.filter(m => m.phase === 'finisher' && m.follows?.includes(reactionId));
@@ -165,10 +206,30 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
     return getMovesByPhase(currentPhase);
   }, [currentPhase, isComplete, canShowFinishers]);
 
+  // User's own previous action (two nodes back when it's the user's turn).
+  // Used to apply doctrine rules (e.g. "after winding/disengaging, retreat next").
+  const userPrevOwnTags = useMemo(() => {
+    if (activePlayNodes.length < 2) return [];
+    const cand = activePlayNodes[activePlayNodes.length - 2]?.data;
+    return cand?.nodeRole === 'user-action' ? (cand.tags || []) : [];
+  }, [activePlayNodes]);
+
   const recommendedMoves = useMemo(() => {
     if (!lastNode) return [];
-    return availableMoves.filter((m) => m.follows?.includes(lastNode.moveId));
-  }, [availableMoves, lastNode]);
+    const filtered = availableMoves.filter((m) => m.follows?.includes(lastNode.moveId));
+    // Sort so the diagram-compliant move surfaces as the ⭐ AI Suggestion.
+    return filtered
+      .map((m) => ({
+        move: m,
+        score: applyDoctrine({
+          aiTags: m.tags || [],
+          userTags: lastNode.tags || [],
+          prevOwnTags: userPrevOwnTags,
+        }),
+      }))
+      .sort((a, b) => b.score - a.score)
+      .map((x) => x.move);
+  }, [availableMoves, lastNode, userPrevOwnTags]);
 
   let commentaryContext = 'commentary_generic';
   const [hasHandledEnd, setHasHandledEnd] = useState(false);
@@ -283,6 +344,12 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
           if (personality && personality.bias) {
             score += personality.bias(move, userTags);
           }
+
+          // ── HEMA Attack Doctrine (instructor's decision tree) ──
+          // AI's own previous action is 2 nodes back (opponent-action → user-action → now opponent-action).
+          const aiPrevOwn = activePlayNodes.length >= 2 ? activePlayNodes[activePlayNodes.length - 2]?.data : null;
+          const prevOwnTags = aiPrevOwn?.nodeRole === 'opponent-action' ? (aiPrevOwn.tags || []) : [];
+          score += applyDoctrine({ aiTags, userTags, prevOwnTags });
 
           // ── Anti-finisher scoring (difficulty-scaled) ──
           // Higher difficulty AI picks reactions that expose FEWER finisher paths
