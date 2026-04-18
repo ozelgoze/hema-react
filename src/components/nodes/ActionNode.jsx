@@ -125,21 +125,8 @@ function ActionNode({ data }) {
         })()}
       </div>
 
-      {/* Tactical breakdown — answers the 4 questions: meeting / bind / forte-weak / execution */}
-      {/* Prefer data.descKey (AI-picked clean/sloppy variant) over the static move default. */}
-      {(() => {
-        const breakdownKey = data.descKey || (data.moveId && getMoveById(data.moveId)?.descKey);
-        return breakdownKey ? (
-          <div className="px-4 pb-3">
-            <p className="text-[12px] md:text-[13px] font-body text-[var(--color-ink-black)] leading-relaxed whitespace-pre-line">
-              {t(breakdownKey)}
-            </p>
-          </div>
-        ) : null;
-      })()}
-
-      {/* Tags */}
-      <div className="flex flex-wrap gap-1.5 px-5 pb-5">
+      {/* Tags — always visible; serve as compact identity (Strong/Bind/Cut etc.) */}
+      <div className="flex flex-wrap gap-1.5 px-5 pb-4">
         <span className="text-xs px-2 py-0.5 bg-[var(--color-parchment-dark)] text-[var(--color-ink-black)] font-bold uppercase tracking-wider border-2 border-[var(--color-ink-black)] shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">
           {t(phaseKey)}
         </span>
@@ -153,34 +140,57 @@ function ActionNode({ data }) {
         ))}
       </div>
 
-      {/* Manuscript Note Toggle */}
-      {data.moveId && getManuscriptKey(data.moveId) && (
-        <div className="border-t-[3px] border-[var(--color-ink-black)] bg-[var(--color-parchment-light)] rounded-b-sm">
-          {!isExpanded ? (
-            <button 
-              onClick={() => setIsExpanded(true)}
-              className="w-full py-3 text-[11px] uppercase tracking-widest font-bold text-[var(--color-ink-black)] flex justify-center items-center gap-2 transition-colors outline-none focus:outline-none bg-[var(--color-parchment-dark)] hover:bg-[var(--color-ink-red)] hover:text-white"
-            >
-              <span>{t('tactics_note') || 'Daha Fazla'}</span> <span className="text-[10px]">▼</span>
-            </button>
-          ) : (
-            <div className="p-5 animate-fade-in relative bg-[var(--color-parchment-light)] shadow-[inset_0_4px_8px_rgba(0,0,0,0.05)] border-b-4 border-l-4 border-r-4 border-transparent">
-              <button 
-                onClick={() => setIsExpanded(false)}
-                className="absolute top-2 right-3 w-8 h-8 flex items-center justify-center text-[var(--color-ink-black)] hover:text-white hover:bg-[var(--color-ink-red)] border-2 border-transparent hover:border-[var(--color-ink-black)] font-bold text-sm transition-all"
+      {/* Unified "More" toggle — tactical breakdown + manuscript note hidden behind single expand */}
+      {(() => {
+        const breakdownKey = data.descKey || (data.moveId && getMoveById(data.moveId)?.descKey);
+        const manuscriptKey = data.moveId && getManuscriptKey(data.moveId);
+        if (!breakdownKey && !manuscriptKey) return null;
+        return (
+          <div className="border-t-[3px] border-[var(--color-ink-black)] bg-[var(--color-parchment-light)] rounded-b-sm">
+            {!isExpanded ? (
+              <button
+                onClick={() => setIsExpanded(true)}
+                className="w-full min-h-[44px] py-3 text-[11px] uppercase tracking-widest font-bold text-[var(--color-ink-black)] flex justify-center items-center gap-2 transition-colors outline-none focus:outline-none bg-[var(--color-parchment-dark)] hover:bg-[var(--color-ink-red)] hover:text-white"
+                aria-label={t('more_details')}
               >
-                ▲
+                <span>{t('more_details')}</span> <span className="text-[10px]">▼</span>
               </button>
-              <div className="text-[10px] text-[var(--color-ink-red)] uppercase font-display font-bold tracking-widest mb-2 flex items-center gap-1.5 border-b-2 border-dashed border-[var(--color-ink-red)] pb-1 w-max">
-                📜 {t('tactics_note')}
+            ) : (
+              <div className="p-5 animate-fade-in relative bg-[var(--color-parchment-light)] shadow-[inset_0_4px_8px_rgba(0,0,0,0.05)] border-b-4 border-l-4 border-r-4 border-transparent">
+                <button
+                  onClick={() => setIsExpanded(false)}
+                  className="absolute top-2 right-3 w-10 h-10 flex items-center justify-center text-[var(--color-ink-black)] hover:text-white hover:bg-[var(--color-ink-red)] border-2 border-transparent hover:border-[var(--color-ink-black)] font-bold text-sm transition-all"
+                  aria-label={t('collapse')}
+                >
+                  ▲
+                </button>
+
+                {breakdownKey && (
+                  <div className="mb-4 pr-10">
+                    <div className="text-[10px] text-[var(--color-ink-black)] uppercase font-display font-bold tracking-widest mb-2 border-b-2 border-dashed border-[var(--color-ink-black)] pb-1 w-max">
+                      {t('tactical_breakdown')}
+                    </div>
+                    <p className="text-[12px] md:text-[13px] font-body text-[var(--color-ink-black)] leading-relaxed whitespace-pre-line">
+                      {t(breakdownKey)}
+                    </p>
+                  </div>
+                )}
+
+                {manuscriptKey && (
+                  <div className="pr-10">
+                    <div className="text-[10px] text-[var(--color-ink-red)] uppercase font-display font-bold tracking-widest mb-2 flex items-center gap-1.5 border-b-2 border-dashed border-[var(--color-ink-red)] pb-1 w-max">
+                      📜 {t('tactics_note')}
+                    </div>
+                    <p className="font-body font-medium text-[13px] md:text-sm text-[var(--color-ink-black)] leading-relaxed mt-2">
+                      "{t(manuscriptKey)}"
+                    </p>
+                  </div>
+                )}
               </div>
-              <p className="font-body font-medium text-[13px] md:text-sm text-[var(--color-ink-black)] leading-relaxed mt-2 pr-4">
-                "{t(getManuscriptKey(data.moveId))}"
-              </p>
-            </div>
-          )}
-        </div>
-      )}
+            )}
+          </div>
+        );
+      })()}
 
       {/* Scoring point indicator */}
       {(role === 'scoring-point' || role === 'opponent-point') && (

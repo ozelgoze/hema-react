@@ -112,7 +112,7 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
                       >
                         {isTopAiPick && (
                           <div className="absolute top-0 right-0 px-3 py-1 bg-[var(--color-gold)] border-l-[2px] border-b-[2px] border-[var(--color-ink-black)] flex items-center justify-center shadow-sm">
-                             <span className="text-[var(--color-ink-black)] text-[10px] font-bold uppercase tracking-widest">🛡️ AI Suggestion</span>
+                             <span className="text-[var(--color-ink-black)] text-[10px] font-bold uppercase tracking-widest">🛡️ {t('ai_suggestion')}</span>
                           </div>
                         )}
                         <h4 className={`font-display font-bold ${isTopAiPick ? 'text-lg text-[var(--color-ink-red)]' : 'text-base'} tracking-wide block mb-1 mt-1`}>
