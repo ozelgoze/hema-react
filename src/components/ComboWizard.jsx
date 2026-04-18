@@ -402,7 +402,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
         <button
            onClick={() => setIsExpanded(!isExpanded)}
            className="md:hidden w-full bg-[var(--color-parchment-dark)] py-2.5 px-4 flex flex-col items-center gap-1.5 border-b-2 border-[var(--color-ink-black)] active:bg-[var(--color-parchment)] transition-colors min-h-[44px] focus:outline-none"
-           aria-label={isExpanded ? 'Collapse duel control' : 'Expand duel control'}
+           aria-label={isExpanded ? t('collapse_duel_control') : t('expand_duel_control')}
         >
            <div className="w-12 h-1.5 bg-[var(--color-ink-faded)] rounded-full"></div>
            {!matchWon && !matchLost && (
@@ -444,13 +444,14 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
             <div className="w-px h-6 bg-[var(--color-ink-faded)] mx-1"></div>
             <button
               onClick={() => setIsAiMode(!isAiMode)}
-              className={`px-3 py-1 text-xs rounded-none border-[2px] font-bold uppercase tracking-wider transition-all duration-300 ${
+              aria-pressed={isAiMode}
+              className={`px-3 min-h-[44px] md:min-h-0 md:py-1 text-xs rounded-none border-[2px] font-bold uppercase tracking-wider transition-all duration-300 ${
                 isAiMode
                   ? 'bg-[var(--color-ink-black)] text-[var(--color-parchment-light)] border-[var(--color-ink-black)]'
                   : 'bg-[var(--color-parchment-light)] text-[var(--color-ink-black)] border-[var(--color-ink-black)]'
               }`}
             >
-              {isAiMode ? t('toggle_ai') : "MANUAL"}
+              {isAiMode ? t('toggle_ai') : t('mode_manual')}
             </button>
           </div>
         </div>

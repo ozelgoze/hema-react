@@ -198,13 +198,13 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleLoad(combo)}
-                            className="flex-1 py-1.5 bg-[var(--color-ink-black)] text-[var(--color-parchment-light)] text-[10px] font-bold uppercase tracking-wider hover:bg-[var(--color-ink-red)] transition-colors border border-[var(--color-ink-black)]"
+                            className="flex-1 min-h-[44px] py-2 bg-[var(--color-ink-black)] text-[var(--color-parchment-light)] text-[10px] font-bold uppercase tracking-wider hover:bg-[var(--color-ink-red)] transition-colors border border-[var(--color-ink-black)]"
                           >
                             {t('btn_load')}
                           </button>
                           <button
                             onClick={(e) => { e.stopPropagation(); handleDelete(combo.id); }}
-                            className="px-3 py-1.5 bg-[var(--color-parchment)] text-[var(--color-ink-red)] border-[2px] border-[var(--color-ink-red)] text-[10px] font-bold uppercase hover:bg-[var(--color-ink-red)] hover:text-white transition-colors"
+                            className="px-3 min-h-[44px] py-2 bg-[var(--color-parchment)] text-[var(--color-ink-red)] border-[2px] border-[var(--color-ink-red)] text-[10px] font-bold uppercase hover:bg-[var(--color-ink-red)] hover:text-white transition-colors"
                           >
                             {t('delete_combo')}
                           </button>

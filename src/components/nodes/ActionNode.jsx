@@ -65,8 +65,8 @@ function ActionNode({ data }) {
       {data.isSelector ? (
         <div className="text-center animate-pulse">
            <span className="text-5xl filter grayscale mb-3 block">⚔️</span>
-           <h2 className="text-xl font-display font-bold text-[var(--color-ink-red)] uppercase tracking-[0.2em]">{t('btn_load') || "HAMLE SEÇ"}</h2>
-           <p className="text-xs text-[var(--color-ink-black)]/70 uppercase tracking-widest mt-2">{t('wizard_you') || "Sıra Sende"}</p>
+           <h2 className="text-xl font-display font-bold text-[var(--color-ink-red)] uppercase tracking-[0.2em]">{t('wizard_select')}</h2>
+           <p className="text-xs text-[var(--color-ink-black)]/70 uppercase tracking-widest mt-2">{t('your_turn')}</p>
         </div>
       ) : (
         <>

@@ -129,9 +129,10 @@ export default function ChronicleLog({ nodes }) {
           <h2 className="font-display text-lg uppercase tracking-widest text-[var(--color-gold)] flex items-center gap-2">
             <span className="text-xl filter grayscale drop-shadow-md">📜</span> {t('chronicle_title')}
           </h2>
-          <button 
+          <button
             onClick={() => setIsOpen(false)}
-            className="text-[var(--color-parchment)] hover:text-[var(--color-ink-red)] text-xl leading-none transition-colors"
+            aria-label={t('collapse')}
+            className="w-11 h-11 flex items-center justify-center text-[var(--color-parchment)] hover:text-[var(--color-ink-red)] text-2xl leading-none transition-colors"
           >
             ×
           </button>
