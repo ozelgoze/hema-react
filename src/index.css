@@ -183,6 +183,14 @@ html, body, #root {
   animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
 }
 
+/* iOS safe area — keeps bottom HUD above the home indicator */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
 /* Ink drawing animation for SVG paths */
 .ink-draw-animation {
   stroke-dasharray: 1000;

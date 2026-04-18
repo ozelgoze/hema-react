@@ -5,7 +5,8 @@ import LanguageSelector from './LanguageSelector';
 import MoveSelectorModal from './MoveSelectorModal';
 
 // ═══════════════════════════════════════════════════════════
-// AI Personality Profiles
+// AI Personality Profiles — functional tag system
+// Tags: Strong/Weak, Bind/NoBind, Cut/Thrust/Grapple/Wind/Counter/Retreat
 // ═══════════════════════════════════════════════════════════
 const AI_PROFILES = {
   liechtenauer: {
@@ -15,18 +16,16 @@ const AI_PROFILES = {
     bias: (move, userTags) => {
       let score = 0;
       const aiTags = move.tags || [];
-      // Liechtenauer: relentless Vor pressure, exploit Strong/Weak imbalance
+      // Relentless forward pressure — answer strength with strength, punish weakness
       if (aiTags.includes('Strong')) score += 6;
-      if (aiTags.includes('Winden')) score += 8;
+      if (aiTags.includes('Counter')) score += 8;
+      if (aiTags.includes('Wind')) score += 7;
       if (userTags.includes('Weak')) score += 12;
-      if (aiTags.includes('Retreat') || aiTags.includes('Abzug')) score -= 10;
-      if (move.type === 'counter') score += 5;
-      // Liechtenauer's Zettel: "Wer auf dich stürmt, Zucken ihm droht"
-      // Against chasers: meet force with force — Gegenhau directly into the charge
-      if (userTags.includes('Nachreisen')) {
-        if (aiTags.includes('Bind') || aiTags.includes('Strong')) score += 15;
-        if (move.id === 'g-gegenhau') score += 20; // Preferred: head-on counter-cut
-        if (aiTags.includes('Retreat') || aiTags.includes('Abzug')) score -= 15; // Never yield ground
+      if (aiTags.includes('Retreat')) score -= 10;
+      // Against a chaser: meet the charge head-on with a counter-cut
+      if (userTags.includes('Cut') && userTags.includes('NoBind')) {
+        if (aiTags.includes('Counter')) score += 15;
+        if (aiTags.includes('Retreat')) score -= 15;
       }
       return score;
     },
@@ -34,24 +33,21 @@ const AI_PROFILES = {
   fiore: {
     nameKey: 'ai_personality_fiore',
     style: 'grappling',
-    finisherBlockStrength: 0.9, // Fiore fights long — very hard to finish quickly
+    finisherBlockStrength: 0.9, // Fiore fights long — hard to finish quickly
     bias: (move, userTags) => {
       let score = 0;
       const aiTags = move.tags || [];
-      // Fiore: close distance aggressively, bind, control, grapple
-      if (aiTags.includes('Zogho Stretto')) score += 10;
-      if (aiTags.includes('Strong')) score += 8;
-      if (move.type === 'grapple') score += 15;
-      if (move.type === 'counter') score += 6;
-      if (userTags.includes('Zogho Largo')) score += 8;
-      if (aiTags.includes('Weak')) score -= 8; // Fiore never shows weakness
-      if (aiTags.includes('Retreat') || aiTags.includes('Abzug')) score -= 12;
-      // Fiore's core: "Chi mi segue, trova la mia punta"
-      // Against chasers, ALWAYS thrust — never cut or retreat
-      if (userTags.includes('Nachreisen')) {
-        if (move.type === 'thrust') score += 20;
-        if (move.id === 'i-colpo-di-punta') score += 25; // Strongest preference
-        if (aiTags.includes('Retreat')) score -= 20; // Never retreat from a chaser
+      // Close distance, secure the bind, control with grapple/thrust
+      if (aiTags.includes('Bind')) score += 8;
+      if (aiTags.includes('Grapple')) score += 15;
+      if (aiTags.includes('Close')) score += 6;
+      if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += 10;
+      if (aiTags.includes('Weak')) score -= 8;
+      if (aiTags.includes('Retreat')) score -= 12;
+      // "Chi mi segue, trova la mia punta" — against a chaser, set the point
+      if (userTags.includes('Cut') && userTags.includes('NoBind')) {
+        if (aiTags.includes('Thrust') && aiTags.includes('Counter')) score += 25;
+        if (aiTags.includes('Retreat')) score -= 20;
       }
       return score;
     },
@@ -63,32 +59,41 @@ const AI_PROFILES = {
     bias: (move, userTags) => {
       let score = 0;
       const aiTags = move.tags || [];
-      // Meyer: technical brilliance, Meisterhau preference, varied patterns
-      if (aiTags.includes('Meisterhau')) score += 12;
-      if (aiTags.includes('Vor')) score += 4;
-      if (move.type === 'counter') score += 6;
-      if (aiTags.includes('Winden')) score += 8;
+      // Technical variety — winding, angles, controlled counters
+      if (aiTags.includes('Wind')) score += 10;
+      if (aiTags.includes('Counter')) score += 6;
+      if (aiTags.includes('Bind')) score += 5;
       score += Math.random() * 4;
-      // Meyer's Kunst des Fechtens: use the Zwerchhau angle against a rusher
-      // Catch them from the side as they charge in — technical, not brute force
-      if (userTags.includes('Nachreisen')) {
-        if (aiTags.includes('Meisterhau')) score += 18; // Zwerchhau-type angles
-        if (move.id === 'g-gegenhau') score += 12; // Still values counter-cuts
-        if (aiTags.includes('Bind')) score += 10; // Create a bind to control
-        if (aiTags.includes('Retreat') || aiTags.includes('Abzug')) score -= 10; // Retreat less preferred against chasers
+      // Against chasers: create a bind, wind into a new line
+      if (userTags.includes('Cut') && userTags.includes('NoBind')) {
+        if (aiTags.includes('Counter')) score += 14;
+        if (aiTags.includes('Bind')) score += 10;
+        if (aiTags.includes('Retreat')) score -= 8;
       }
-      // Meyer is technical, not cowardly — moderate retreat penalty
-      if (aiTags.includes('Retreat') || aiTags.includes('Abzug')) score -= 6;
+      if (aiTags.includes('Retreat')) score -= 6;
       return score;
     },
   },
 };
 
 // AI Difficulty — controls how optimally the AI plays
+// cleanProb = probability the AI executes its intent flawlessly (descKey unchanged).
+// 1 - cleanProb = probability it botches (descKey → desc_*_sloppy). Only applied to reactions.
 const AI_DIFFICULTY = {
-  novice: { randomWeight: 10, topN: 5, thinkTime: 600, minStepsForFinisher: 1, finisherBlockMult: 0 },
-  adept: { randomWeight: 3, topN: 3, thinkTime: 1000, minStepsForFinisher: 3, finisherBlockMult: 0.5 },
-  master: { randomWeight: 0.5, topN: 1, thinkTime: 1400, minStepsForFinisher: 5, finisherBlockMult: 1.0 },
+  novice: { randomWeight: 10, topN: 5, thinkTime: 600, minStepsForFinisher: 1, finisherBlockMult: 0, cleanProb: 0.10 },
+  adept: { randomWeight: 3, topN: 3, thinkTime: 1000, minStepsForFinisher: 3, finisherBlockMult: 0.5, cleanProb: 0.65 },
+  master: { randomWeight: 0.5, topN: 1, thinkTime: 1400, minStepsForFinisher: 5, finisherBlockMult: 1.0, cleanProb: 0.95 },
+};
+
+// Reactions are the only moves with clean/sloppy description variants.
+const REACTION_MOVE_IDS = new Set(['react-strong-parry', 'react-soft-parry', 'react-counter-cut', 'react-wind', 'react-retreat']);
+
+// Pick clean or sloppy description based on difficulty.
+// Sloppy variants only exist for reactions — other phases fall through unchanged.
+const pickDescKey = (move, cleanProb) => {
+  if (!move?.descKey) return null;
+  if (!REACTION_MOVE_IDS.has(move.id)) return move.descKey;
+  return Math.random() < cleanProb ? move.descKey : `${move.descKey}_sloppy`;
 };
 
 // Calculate how many finisher paths are available from a given reaction
@@ -195,18 +200,20 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
   if (isMistake) {
     const oppTags = oppReactionData.tags || [];
     const userTags = userActionData.tags || [];
-    const isGerman = oppReactionData.tradition === 'german' || userActionData.tradition === 'german';
 
-    if (isGerman) {
-       if (oppTags.includes('Strong') && userTags.includes('Weak')) commentaryContext = 'feedback_german_weak_vs_strong';
-       else if (oppTags.includes('Winden') && !userTags.includes('Winden')) commentaryContext = 'feedback_german_winden';
-       else if (oppTags.includes('Kron')) commentaryContext = 'commentary_crown';
-       else if (oppTags.includes('Retreat') || oppTags.includes('Abzug')) commentaryContext = 'commentary_retreats';
-       else commentaryContext = 'commentary_generic';
+    // Diagnose the structural mismatch using the new functional tag vocabulary.
+    if (oppTags.includes('Strong') && oppTags.includes('Bind') && userTags.includes('Weak')) {
+      commentaryContext = 'feedback_weak_vs_strong';
+    } else if (oppTags.includes('Bind') && userTags.includes('NoBind')) {
+      commentaryContext = 'feedback_bind_dropped';
+    } else if (oppTags.includes('Retreat') && userTags.includes('Cut') && userTags.includes('NoBind')) {
+      commentaryContext = 'feedback_chased_blind';
+    } else if (oppTags.includes('Strong') && oppTags.includes('Bind') && userTags.includes('Cut')) {
+      commentaryContext = 'feedback_high_strong_trap';
+    } else if (userTags.includes('Grapple') && !oppTags.includes('Bind')) {
+      commentaryContext = 'feedback_grapple_too_far';
     } else {
-       if (oppTags.includes('Zogho Largo') && userTags.includes('Zogho Stretto')) commentaryContext = 'feedback_italian_largo_vs_stretto';
-       else if (oppTags.includes('Strong')) commentaryContext = 'commentary_crown';
-       else commentaryContext = 'commentary_generic';
+      commentaryContext = 'commentary_generic';
     }
   }
 
@@ -215,24 +222,20 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
   // ═══════════════════════════════════════════════════════════
   useEffect(() => {
     if (isOpponentTurn && isAiMode && !isMistake) {
-      // If no recommended moves exist, AI uses a fallback (withdrawal/reset)
+      // If no recommended moves exist, AI falls back to a retreat to reset the fight
       if (recommendedMoves.length === 0) {
         setAiThinking(true);
         const timer = setTimeout(() => {
-          const personalityTradition = aiPersonality === 'fiore' ? 'italian' : 'german';
-          const fallbackId = personalityTradition === 'italian' ? 'i-ritirata' : 'g-abzug';
-          const fallbackMove = getMoveById(fallbackId);
+          const fallbackMove = getMoveById('react-retreat');
           if (fallbackMove) {
             onAddNode({
               moveId: fallbackMove.id,
-              moveName: fallbackMove.name,
               nameKey: fallbackMove.nameKey,
+              descKey: pickDescKey(fallbackMove, difficulty.cleanProb),
               nodeRole: 'opponent-action',
               phase: currentPhase,
               step: nodes.length + 1,
-              tradition: fallbackMove.tradition,
               tags: fallbackMove.tags,
-              master: fallbackMove.master,
             });
           }
           setAiThinking(false);
@@ -250,29 +253,24 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
           const userTags = lastNode?.tags || [];
 
           // ── Core HEMA principles (always active) ──
-          if (userTags.includes('Strong')) {
-            if (aiTags.includes('Winden') || aiTags.includes('Weak') || aiTags.includes('Retreat') || aiTags.includes('Abzug')) score += 10;
-            if (aiTags.includes('Strong')) score -= 5;
+          // Strong vs Strong is wasteful — yield or wind around it
+          if (userTags.includes('Strong') && userTags.includes('Bind')) {
+            if (aiTags.includes('Wind') || aiTags.includes('Weak') || aiTags.includes('NoBind')) score += 10;
+            if (aiTags.includes('Strong') && aiTags.includes('Cut')) score -= 5;
           }
-          if (userTags.includes('Zogho Largo') || userTags.includes('Largo')) {
-            if (aiTags.includes('Zogho Stretto') || aiTags.includes('Stretto')) score += 8;
+          // Against a retreating opponent, chase — but a counter-thrust is safer
+          if (userTags.includes('Retreat')) {
+            if (aiTags.includes('Cut') && aiTags.includes('NoBind')) score += 6;
+            if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += 10;
           }
-          if (userTags.includes('Retreat') || userTags.includes('Abzug')) {
-            if (aiTags.includes('Nachreisen')) score += 10;
+          // Against a committed cut with no bind, a counter-cut or counter-thrust is the answer
+          if (userTags.includes('Cut') && userTags.includes('NoBind')) {
+            if (aiTags.includes('Counter')) score += 8;
           }
 
           // ── Personality bias ──
           if (personality && personality.bias) {
             score += personality.bias(move, userTags);
-          }
-
-          // ── Tradition preference ── 
-          // AI strongly prefers moves from its personality's tradition
-          const personalityTradition = aiPersonality === 'fiore' ? 'italian' : 'german';
-          if (move.tradition === personalityTradition) {
-            score += 15; // Heavy bonus for matching tradition
-          } else {
-            score -= 5; // Penalty for cross-tradition
           }
 
           // ── Anti-finisher scoring (difficulty-scaled) ──
@@ -288,12 +286,11 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
           }
 
           // ── Fallback penalty ──
-          // Withdrawal/retreat moves marked as fallback should only be used
-          // when no better tactical option exists
+          // Retreat moves marked as fallback should only be used when no better option exists
           if (move.isFallback) {
             score -= 25;
           }
-          
+
           return { ...move, score };
         });
 
@@ -303,14 +300,12 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
 
         onAddNode({
           moveId: bestMove.id,
-          moveName: bestMove.name,
           nameKey: bestMove.nameKey,
+          descKey: pickDescKey(bestMove, difficulty.cleanProb),
           nodeRole: 'opponent-action',
           phase: currentPhase,
           step: nodes.length + 1,
-          tradition: bestMove.tradition,
           tags: bestMove.tags,
-          master: bestMove.master,
         });
         setAiThinking(false);
       }, difficulty.thinkTime);
@@ -324,20 +319,17 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
       const timer = setTimeout(() => {
         onAddNode({
           moveId: null,
-          moveName: 'Riposte',
           nameKey: 'opponent_finisher_name',
           descKey: commentaryContext,
           nodeRole: 'opponent-point',
           phase: 'finisher',
           step: nodes.length + 1,
-          tradition: oppReactionData?.tradition || 'german',
           tags: ['Punish', 'Hit'],
-          master: oppReactionData?.master || 'Unknown',
         });
       }, 800);
       return () => clearTimeout(timer);
     }
-  }, [isOpponentTurn, isAiMode, isMistake, onAddNode, nodes.length, oppReactionData, commentaryContext]);
+  }, [isOpponentTurn, isAiMode, isMistake, onAddNode, nodes.length, commentaryContext]);
 
   // Reactive Spawning of SelectorNodes
   useEffect(() => {
@@ -361,23 +353,23 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
 
     onAddNode({
       moveId: move.id,
-      moveName: move.name,
       nameKey: move.nameKey,
       nodeRole,
       phase: move.type === 'finisher' ? 'finisher' : 'user-action',
-      tradition: move.tradition,
       tags: move.tags,
-      master: move.master,
     }, true);
-    
+
     const aiTags = oppReactionData?.tags || [];
+    const userTags = move.tags || [];
     if (isAiMode && isOpponentTurn) {
-        if (move.tags?.includes('Weak') && aiTags.includes('Strong')) {
-           setLiveFeedback({ type: 'bad', text: t('feedback_german_weak_vs_strong'), master: 'Liechtenauer' });
-        } else if (aiTags.includes('Kron') && !move.tags?.includes('Unterhau')) {
-           setLiveFeedback({ type: 'warning', text: t('commentary_crown').replace('{oppMove}', oppReactionData?.name), master: 'Meyer' });
-        } else if ((aiTags.includes('Abzug') || aiTags.includes('Retreat')) && !move.tags?.includes('Nachreisen')) {
-           setLiveFeedback({ type: 'warning', text: t('commentary_retreats').replace('{oppMove}', oppReactionData?.name), master: 'Historical Principle' });
+        if (userTags.includes('Weak') && aiTags.includes('Strong') && aiTags.includes('Bind')) {
+           setLiveFeedback({ type: 'bad', text: t('feedback_weak_vs_strong'), master: 'Principle' });
+        } else if (aiTags.includes('Bind') && userTags.includes('NoBind')) {
+           setLiveFeedback({ type: 'warning', text: t('feedback_bind_dropped'), master: 'Principle' });
+        } else if (aiTags.includes('Retreat') && userTags.includes('Cut') && userTags.includes('NoBind')) {
+           setLiveFeedback({ type: 'warning', text: t('feedback_chased_blind'), master: 'Fiore' });
+        } else if (userTags.includes('Grapple') && !aiTags.includes('Bind')) {
+           setLiveFeedback({ type: 'warning', text: t('feedback_grapple_too_far'), master: 'Principle' });
         } else if (!isMistake) {
            setLiveFeedback({ type: 'good', text: t('feedback_good'), master: 'Combat Flow' });
         }
@@ -391,15 +383,31 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
 
   return (
     <>
-    <div className={`fixed bottom-0 left-0 w-full md:absolute md:top-4 md:bottom-auto md:left-1/2 md:-translate-x-1/2 z-50 md:w-[420px] transition-transform duration-300 ease-in-out ${!isExpanded ? 'translate-y-[calc(100%-54px)] md:translate-y-0' : 'translate-y-0'}`}>
+    <div className={`fixed bottom-0 left-0 w-full md:absolute md:top-4 md:bottom-auto md:left-1/2 md:-translate-x-1/2 z-50 md:w-[420px] transition-transform duration-300 ease-in-out ${!isExpanded ? 'translate-y-[calc(100%-72px)] md:translate-y-0' : 'translate-y-0'}`}>
       <div className="bg-[var(--color-parchment-light)] rounded-t-xl md:rounded-sm border-t-[3px] md:border-[3px] border-[var(--color-ink-black)] shadow-[0_-10px_40px_rgba(42,37,34,0.2)] md:shadow-[6px_6px_0_0_var(--color-ink-black)] overflow-hidden relative transition-all duration-300">
-        
-        <div 
-           className="md:hidden w-full h-[6px] bg-[var(--color-parchment-dark)] flex justify-center items-center py-2 border-b border-[var(--color-ink-faded)] cursor-pointer"
+
+        {/* Mobile drag handle — larger tap target with live score peek when collapsed */}
+        <button
            onClick={() => setIsExpanded(!isExpanded)}
+           className="md:hidden w-full bg-[var(--color-parchment-dark)] py-2.5 px-4 flex flex-col items-center gap-1.5 border-b-2 border-[var(--color-ink-black)] active:bg-[var(--color-parchment)] transition-colors min-h-[44px] focus:outline-none"
+           aria-label={isExpanded ? 'Collapse duel control' : 'Expand duel control'}
         >
-           <div className="w-12 h-1 bg-[var(--color-ink-faded)] rounded-full"></div>
-        </div>
+           <div className="w-12 h-1.5 bg-[var(--color-ink-faded)] rounded-full"></div>
+           {!matchWon && !matchLost && (
+             <div className="flex items-center gap-3 text-[10px] font-display uppercase tracking-widest text-[var(--color-ink-black)]">
+               <span className="flex items-center gap-1">
+                 <span className="font-bold">{t('you')}</span>
+                 <span className="text-[var(--color-gold)] font-bold">{userScore}</span>
+               </span>
+               <span className="opacity-40">—</span>
+               <span className="flex items-center gap-1">
+                 <span className="text-[var(--color-ink-red)] font-bold">{aiScore}</span>
+                 <span className="font-bold">AI</span>
+               </span>
+               {aiThinking && <span className="text-[var(--color-ink-red)] italic animate-pulse ml-2">⚔️</span>}
+             </div>
+           )}
+        </button>
 
         {/* Header */}
         <div 
@@ -513,7 +521,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
         )}
 
         {/* Scrollable Body Container */}
-        <div className="p-4 md:p-5 max-h-[30vh] md:max-h-none overflow-y-auto scrollbar-thin">
+        <div className="p-4 md:p-5 max-h-[50vh] md:max-h-none overflow-y-auto scrollbar-thin safe-bottom">
           {/* Match Won/Lost Banner (full match result) */}
           {(matchWon || matchLost) ? (
             <div className="text-center py-4 animate-fade-in">
@@ -582,7 +590,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
 
         {/* Sticky Actions Footer (Undo / Clear only) */}
         {(!aiThinking && nodes.length > 0) && (
-          <div className="flex gap-3 px-4 py-3 bg-[var(--color-parchment)] border-t-[2px] border-[var(--color-ink-black)]">
+          <div className="flex gap-3 px-4 py-3 bg-[var(--color-parchment)] border-t-[2px] border-[var(--color-ink-black)] safe-bottom">
             <button onClick={onUndo} disabled={nodes.length === 0} className="px-3 py-3 md:py-3 bg-[var(--color-parchment-dark)] border-[2px] border-[var(--color-ink-black)] hover:bg-[var(--color-ink-black)] hover:text-[var(--color-parchment-light)] text-[var(--color-ink-black)] text-xs font-bold uppercase tracking-wider transition-all disabled:opacity-50 shadow-[4px_4px_0_0_var(--color-ink-black)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none min-h-[44px] min-w-0 shrink-0 flex items-center justify-center gap-2">
               ↩️ <span className="hidden md:inline">{t('wizard_undo')}</span>
             </button>

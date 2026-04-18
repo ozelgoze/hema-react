@@ -114,7 +114,8 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
 
       <button
         onClick={handleDownloadImage}
-        className="absolute top-20 right-4 md:top-auto md:bottom-6 md:right-6 z-50 glass-panel px-3 py-2 md:px-4 md:py-3 rounded-full text-[10px] md:text-xs font-bold text-amber-300 uppercase tracking-widest border border-amber-500/30 hover:border-amber-400 hover:bg-amber-500/20 hover:scale-105 transition-all shadow-[0_0_20px_rgba(245,158,11,0.15)] flex items-center gap-1 md:gap-2 cursor-pointer"
+        aria-label={t('download_image')}
+        className="absolute top-[128px] right-3 md:top-auto md:bottom-6 md:right-6 z-50 glass-panel px-3 py-2 md:px-4 md:py-3 rounded-full text-[10px] md:text-xs font-bold text-amber-300 uppercase tracking-widest border border-amber-500/30 hover:border-amber-400 hover:bg-amber-500/20 hover:scale-105 transition-all shadow-[0_0_20px_rgba(245,158,11,0.15)] flex items-center gap-1 md:gap-2 cursor-pointer min-h-[40px]"
         title={t('download_image')}
       >
         <span className="text-sm md:text-lg filter grayscale opacity-80">📸</span> <span className="hidden md:inline">{t('download_btn')}</span>

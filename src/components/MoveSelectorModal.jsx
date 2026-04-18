@@ -5,24 +5,22 @@ import { hemaMoves, getMovesByPhase } from '../data/hemaMoves';
 export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recommendedMoves, isAiMode, currentPhase }) {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
-  const [traditionFilter, setTraditionFilter] = useState(null);
+  const [phaseFilter, setPhaseFilter] = useState(null);
 
-  // Reset filters on open/close
   useEffect(() => {
     if (!isOpen) {
       setSearchTerm('');
-      setTraditionFilter(null);
+      setPhaseFilter(null);
     }
   }, [isOpen]);
 
   const availableMoves = useMemo(() => {
-    // Phase-filter: only show moves relevant to the current phase 
     let moves;
     if (searchTerm) {
-      // When searching, search across ALL moves so the user can find anything
       moves = hemaMoves;
+    } else if (phaseFilter) {
+      moves = getMovesByPhase(phaseFilter);
     } else if (currentPhase === 'followup') {
-      // In follow-up phase, also show finishers as valid options
       moves = [...getMovesByPhase('followup'), ...getMovesByPhase('finisher')];
     } else if (currentPhase) {
       moves = getMovesByPhase(currentPhase);
@@ -30,9 +28,6 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
       moves = hemaMoves;
     }
 
-    if (traditionFilter) {
-      moves = moves.filter((m) => m.tradition === traditionFilter);
-    }
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
       moves = moves.filter((m) => {
@@ -41,13 +36,12 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
         return nameMatch || tagsMatch;
       });
     }
-    // Filter out already recommended moves from the main list if search is empty
     if (!searchTerm && recommendedMoves && recommendedMoves.length > 0) {
        const recIds = recommendedMoves.map(rm => rm.id);
        moves = moves.filter(m => !recIds.includes(m.id));
     }
     return moves;
-  }, [traditionFilter, searchTerm, t, recommendedMoves, currentPhase]);
+  }, [phaseFilter, searchTerm, t, recommendedMoves, currentPhase]);
 
   if (!isOpen) return null;
 
@@ -69,17 +63,17 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
         {/* Filters */}
         <div className="p-4 bg-[var(--color-parchment-light)] border-b-[2px] border-[var(--color-ink-black)] space-y-3">
           <div className="flex bg-[var(--color-parchment-dark)] border-[2px] border-[var(--color-ink-black)] p-0.5">
-            {['all', 'german', 'italian'].map((trad) => (
+            {['all', 'starter', 'reaction', 'followup', 'finisher'].map((ph) => (
               <button
-                key={trad}
-                onClick={() => setTraditionFilter(trad === 'all' ? null : trad)}
-                className={`flex-1 px-3 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-300 min-h-[44px] ${
-                  (traditionFilter === (trad === 'all' ? null : trad))
+                key={ph}
+                onClick={() => setPhaseFilter(ph === 'all' ? null : ph)}
+                className={`flex-1 px-2 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-300 min-h-[44px] ${
+                  (phaseFilter === (ph === 'all' ? null : ph))
                     ? 'bg-[var(--color-ink-black)] text-[var(--color-parchment-light)]'
                     : 'bg-transparent text-[var(--color-ink-black)] hover:bg-[var(--color-parchment)]'
                 }`}
               >
-                {t(`wizard_${trad}`)}
+                {ph === 'all' ? t('wizard_all') : t(`phase_${ph}`)}
               </button>
             ))}
           </div>
@@ -125,7 +119,7 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
                           {t(move.nameKey)}
                         </h4>
                       <span className="text-[10px] uppercase tracking-widest font-bold opacity-80 block text-[var(--color-ink-faded)]">
-                        {move.master}
+                        {t(`phase_${move.phase}`)}
                       </span>
                       <div className="flex flex-wrap gap-1 mt-2">
                         {move.tags?.map(tag => (
@@ -152,8 +146,8 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
                 onClick={() => { onSelectMove(move); onClose(); }}
                 className="w-full text-left px-4 py-4 min-h-[55px] border-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-light)] text-[var(--color-ink-black)] hover:bg-[var(--color-ink-black)] hover:text-[var(--color-parchment-light)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-ink-red)] shadow-[2px_2px_0_0_var(--color-ink-faded)]"
               >
-                <span className="font-bold text-sm block md:inline">{t(move.nameKey)}</span> 
-                <span className="opacity-70 text-[10px] md:ml-2 block md:inline mt-1 md:mt-0 uppercase tracking-wider">{move.master} [{move.tags?.join(', ')}]</span>
+                <span className="font-bold text-sm block md:inline">{t(move.nameKey)}</span>
+                <span className="opacity-70 text-[10px] md:ml-2 block md:inline mt-1 md:mt-0 uppercase tracking-wider">{t(`phase_${move.phase}`)} [{move.tags?.join(', ')}]</span>
               </button>
             ))}
             {availableMoves.length === 0 && (

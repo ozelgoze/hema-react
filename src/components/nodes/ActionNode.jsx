@@ -1,7 +1,7 @@
 import { memo, useState } from 'react';
 import { Handle, Position } from '@xyflow/react';
 import { useTranslation } from '../../i18n/LanguageContext';
-import { getManuscriptKey } from '../../data/hemaMoves';
+import { getManuscriptKey, getMoveById } from '../../data/hemaMoves';
 
 const roleConfig = {
   'user-action': {
@@ -40,7 +40,6 @@ function ActionNode({ data }) {
   const role = data.nodeRole || 'user-action';
   const config = roleConfig[role];
 
-  const traditionKey = data.tradition === 'german' ? 'tradition_german' : 'tradition_italian';
   const phaseKey = `phase_${data.phase}`;
 
   const roleLabelKey =
@@ -104,16 +103,30 @@ function ActionNode({ data }) {
       {/* Move Name */}
       <div className="px-4 py-3">
         <h3 className={`text-xl font-bold font-display ${config.textColor}`}>
-          <span className="drop-cap">{data.nameKey ? t(data.nameKey)[0] : data.moveName[0]}</span>
-          {data.nameKey ? t(data.nameKey).slice(1) : data.moveName.slice(1)}
+          {data.nameKey ? (
+            <>
+              <span className="drop-cap">{t(data.nameKey)[0]}</span>
+              {t(data.nameKey).slice(1)}
+            </>
+          ) : null}
         </h3>
       </div>
 
+      {/* Tactical breakdown — answers the 4 questions: meeting / bind / forte-weak / execution */}
+      {/* Prefer data.descKey (AI-picked clean/sloppy variant) over the static move default. */}
+      {(() => {
+        const breakdownKey = data.descKey || (data.moveId && getMoveById(data.moveId)?.descKey);
+        return breakdownKey ? (
+          <div className="px-4 pb-3">
+            <p className="text-[12px] md:text-[13px] font-body text-[var(--color-ink-black)] leading-relaxed whitespace-pre-line">
+              {t(breakdownKey)}
+            </p>
+          </div>
+        ) : null;
+      })()}
+
       {/* Tags */}
       <div className="flex flex-wrap gap-1.5 px-5 pb-5">
-        <span className={`text-xs px-2 py-0.5 bg-[var(--color-ink-faded)] text-[var(--color-parchment)] font-bold uppercase tracking-wider border-2 border-[var(--color-ink-black)]`}>
-          {t(traditionKey)}
-        </span>
         <span className="text-xs px-2 py-0.5 bg-[var(--color-parchment-dark)] text-[var(--color-ink-black)] font-bold uppercase tracking-wider border-2 border-[var(--color-ink-black)] shadow-[2px_2px_0_0_rgba(0,0,0,0.1)]">
           {t(phaseKey)}
         </span>

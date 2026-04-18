@@ -15,28 +15,26 @@ export default function ChronicleLog({ nodes }) {
 
   const getMasterQuote = (nameKey) => {
     if (!nameKey) return null;
-    if (nameKey === 'move_zornhau') {
+    if (nameKey === 'move_high_cut') {
       const quotes = ['quote_liech_zornhau', 'quote_meyer_zornhau', 'quote_fiore_fendente'];
       return t(quotes[Math.floor(Math.random() * quotes.length)]);
     }
-    if (nameKey === 'move_winden') {
+    if (nameKey === 'move_wind' || nameKey === 'move_wind_thrust') {
       const quotes = ['quote_liech_winden', 'quote_vadi_winden'];
       return t(quotes[Math.floor(Math.random() * quotes.length)]);
     }
-    if (nameKey === 'move_nachreisen') {
+    if (nameKey === 'move_chase') {
       return t('quote_liech_nachreisen');
     }
-    if (nameKey === 'move_stretto' || nameKey === 'move_zogho_stretto') {
+    if (nameKey === 'move_grapple') {
       return t('quote_fiore_stretto');
     }
-    
-    // Add generic historical wisdom for standard moves
     const generics = ['quote_generic_1', 'quote_generic_2'];
     return t(generics[Math.floor(Math.random() * generics.length)]);
   };
 
   const generateNarrative = (node, index) => {
-    const moveName = node.data.nameKey ? t(node.data.nameKey) : node.data.moveName;
+    const moveName = node.data.nameKey ? t(node.data.nameKey) : '';
     const role = node.data.nodeRole;
     const quote = getMasterQuote(node.data.nameKey);
 
@@ -106,16 +104,18 @@ export default function ChronicleLog({ nodes }) {
 
   return (
     <div className={`fixed z-40 transition-all duration-300 pointer-events-auto
-        ${isOpen ? 'right-0 top-0 h-full md:bottom-24 md:top-4 md:right-4 md:h-auto' : 'right-0 bottom-[180px] md:bottom-auto md:top-4 md:right-4'}
+        ${isOpen ? 'right-0 top-0 h-full md:bottom-24 md:top-4 md:right-4 md:h-auto' : 'right-3 top-[72px] md:top-4 md:right-4 md:bottom-auto'}
       `}
     >
       {/* Toggle Button */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-[var(--color-parchment-dark)] border-2 border-[var(--color-ink-black)] border-r-0 md:border-r-2 text-[var(--color-ink-black)] font-display font-bold px-3 py-2 text-sm uppercase tracking-widest shadow-[inset_0_0_10px_rgba(42,37,34,0.1)] shadow-[-4px_4px_0_0_var(--color-ink-black)] md:shadow-[4px_4px_0_0_var(--color-ink-black)] hover:bg-[var(--color-ink-black)] hover:text-[var(--color-parchment)] transition-all rounded-l-md md:rounded-none"
+          aria-label={t('chronicle_open')}
+          className="bg-[var(--color-parchment-dark)] border-2 border-[var(--color-ink-black)] text-[var(--color-ink-black)] font-display font-bold px-3 py-2 text-xs md:text-sm uppercase tracking-widest shadow-[4px_4px_0_0_var(--color-ink-black)] hover:bg-[var(--color-ink-black)] hover:text-[var(--color-parchment)] transition-all flex items-center gap-1.5 min-h-[40px]"
         >
-          {t('chronicle_open')}
+          <span className="text-base filter grayscale">📜</span>
+          <span className="hidden md:inline">{t('chronicle_open')}</span>
         </button>
       )}
 
