@@ -1,8 +1,9 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
-import { getMovesByPhase, getMoveById, hemaMoves } from '../data/hemaMoves';
+import { getMovesByPhase, getMoveById, hemaMoves, deriveMeasure, measureFit, MEASURE } from '../data/hemaMoves';
 import LanguageSelector from './LanguageSelector';
 import MoveSelectorModal from './MoveSelectorModal';
+import MeasureGauge from './MeasureGauge';
 
 // ═══════════════════════════════════════════════════════════
 // AI Personality Profiles — functional tag system
@@ -105,7 +106,7 @@ const pickDescKey = (move, cleanProb) => {
 //   D. No reaction + can't hit → approach (not encoded — UI-level hint only)
 // Returns an additive score. Applied on top of personality + core-principle scoring.
 // ═══════════════════════════════════════════════════════════
-const applyDoctrine = ({ aiTags = [], userTags = [], prevOwnTags = [] }) => {
+const applyDoctrine = ({ aiTags = [], userTags = [], prevOwnTags = [], tier = MEASURE.MITTEL }) => {
   let score = 0;
 
   // B. "Merkez çizgisini bozuyor → Abnemen/Zucken/Durchwechsel/Winding sonrasında uzaklaş."
@@ -132,6 +133,20 @@ const applyDoctrine = ({ aiTags = [], userTags = [], prevOwnTags = [] }) => {
   if (userTags.includes('Retreat')) {
     if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += 6;
     if (aiTags.includes('Cut') && aiTags.includes('NoBind')) score += 3;
+  }
+
+  // D. "Vuramam → ileri-geri küçük adımlarla yaklaş."
+  // At weit (out of direct reach), reward the single move that closes distance (Nachreisen/chase);
+  // heavily discourage anything that needs nahe (grapple/pommel/takedown) until measure collapses.
+  if (tier === MEASURE.WEIT) {
+    if (aiTags.includes('Grapple')) score -= 10;
+    if (aiTags.includes('Close')) score -= 6;
+    if (aiTags.includes('Retreat')) score -= 3;
+  }
+  // At nahe, the committed cut/thrust is overstretched — prefer close-work (grapple/pommel) or break out.
+  if (tier === MEASURE.NAHE) {
+    if (aiTags.includes('Grapple') || aiTags.includes('Close')) score += 5;
+    if (aiTags.includes('Retreat')) score += 3; // legitimate break from Zogho Stretto
   }
 
   return score;
@@ -214,6 +229,9 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
     return cand?.nodeRole === 'user-action' ? (cand.tags || []) : [];
   }, [activePlayNodes]);
 
+  // Current HEMA measure (tier 0=Nahe, 1=Mittel, 2=Weit), derived by walking the exchange.
+  const currentMeasure = useMemo(() => deriveMeasure(activePlayNodes), [activePlayNodes]);
+
   const recommendedMoves = useMemo(() => {
     if (!lastNode) return [];
     const filtered = availableMoves.filter((m) => m.follows?.includes(lastNode.moveId));
@@ -221,15 +239,17 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
     return filtered
       .map((m) => ({
         move: m,
-        score: applyDoctrine({
-          aiTags: m.tags || [],
-          userTags: lastNode.tags || [],
-          prevOwnTags: userPrevOwnTags,
-        }),
+        score:
+          applyDoctrine({
+            aiTags: m.tags || [],
+            userTags: lastNode.tags || [],
+            prevOwnTags: userPrevOwnTags,
+            tier: currentMeasure,
+          }) + measureFit(m, currentMeasure),
       }))
       .sort((a, b) => b.score - a.score)
       .map((x) => x.move);
-  }, [availableMoves, lastNode, userPrevOwnTags]);
+  }, [availableMoves, lastNode, userPrevOwnTags, currentMeasure]);
 
   let commentaryContext = 'commentary_generic';
   const [hasHandledEnd, setHasHandledEnd] = useState(false);
@@ -349,7 +369,8 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
           // AI's own previous action is 2 nodes back (opponent-action → user-action → now opponent-action).
           const aiPrevOwn = activePlayNodes.length >= 2 ? activePlayNodes[activePlayNodes.length - 2]?.data : null;
           const prevOwnTags = aiPrevOwn?.nodeRole === 'opponent-action' ? (aiPrevOwn.tags || []) : [];
-          score += applyDoctrine({ aiTags, userTags, prevOwnTags });
+          score += applyDoctrine({ aiTags, userTags, prevOwnTags, tier: currentMeasure });
+          score += measureFit(move, currentMeasure);
 
           // ── Anti-finisher scoring (difficulty-scaled) ──
           // Higher difficulty AI picks reactions that expose FEWER finisher paths
@@ -559,6 +580,9 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
             </div>
           </div>
         )}
+
+        {/* HEMA Measure Gauge — animated Mensur/Misura indicator */}
+        {!matchWon && !matchLost && <MeasureGauge tier={currentMeasure} />}
 
         {/* Combat Tracker (Score Counter) */}
         {!matchWon && !matchLost && (

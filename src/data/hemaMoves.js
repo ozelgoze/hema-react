@@ -208,6 +208,81 @@ export const hemaMoves = [
 export const allMoves = hemaMoves;
 
 // ═══════════════════════════════════════════════════════════
+// HEMA Measure (Mensur / Misura) — 3-tier distance model
+// 2 = Weit Mensur / Misura Larga (long / out-of-direct-strike)
+// 1 = Mittel Mensur / Mezza Misura (middle / full cut & thrust)
+// 0 = Nahe Mensur / Zogho Stretto (close / grapple, half-sword, pommel)
+// ═══════════════════════════════════════════════════════════
+export const MEASURE = Object.freeze({ WEIT: 2, MITTEL: 1, NAHE: 0 });
+export const INITIAL_MEASURE = MEASURE.MITTEL;
+
+// Map each move to its effect on measure.
+// 'open'      → +1 (push apart, cap at weit)
+// 'close'     → −1 (draw in, floor at nahe)
+// 'set-nahe'  → force to 0 (grapple commits to closing)
+// 'set-mittel'→ force to 1 (starter/finisher cut/thrust is a full-measure exchange)
+// 'neutral'   → no change (bind-holding actions: wind, press-through on bind)
+export const measureEffect = (move) => {
+  if (!move) return 'neutral';
+  const tags = move.tags || [];
+  if (tags.includes('Retreat')) return 'open';
+  if (tags.includes('Grapple')) return 'set-nahe';
+  if (move.id === 'fu-chase') return 'close';         // Nachreisen physically closes
+  if (move.id === 'fin-pommel') return 'set-nahe';    // Mordschlag is a close action
+  if (tags.includes('Wind') && tags.includes('Bind')) return 'neutral'; // winding keeps bind measure
+  if (move.phase === 'starter' || move.phase === 'finisher') return 'set-mittel';
+  return 'neutral';
+};
+
+export const applyMeasureEffect = (tier, move) => {
+  const e = measureEffect(move);
+  if (e === 'open') return Math.min(MEASURE.WEIT, tier + 1);
+  if (e === 'close') return Math.max(MEASURE.NAHE, tier - 1);
+  if (e === 'set-nahe') return MEASURE.NAHE;
+  if (e === 'set-mittel') return MEASURE.MITTEL;
+  return tier;
+};
+
+// Walk the active play nodes in order and fold the measure effect of each move.
+export const deriveMeasure = (activeNodes) => {
+  let tier = INITIAL_MEASURE;
+  for (const n of activeNodes || []) {
+    const move = getMoveById(n?.data?.moveId);
+    if (move) tier = applyMeasureEffect(tier, move);
+  }
+  return tier;
+};
+
+// Measure-fit heuristic for scoring: how well this move fits the current measure.
+// Returns a small positive/negative number. Used by AI doctrine and user suggestion ranking.
+export const measureFit = (move, tier) => {
+  if (!move) return 0;
+  const tags = move.tags || [];
+  // Grapple / pommel / takedown need nahe. Heavy penalty from weit.
+  if (tags.includes('Grapple') || move.id === 'fin-pommel' || move.id === 'fin-takedown') {
+    if (tier === MEASURE.NAHE) return 6;
+    if (tier === MEASURE.MITTEL) return -3;
+    return -10; // from weit — impossible without closing first
+  }
+  // Chase closes distance — best initiated from mittel (opponent a step away, recoverable).
+  if (move.id === 'fu-chase') {
+    if (tier === MEASURE.MITTEL) return 3;
+    if (tier === MEASURE.WEIT) return -2; // too far to chase cleanly
+  }
+  // Cuts & thrusts need mittel minimum. Penalize at nahe (overcommitted, tangled blade).
+  if (tags.includes('Cut') || tags.includes('Thrust')) {
+    if (tier === MEASURE.WEIT && !tags.includes('Counter')) return -4; // out of distance
+    if (tier === MEASURE.NAHE) return -2; // too close for a full cut/thrust
+  }
+  // Retreat is best from nahe (break the grapple/bind) or mittel; wasted from weit.
+  if (tags.includes('Retreat')) {
+    if (tier === MEASURE.NAHE) return 4;
+    if (tier === MEASURE.WEIT) return -3;
+  }
+  return 0;
+};
+
+// ═══════════════════════════════════════════════════════════
 // Manuscript Source Notes — primary treatise per move
 // ═══════════════════════════════════════════════════════════
 export const manuscriptNotes = {
