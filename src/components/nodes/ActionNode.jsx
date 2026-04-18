@@ -110,6 +110,19 @@ function ActionNode({ data }) {
             </>
           ) : null}
         </h3>
+        {(() => {
+          // Derive hint_* key from move_* nameKey to show a brief localized description
+          // under the original HEMA term (e.g. Oberhau → "Descending cut from high guard").
+          if (!data.nameKey || !data.nameKey.startsWith('move_')) return null;
+          const hintKey = 'hint_' + data.nameKey.slice('move_'.length);
+          const hint = t(hintKey);
+          if (!hint || hint === hintKey) return null;
+          return (
+            <p className="mt-1 text-[11px] md:text-xs italic font-body text-[var(--color-ink-faded)] leading-snug">
+              {hint}
+            </p>
+          );
+        })()}
       </div>
 
       {/* Tactical breakdown — answers the 4 questions: meeting / bind / forte-weak / execution */}

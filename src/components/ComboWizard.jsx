@@ -200,11 +200,13 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
   if (isMistake) {
     const oppTags = oppReactionData.tags || [];
     const userTags = userActionData.tags || [];
+    const isIntentionalDisengage = userTags.includes('Thrust') && userTags.includes('NoBind');
 
     // Diagnose the structural mismatch using the new functional tag vocabulary.
-    if (oppTags.includes('Strong') && oppTags.includes('Bind') && userTags.includes('Weak')) {
+    // Exclude intentional disengages (Thrust+NoBind) — those legitimately break the bind.
+    if (oppTags.includes('Strong') && oppTags.includes('Bind') && userTags.includes('Weak') && !isIntentionalDisengage) {
       commentaryContext = 'feedback_weak_vs_strong';
-    } else if (oppTags.includes('Bind') && userTags.includes('NoBind')) {
+    } else if (oppTags.includes('Bind') && userTags.includes('NoBind') && !isIntentionalDisengage) {
       commentaryContext = 'feedback_bind_dropped';
     } else if (oppTags.includes('Retreat') && userTags.includes('Cut') && userTags.includes('NoBind')) {
       commentaryContext = 'feedback_chased_blind';
@@ -266,6 +268,15 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
           // Against a committed cut with no bind, a counter-cut or counter-thrust is the answer
           if (userTags.includes('Cut') && userTags.includes('NoBind')) {
             if (aiTags.includes('Counter')) score += 8;
+          }
+          // Against a disengage-thrust (Durchwechseln: user broke bind, now thrusts a new line),
+          // the AI must treat it as a fresh incoming thrust — parry it, re-bind, or counter-thrust.
+          // Critically: do NOT try to wind a bind that no longer exists.
+          if (userTags.includes('Thrust') && userTags.includes('NoBind')) {
+            if (aiTags.includes('Bind')) score += 10;           // re-establish bind on the new thrust
+            if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += 8; // counter-thrust
+            if (aiTags.includes('Wind')) score -= 12;           // no bind to wind — penalize
+            if (aiTags.includes('Retreat')) score -= 2;         // valid but cedes tempo
           }
 
           // ── Personality bias ──
@@ -361,10 +372,11 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
 
     const aiTags = oppReactionData?.tags || [];
     const userTags = move.tags || [];
+    const isIntentionalDisengage = userTags.includes('Thrust') && userTags.includes('NoBind');
     if (isAiMode && isOpponentTurn) {
-        if (userTags.includes('Weak') && aiTags.includes('Strong') && aiTags.includes('Bind')) {
+        if (userTags.includes('Weak') && aiTags.includes('Strong') && aiTags.includes('Bind') && !isIntentionalDisengage) {
            setLiveFeedback({ type: 'bad', text: t('feedback_weak_vs_strong'), master: 'Principle' });
-        } else if (aiTags.includes('Bind') && userTags.includes('NoBind')) {
+        } else if (aiTags.includes('Bind') && userTags.includes('NoBind') && !isIntentionalDisengage) {
            setLiveFeedback({ type: 'warning', text: t('feedback_bind_dropped'), master: 'Principle' });
         } else if (aiTags.includes('Retreat') && userTags.includes('Cut') && userTags.includes('NoBind')) {
            setLiveFeedback({ type: 'warning', text: t('feedback_chased_blind'), master: 'Fiore' });

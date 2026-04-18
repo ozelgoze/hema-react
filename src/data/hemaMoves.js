@@ -62,7 +62,7 @@ export const hemaMoves = [
     tags: ['Bind', 'Strong'],
     follows: [
       'attack-high-cut', 'attack-side-cut', 'attack-low-cut', 'attack-thrust',
-      'fu-press-through', 'fu-wind-thrust',
+      'fu-press-through', 'fu-wind-thrust', 'fu-disengage',
     ],
   },
   {
@@ -74,7 +74,7 @@ export const hemaMoves = [
     tags: ['Bind', 'Weak'],
     follows: [
       'attack-high-cut', 'attack-low-cut', 'attack-thrust',
-      'fu-wind-thrust', 'fu-chase',
+      'fu-wind-thrust', 'fu-chase', 'fu-disengage',
     ],
   },
   {

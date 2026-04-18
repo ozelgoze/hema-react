@@ -95,37 +95,63 @@ export default {
   tradition_german: 'German',
   tradition_italian: 'Italian',
 
-  // ── Combo names ──
+  // ── Combo names & Meta ──
   combo_meyer_zornhau: "Meyer's Zornhau Sequence",
   combo_meyer_zornhau_desc: 'A classic opening with the Wrath Cut, countering a crown parry by pulling the blade away (Zucken) and finishing with a slice.',
+  meta_meyer_hist: 'Meyer was writing in an era when thrusting was banned in civic fencing schools (Fechtschule) because of the risk of breaking facial bones. That is why, after the Zornhau, he chose to pull the sword back (Zucken) and score safely with a rising slice (Schnitt) rather than run the opponent through.',
+  meta_meyer_swordfish: 'Modern Swordfish Rules Note: in today\'s tournaments cuts and thrusts are weighted differently (a thrust to the head is often 3 points). Meyer\'s "Schnitt instead of thrust" tactic can expose you to an afterblow in modern meta — sticking with the thrust tends to be safer at ruleset level.',
   combo_fiore_exchange: "Fiore's Exchange of Points",
   combo_fiore_exchange_desc: 'A thrust exchange from Zogho Stretto, leveraging the bind to apply a lower lock and finishing with a pommel strike.',
+  meta_fiore_hist: 'The Italian armoured system (Armizare) is extremely close-measure. Fiore advises that, the moment you neutralize the enemy\'s blade, you finish not with a cut (which cannot pierce armour) but with grapple or a solid thrusting point (Punta).',
+  meta_fiore_swordfish: 'Swordfish Tournament Advice: Fiore\'s close grappling is one of the favourite things of modern referees. A clean lock-score after neutralizing the sword drives the afterblow risk to zero.',
   combo_liech_nachreisen: "Liechtenauer's Nachreisen",
   combo_liech_nachreisen_desc: 'An aggressive pursuit after the initial cut: chasing a retreating opponent and finishing with a devastating Zwerchhau.',
+  meta_liech_hist: 'Liechtenauer\'s system is built on "Vor" (forward pressure). When the opponent cannot bear the pressure and panic-retreats (Abzug), never give them distance to recover — while fear is still in their mind, finish them with Nachreisen (travelling after).',
+  meta_liech_swordfish: 'Swordfish Tournament Advice: Nachreisen is KING of the modern meta. The highest-scoring knockouts in Nordic and Swedish tournaments come from aggressively chasing a retreating opponent with a Zwerchhau just before the referee calls "Halt!".',
 
-  // ── Move names — high-level, functional ──
+  // ── Move names — original HEMA terminology (shared across all languages) ──
   // Starters
-  move_high_cut: 'High Cut',
-  move_side_cut: 'Horizontal Cut',
-  move_low_cut: 'Rising Cut',
-  move_thrust: 'Direct Thrust',
+  move_high_cut: 'Oberhau',
+  move_side_cut: 'Mittelhau',
+  move_low_cut: 'Unterhau',
+  move_thrust: 'Stich',
   // Reactions
-  move_strong_parry: 'Strong Parry (Hard Bind)',
-  move_soft_parry: 'Yielding Parry (Soft Bind)',
-  move_counter_cut: 'Counter-Cut',
-  move_wind: 'Wind in the Bind',
-  move_retreat: 'Step Back (Break Measure)',
+  move_strong_parry: 'Versetzen',
+  move_soft_parry: 'Nachgeben',
+  move_counter_cut: 'Zornhau',
+  move_wind: 'Winden',
+  move_retreat: 'Abzug',
   // Follow-ups
-  move_disengage: 'Disengage & Thrust',
-  move_press_through: 'Press Through the Bind',
-  move_chase: 'Chase the Retreat',
-  move_wind_thrust: 'Wind into Thrust',
-  move_grapple: 'Close & Grapple',
+  move_disengage: 'Durchwechseln',
+  move_press_through: 'Abnehmen',
+  move_chase: 'Nachreisen',
+  move_wind_thrust: 'Mutieren',
+  move_grapple: 'Ringen am Schwert',
   // Finishers
-  move_fin_thrust: 'Thrust to the Opening',
-  move_fin_cut: 'Decisive Cut',
-  move_fin_pommel: 'Pommel Strike',
-  move_fin_takedown: 'Disarm / Takedown',
+  move_fin_thrust: 'Einstich',
+  move_fin_cut: 'Schnitt',
+  move_fin_pommel: 'Mordschlag',
+  move_fin_takedown: 'Abrinnen',
+
+  // ── Short hint per move (localized "what it is") ──
+  hint_high_cut: 'Descending cut from the high guard.',
+  hint_side_cut: 'Horizontal cut across the centerline.',
+  hint_low_cut: 'Rising cut from below.',
+  hint_thrust: 'Straight thrust along the centerline.',
+  hint_strong_parry: 'Hard displacement — forte meets forte.',
+  hint_soft_parry: 'Yielding parry — gives ground in the bind.',
+  hint_counter_cut: 'Wrath-cut — cut back into the incoming cut.',
+  hint_wind: 'Rotate the point over the bind, keeping contact.',
+  hint_retreat: 'Step off-line and break measure.',
+  hint_disengage: 'Drop under the bind and thrust a new opening.',
+  hint_press_through: 'Overpower the bind, slide to a new target.',
+  hint_chase: 'Pursue a retreating opponent with a full cut.',
+  hint_wind_thrust: 'Wind from the bind into a thrust without breaking contact.',
+  hint_grapple: 'Close the measure and wrestle for control.',
+  hint_fin_thrust: 'Finishing thrust into the opening.',
+  hint_fin_cut: 'Finishing slice — decisive edge contact.',
+  hint_fin_pommel: 'Pommel strike at half-sword range.',
+  hint_fin_takedown: 'Takedown or disarm in close.',
 
   // ── Move descriptions — where contact, bind hard/soft, forte/weak, clean execution ──
   desc_high_cut: 'Descending cut from a high guard (covers Zornhau, Oberhau, Fendente). Long measure. If parried, blades typically meet in the middle — a bind is likely. Covers lateral and diagonal descents.',
@@ -153,6 +179,17 @@ export default {
   desc_fin_cut: 'Decisive cut to head or limb (Schnitt, finishing Zwerchhau). Edge engagement scores the point.',
   desc_fin_pommel: 'Close-range pommel strike to head or face. Half-sword the blade, drive the pommel through.',
   desc_fin_takedown: 'Complete the grapple: wrench the sword free (Dislocazione) or throw to the ground (Proiettare).',
+
+  // ── Master Quotes (training module) ──
+  quote_liech_zornhau: '"Whatever comes from above, meet it with the Zornhau and spit death with the point of your sword." — Johannes Liechtenauer',
+  quote_meyer_zornhau: '"The wrath-cut cannot be parried away, only bent. He who keeps his calm under attack masters the steel." — Joachim Meyer',
+  quote_fiore_fendente: '"The Fendente is the shortest road from heaven to hell; even a shield struggles to stop it." — Fiore dei Liberi',
+  quote_liech_winden: '"When he binds your sword with his, pulling away in fear means death. You must Fühlen (feel) and turn my blade like the wind (Winden)." — Johannes Liechtenauer',
+  quote_vadi_winden: '"To meet strength with strength is a fool\'s errand. When he presses hard, soften your sword and flow around his edges." — Filippo Vadi',
+  quote_liech_nachreisen: '"Fools drop their swords as they retreat. Become his fate — Nachreisen behind the retreating man." — Johannes Liechtenauer',
+  quote_fiore_stretto: '"Zogho Stretto (close play) is the place of lions. When you close the measure, let your hands and feet speak — not the blade." — Fiore dei Liberi',
+  quote_generic_1: '"Remember: speed is not born from strength, but from arriving at the right guard at the right moment." — Anonymous Master',
+  quote_generic_2: '"Defending alone does not keep you alive; it only delays death. Every defence must also be a threat." — Johannes Liechtenauer',
 
   // ── Language ──
   language: 'Language',
