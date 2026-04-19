@@ -73,6 +73,12 @@ export default {
   feedback_chased_blind: 'Inseguimento cieco di un avversario in ritirata. Un taglio impegnato in una linea non incrociata espone il vostro centro — una contro-stoccata può finirvi a metà passo.',
   feedback_high_strong_trap: 'Contro una parata alta forte (Kron / forte sollevato), i tagli discendenti si bloccano sul forte e lasciano tutto il basso corpo scoperto. Girare intorno alla legatura, non attraverso.',
   feedback_grapple_too_far: 'Lottare senza prima assicurare la legatura. A lunga misura la loro punta è ancora libera — siete camminati in una stoccata.',
+  fin_fail_measure_nahe: 'Troppo vicino per un taglio o stoccata pieni — le braccia senza spazio. Il colpo non arriva pulito; la posizione è rotta e il tempo passa all\'avversario.',
+  fin_fail_measure_weit: 'Fuori misura. La punta è caduta corta e la tua linea è estesa; l\'iniziativa ora è dell\'avversario.',
+  fin_fail_need_nahe: 'I finish di pomo e lotta funzionano solo in misura stretta. Da qui il tentativo è sprecato — recupera la distanza.',
+  fin_fail_no_bind: 'Lo Schnitt richiede la legatura. Senza contatto di filo non c\'è nulla su cui scorrere; il filo passa nell\'aria.',
+  fin_fail_no_grapple: 'L\'abbattimento richiede prima la presa. Senza quella presa il tentativo muore e l\'avversario si muove libero.',
+  fin_fail_controlled_bind: 'Stoccata dritta nel forte di una legatura dominante — la lama è deviata. Prima gira o cava, poi impegna la punta.',
   commentary_generic: 'La mossa era strutturalmente incompatibile con la situazione attuale di legatura/misura.',
   duel_suggestion: 'Suggerimento: Contro un avversario che usa {oppMove}, dovresti rispondere con ⭐ {recMove}.',
   node_opponent_point: "💀 PUNTO DELL'AVVERSARIO",
@@ -237,6 +243,8 @@ export default {
 
   // ── AI Difficulty & Personality ──
   ai_difficulty: 'Difficoltà IA',
+  ai_personality: 'Personalità IA',
+  close: 'Chiudi',
   ai_novice: 'Novizio',
   ai_adept: 'Adepto',
   ai_master: 'Maestro',

@@ -283,6 +283,55 @@ export const measureFit = (move, tier) => {
 };
 
 // ═══════════════════════════════════════════════════════════
+// Finisher prerequisites (HEMA doctrine).
+// Returns null when the finisher is valid; otherwise a failure reason key:
+//   'fin_fail_measure_nahe' — move needs mittel, opponent too close, blade tangles
+//   'fin_fail_measure_weit' — move needs mittel, opponent too far, point/edge falls short
+//   'fin_fail_need_nahe'    — close-work finisher attempted from mittel/weit
+//   'fin_fail_no_bind'      — Schnitt / Durchstich without an established bind
+//   'fin_fail_no_grapple'   — Takedown without first grappling
+//   'fin_fail_controlled_bind' — thrust into opponent's dominant forte without winding first
+// Caller maps each reason to i18n feedback text.
+// ═══════════════════════════════════════════════════════════
+export const evaluateFinisher = (move, { tier, prevOppTags = [], userPrevOwnTags = [] } = {}) => {
+  if (!move || move.type !== 'finisher') return null;
+
+  const prevWasWindOrDisengage =
+    userPrevOwnTags.includes('Wind') ||
+    (userPrevOwnTags.includes('NoBind') && userPrevOwnTags.includes('Thrust'));
+  const prevWasGrapple = userPrevOwnTags.includes('Grapple');
+  const bindEstablished = prevOppTags.includes('Bind') || userPrevOwnTags.includes('Bind');
+
+  switch (move.id) {
+    case 'fin-thrust':
+      if (tier === MEASURE.NAHE) return 'fin_fail_measure_nahe';
+      if (tier === MEASURE.WEIT) return 'fin_fail_measure_weit';
+      if (prevOppTags.includes('Strong') && prevOppTags.includes('Bind') && !prevWasWindOrDisengage) {
+        return 'fin_fail_controlled_bind';
+      }
+      return null;
+
+    case 'fin-cut':
+      if (tier === MEASURE.NAHE) return 'fin_fail_measure_nahe';
+      if (tier === MEASURE.WEIT) return 'fin_fail_measure_weit';
+      if (!bindEstablished && !prevOppTags.includes('Retreat')) return 'fin_fail_no_bind';
+      return null;
+
+    case 'fin-pommel':
+      if (tier !== MEASURE.NAHE) return 'fin_fail_need_nahe';
+      return null;
+
+    case 'fin-takedown':
+      if (tier !== MEASURE.NAHE) return 'fin_fail_need_nahe';
+      if (!prevWasGrapple) return 'fin_fail_no_grapple';
+      return null;
+
+    default:
+      return null;
+  }
+};
+
+// ═══════════════════════════════════════════════════════════
 // Manuscript Source Notes — primary treatise per move
 // ═══════════════════════════════════════════════════════════
 export const manuscriptNotes = {

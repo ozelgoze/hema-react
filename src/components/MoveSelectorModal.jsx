@@ -47,7 +47,7 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
 
   return (
     <div className="fixed inset-0 z-[99999] bg-[var(--color-ink-black)]/90 backdrop-blur-sm flex justify-center items-end md:items-center overflow-hidden animate-fade-in touch-none">
-      <div className="w-full h-[90vh] md:h-[80vh] md:w-[600px] bg-[var(--color-parchment)] md:border-[4px] border-t-[4px] border-[var(--color-ink-black)] shadow-[0_0_50px_rgba(42,37,34,0.5)] md:shadow-[10px_10px_0_0_var(--color-ink-black)] flex flex-col animate-slide-up md:animate-scale-in relative">
+      <div className="w-full h-[90vh] h-[90dvh] md:h-[80vh] md:w-[600px] bg-[var(--color-parchment)] md:border-[4px] border-t-[4px] border-[var(--color-ink-black)] shadow-[0_0_50px_rgba(42,37,34,0.5)] md:shadow-[10px_10px_0_0_var(--color-ink-black)] flex flex-col animate-slide-up md:animate-scale-in relative">
         
         {/* Header */}
         <div className="flex justify-between items-center p-4 border-b-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)]">
@@ -55,7 +55,7 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
             <h2 className="text-xl font-display font-bold text-[var(--color-ink-red)] uppercase tracking-widest leading-none block">{t('you')}</h2>
             <span className="text-xs font-bold text-[var(--color-ink-faded)] uppercase tracking-[0.2em]">{t('wizard_select')}</span>
           </div>
-          <button onClick={onClose} className="w-10 h-10 flex items-center justify-center border-2 border-[var(--color-ink-black)] bg-[var(--color-parchment-light)] hover:bg-[var(--color-ink-red)] hover:text-white transition-colors shadow-[2px_2px_0_0_var(--color-ink-black)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none font-bold text-xl">
+          <button onClick={onClose} aria-label={t('close') || 'Close'} className="w-11 h-11 flex items-center justify-center border-2 border-[var(--color-ink-black)] bg-[var(--color-parchment-light)] hover:bg-[var(--color-ink-red)] hover:text-white transition-colors shadow-[2px_2px_0_0_var(--color-ink-black)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none font-bold text-xl">
             ✕
           </button>
         </div>
@@ -82,7 +82,7 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--color-ink-black)] opacity-50 text-lg">🔍</span>
             <input
               type="text"
-              autoFocus
+              autoFocus={typeof window !== 'undefined' && window.innerWidth >= 768}
               placeholder={t('wizard_select') + "..."}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}

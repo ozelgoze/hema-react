@@ -55,7 +55,7 @@ function ActionNode({ data }) {
     <div
       className={`
         action-node-wrap
-        relative min-w-[300px] w-[340px]
+        relative min-w-[280px] w-[300px] md:min-w-[300px] md:w-[340px]
         ${data.isSelector ? 'glass-panel border-dashed border-[4px] border-[var(--color-ink-red)] hover:bg-[var(--color-ink-red)]/10 cursor-pointer flex flex-col items-center justify-center p-8' : config.class}
         ${!data.isSelector && 'panel-interactive'}
         transition-all duration-300

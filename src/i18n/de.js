@@ -73,6 +73,12 @@ export default {
   feedback_chased_blind: 'Blinde Verfolgung eines zurückweichenden Gegners. Ein voller Schnitt ohne Kreuzung setzt Ihre Mitte frei — ein Gegenstich kann Sie mitten im Schritt erledigen.',
   feedback_high_strong_trap: 'Gegen eine hohe starke Parade (Kron / erhobenes Forte) verfangen sich absteigende Schnitte am Forte und der Unterkörper bleibt offen. Um die Bindung herum, nicht hindurch.',
   feedback_grapple_too_far: 'Ringen ohne vorherige Bindungssicherung. Auf weiter Mess ist ihre Spitze noch frei — Sie laufen in den Stoß.',
+  fin_fail_measure_nahe: 'Zu nah für vollen Hieb oder Stoß — die Arme hatten keinen Raum. Der Schlag sitzt nicht sauber; die Position ist hin und der Gegner hat das Tempo.',
+  fin_fail_measure_weit: 'Ausser Mensur. Die Spitze kam nicht an, deine Linie liegt gestreckt; die Initiative gehört jetzt dem Gegner.',
+  fin_fail_need_nahe: 'Mordschlag und Ringen-Finisher funktionieren nur in naher Mensur. Von hier aus geht der Versuch ins Leere — erst Distanz schließen.',
+  fin_fail_no_bind: 'Der Schnitt braucht die Bindung. Ohne Klingenkontakt gibt es nichts zum Abgleiten; die Schneide fährt durch leere Luft.',
+  fin_fail_no_grapple: 'Ein Zu-Boden-Ringen verlangt erst den Griff. Ohne diesen Griff stirbt der Versuch und der Gegner bewegt sich frei.',
+  fin_fail_controlled_bind: 'Stoss direkt in die Stärke einer dominanten Bindung — die Klinge wird abgewiesen. Erst winden oder abnehmen, bevor die Spitze geht.',
   commentary_generic: 'Die Aktion war strukturell unvereinbar mit der aktuellen Bindungs-/Mess-Lage.',
   duel_suggestion: 'Vorschlag: Gegen einen Gegner, der {oppMove} ausführt, sollten Sie mit ⭐ {recMove} antworten.',
   node_opponent_point: '💀 GEGNER HAT GEPUNKTET',
@@ -237,6 +243,8 @@ export default {
 
   // ── AI Difficulty & Personality ──
   ai_difficulty: 'KI-Schwierigkeit',
+  ai_personality: 'KI-Persönlichkeit',
+  close: 'Schließen',
   ai_novice: 'Neuling',
   ai_adept: 'Adept',
   ai_master: 'Meister',

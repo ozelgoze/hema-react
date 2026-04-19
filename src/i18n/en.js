@@ -72,6 +72,12 @@ export default {
   feedback_chased_blind: 'Blind pursuit of a retreating opponent. A committed cut into an uncrossed line exposes your center — a counter-thrust can end you mid-stride.',
   feedback_high_strong_trap: 'Against a strong high parry (Kron / forte raised), descending cuts lock onto the forte and leave the entire lower body exposed. Go around the bind, not through it.',
   feedback_grapple_too_far: 'Grappling without first securing the bind. At long measure their point is still free — you walked into a thrust.',
+  fin_fail_measure_nahe: 'Too close for a full cut or thrust — your arms had no room. The blow never lands cleanly; you are now out of position and the opponent gets the tempo.',
+  fin_fail_measure_weit: 'Out of distance. The point fell short and your line is extended; the opponent now has the initiative.',
+  fin_fail_need_nahe: 'Pommel-strike and grappling finishers only work at close measure. From here the attempt is wasted — regain distance.',
+  fin_fail_no_bind: 'Schnitt requires the bind. Without edge contact there is nothing to slide down; the edge passes through empty air.',
+  fin_fail_no_grapple: 'A takedown demands you seize the opponent first. Without that grip the attempt dies and the opponent can move freely.',
+  fin_fail_controlled_bind: 'Thrusting straight into the forte of a dominant bind — the blade is deflected. You must wind or disengage before committing the point.',
   commentary_generic: 'The move was structurally incompatible with the current bind/distance situation.',
   duel_suggestion: 'Suggestion: Against an opponent who does {oppMove}, you should respond with ⭐ {recMove}.',
   node_opponent_point: '💀 OPPONENT SCORED',
@@ -236,6 +242,8 @@ export default {
 
   // ── AI Difficulty & Personality ──
   ai_difficulty: 'AI Difficulty',
+  ai_personality: 'AI Personality',
+  close: 'Close',
   ai_novice: 'Novice',
   ai_adept: 'Adept',
   ai_master: 'Master',

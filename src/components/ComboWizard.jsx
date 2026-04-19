@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
-import { getMovesByPhase, getMoveById, hemaMoves, deriveMeasure, measureFit, MEASURE } from '../data/hemaMoves';
+import { getMovesByPhase, getMoveById, hemaMoves, deriveMeasure, measureFit, MEASURE, evaluateFinisher } from '../data/hemaMoves';
 import LanguageSelector from './LanguageSelector';
 import MoveSelectorModal from './MoveSelectorModal';
 import MeasureGauge from './MeasureGauge';
@@ -448,20 +448,35 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
 
   const handleMoveSelect = useCallback((move) => {
     if (!move) return;
-    const nodeRole = move.type === 'finisher' ? 'scoring-point' : 'user-action';
+
+    const aiTags = oppReactionData?.tags || [];
+    const userTags = move.tags || [];
+
+    // HEMA finisher prerequisites — fail = whiff, blade hangs in air, exchange continues.
+    // The opponent still gets to react normally; they do not automatically score.
+    const finisherFailure = move.type === 'finisher'
+      ? evaluateFinisher(move, { tier: currentMeasure, prevOppTags: aiTags, userPrevOwnTags })
+      : null;
+
+    const isWhiff = !!finisherFailure;
+    const nodeRole = (move.type === 'finisher' && !isWhiff)
+      ? 'scoring-point'
+      : 'user-action';
 
     onAddNode({
       moveId: move.id,
       nameKey: move.nameKey,
       nodeRole,
-      phase: move.type === 'finisher' ? 'finisher' : 'user-action',
-      tags: move.tags,
+      phase: isWhiff ? 'user-action' : (move.type === 'finisher' ? 'finisher' : 'user-action'),
+      // On whiff, strip Kill so downstream doctrine/measure scoring treats it as an overcommitted strike.
+      tags: isWhiff ? (move.tags || []).filter((t) => t !== 'Kill') : move.tags,
+      finisherFailure: finisherFailure || undefined,
     }, true);
 
-    const aiTags = oppReactionData?.tags || [];
-    const userTags = move.tags || [];
     const isIntentionalDisengage = userTags.includes('Thrust') && userTags.includes('NoBind');
-    if (isAiMode && isOpponentTurn) {
+    if (finisherFailure) {
+       setLiveFeedback({ type: 'bad', text: t(finisherFailure), master: 'Principle' });
+    } else if (isAiMode && isOpponentTurn) {
         if (userTags.includes('Weak') && aiTags.includes('Strong') && aiTags.includes('Bind') && !isIntentionalDisengage) {
            setLiveFeedback({ type: 'bad', text: t('feedback_weak_vs_strong'), master: 'Principle' });
         } else if (aiTags.includes('Bind') && userTags.includes('NoBind') && !isIntentionalDisengage) {
@@ -476,7 +491,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
     } else {
        setLiveFeedback({ type: 'neutral', text: t('feedback_neutral').replace('{moveName}', t(move.nameKey)), master: 'Combat Flow' });
     }
-  }, [nodes.length, onAddNode, isAiMode, isOpponentTurn, oppReactionData, isMistake, t]);
+  }, [onAddNode, isAiMode, isOpponentTurn, oppReactionData, isMistake, t, currentMeasure, userPrevOwnTags]);
 
   const matchWon = userScore >= maxScore;
   const matchLost = aiScore >= maxScore;
@@ -510,28 +525,31 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
         </button>
 
         {/* Header */}
-        <div 
-          className="px-5 py-3 border-b-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)] flex justify-between items-center cursor-pointer md:cursor-default"
+        <div
+          className="px-4 md:px-5 py-2 md:py-3 border-b-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)] flex justify-between items-center gap-2 cursor-pointer md:cursor-default"
           onClick={() => {
             if (window.innerWidth < 768) {
               setIsExpanded(!isExpanded);
             }
           }}
         >
-          <div className="flex items-center gap-2">
-             <h2 className="text-lg font-display text-[var(--color-ink-red)] flex items-center gap-2">
-               <span className="text-xl filter grayscale drop-shadow-md">⚔️</span>
-               {t('duel_control')}
+          <div className="flex items-center gap-2 min-w-0">
+             <h2 className="text-base md:text-lg font-display text-[var(--color-ink-red)] flex items-center gap-1.5 md:gap-2 truncate">
+               <span className="text-lg md:text-xl filter grayscale drop-shadow-md shrink-0">⚔️</span>
+               <span className="truncate">{t('duel_control')}</span>
              </h2>
-             <span className="md:hidden text-[var(--color-ink-faded)] text-xs ml-1 flex">
+             <span className="md:hidden text-[var(--color-ink-faded)] text-xs flex shrink-0">
                 {isExpanded ? '▼' : '▲'}
              </span>
           </div>
-          <div className="flex items-center gap-2">
-            <LanguageSelector />
-            <div className="w-px h-6 bg-[var(--color-ink-faded)] mx-1"></div>
+          <div className="flex items-center gap-2 shrink-0">
+            {/* LanguageSelector — desktop only in header; mobile gets its own row below */}
+            <div className="hidden md:flex items-center gap-2">
+              <LanguageSelector />
+              <div className="w-px h-6 bg-[var(--color-ink-faded)] mx-1"></div>
+            </div>
             <button
-              onClick={() => setIsAiMode(!isAiMode)}
+              onClick={(e) => { e.stopPropagation(); setIsAiMode(!isAiMode); }}
               aria-pressed={isAiMode}
               className={`px-3 min-h-[44px] md:min-h-0 md:py-1 text-xs rounded-none border-[2px] font-bold uppercase tracking-wider transition-all duration-300 ${
                 isAiMode
@@ -544,21 +562,27 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
           </div>
         </div>
 
+        {/* Mobile LanguageSelector row — hidden on desktop */}
+        <div className="md:hidden px-4 py-2 bg-[var(--color-parchment-dark)] border-b-[2px] border-[var(--color-ink-black)] flex justify-center" onClick={(e) => e.stopPropagation()}>
+          <LanguageSelector />
+        </div>
+
         {/* AI Settings Row (only when AI mode active) */}
         {isAiMode && (
-          <div className="px-5 py-2 flex items-center gap-3 bg-[var(--color-parchment-dark)] border-b-[2px] border-[var(--color-ink-black)] flex-wrap">
+          <div className="px-4 md:px-5 py-2 flex items-center gap-2 md:gap-3 bg-[var(--color-parchment-dark)] border-b-[2px] border-[var(--color-ink-black)] flex-wrap">
             {/* Difficulty */}
-            <div className="flex items-center gap-1">
-              <span className="text-[9px] uppercase font-bold text-[var(--color-ink-black)] tracking-widest">{t('ai_difficulty')}:</span>
-              <div className="flex bg-[var(--color-parchment)] border border-[var(--color-ink-black)]">
+            <div className="flex items-center gap-1 flex-1 md:flex-none min-w-0">
+              <span className="text-[9px] uppercase font-bold text-[var(--color-ink-black)] tracking-widest shrink-0">{t('ai_difficulty')}:</span>
+              <div className="flex bg-[var(--color-parchment)] border border-[var(--color-ink-black)] flex-1 md:flex-none">
                 {['novice', 'adept', 'master'].map((diff) => (
                   <button
                     key={diff}
                     onClick={() => setAiDifficulty(diff)}
-                    className={`px-2 py-1 text-[9px] font-bold uppercase tracking-wider transition-all min-h-[28px] ${
+                    aria-pressed={aiDifficulty === diff}
+                    className={`flex-1 md:flex-none px-2 py-1 text-[9px] font-bold uppercase tracking-wider transition-all min-h-[44px] md:min-h-[28px] ${
                       aiDifficulty === diff
                         ? 'bg-[var(--color-ink-black)] text-[var(--color-parchment-light)]'
-                        : 'text-[var(--color-ink-black)] hover:bg-[var(--color-parchment-dark)]'
+                        : 'text-[var(--color-ink-black)] hover:bg-[var(--color-parchment-dark)] active:bg-[var(--color-parchment-dark)]'
                     }`}
                   >
                     {t(`ai_${diff}`)}
@@ -567,11 +591,12 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
               </div>
             </div>
             {/* Personality */}
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-1 md:flex-none min-w-0">
               <select
                 value={aiPersonality}
                 onChange={(e) => setAiPersonality(e.target.value)}
-                className="bg-[var(--color-parchment)] border border-[var(--color-ink-black)] text-[9px] font-bold uppercase tracking-wider px-2 py-1 text-[var(--color-ink-black)] focus:outline-none focus:border-[var(--color-ink-red)] min-h-[28px] cursor-pointer"
+                aria-label={t('ai_personality') || 'AI Personality'}
+                className="w-full md:w-auto bg-[var(--color-parchment)] border border-[var(--color-ink-black)] text-[9px] font-bold uppercase tracking-wider px-2 py-1 text-[var(--color-ink-black)] focus:outline-none focus:border-[var(--color-ink-red)] min-h-[44px] md:min-h-[28px] cursor-pointer"
               >
                 {Object.keys(AI_PROFILES).map((key) => (
                   <option key={key} value={key}>{t(AI_PROFILES[key].nameKey)}</option>

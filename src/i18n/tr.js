@@ -74,6 +74,12 @@ export default {
   feedback_chased_blind: 'Geri çekilen rakibe kör takip. Çaprazlama olmadan merkeze giren kesim, karşı sivri ucu (counter-thrust) davet eder — adım atarken onun ucuna oturursun.',
   feedback_high_strong_trap: 'Yüksek ve sert savunmaya (Kron / yukarı forte) üstten kesim, kılıcının forte\'sine kilitlenir ve alt tarafın tamamen açık kalır. Bindin içinden değil, etrafından dolaş.',
   feedback_grapple_too_far: 'Bind kurulmadan güreşe girdin. Uzun ölçüde rakibin ucu hâlâ serbest — saplamaya yürüdün.',
+  fin_fail_measure_nahe: 'Tam kesiş/saplama için fazla yakınsın — kolların açılmadı. Darbe oturmadı, pozisyonun bozuldu, tempo rakibe geçti.',
+  fin_fail_measure_weit: 'Mesafe tutmadı. Uç ulaşmadı, hattın uzatılmış kaldı; insiyatif şimdi rakipte.',
+  fin_fail_need_nahe: 'Kabza vuruşu ve güreş bitiricileri sadece yakın mesafede iş görür. Buradan boşa sallıyorsun — önce mesafeyi kapatman lazım.',
+  fin_fail_no_bind: 'Schnitt bind ister. Kenar teması olmadan kayacak bir şey yok — kılıç boşa geçti.',
+  fin_fail_no_grapple: 'Yere indirmek için önce rakibi kavramalısın. Tutuş olmadan hamle ölüyor, rakip serbestçe hareket ediyor.',
+  fin_fail_controlled_bind: 'Hâkim bindin forte\'sine direkt saplama — kılıç yana itildi. Ucu zorlamadan önce winden veya disengage yapmalısın.',
   commentary_generic: 'Seçtiğin hamle mevcut bind/mesafe durumuyla yapısal olarak bağdaşmıyor.',
   duel_suggestion: 'Öneri: {oppMove} yapan bir rakibe karşı ⭐ {recMove} ile cevap vermelisin.',
 
@@ -243,6 +249,8 @@ export default {
 
   // ── AI Difficulty & Personality ──
   ai_difficulty: 'AI Zorluk',
+  ai_personality: 'AI Karakteri',
+  close: 'Kapat',
   ai_novice: 'Çırak',
   ai_adept: 'Kalfa',
   ai_master: 'Usta',
