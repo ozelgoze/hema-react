@@ -73,6 +73,16 @@ export default function ChronicleLog({ nodes }) {
     }
 
     if (role === 'user-action') {
+      if (node.data.finisherFailure) {
+        return (
+          <span className="block mb-2 mt-4 border-l-2 border-dashed border-[var(--color-ink-red)] pl-3 text-[var(--color-ink-black)]">
+            <span className="block font-display text-[10px] uppercase tracking-widest text-[var(--color-ink-red)] mb-1">
+              Ictus Vanus
+            </span>
+            {t('chronicle_narrator_whiff').replace('{moveName}', moveName)}
+          </span>
+        );
+      }
       return (
         <span className="block mb-2 mt-4">
           {t('chronicle_narrator_user').replace('{moveName}', moveName)}

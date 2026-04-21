@@ -58,6 +58,7 @@ function ActionNode({ data }) {
         relative min-w-[280px] w-[300px] md:min-w-[300px] md:w-[340px]
         ${data.isSelector ? 'glass-panel border-dashed border-[4px] border-[var(--color-ink-red)] hover:bg-[var(--color-ink-red)]/10 cursor-pointer flex flex-col items-center justify-center p-8' : config.class}
         ${!data.isSelector && 'panel-interactive'}
+        ${data.finisherFailure ? 'border-dashed border-[var(--color-ink-red)] opacity-75' : ''}
         transition-all duration-300
         ${data.isActive ? 'ring-4 ring-[var(--color-gold)] shadow-[0_0_20px_var(--color-gold)] scale-[1.02]' : 'opacity-80 hover:opacity-100'}
       `}
@@ -74,6 +75,12 @@ function ActionNode({ data }) {
       {data.isActive && (
         <div className="absolute -top-3 -right-3 z-20 animate-bounce">
           <span className="text-2xl drop-shadow-md">👇</span>
+        </div>
+      )}
+      {/* Whiffed finisher banner — HEMA doctrine prereq failed, blade went into empty air */}
+      {data.finisherFailure && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20 px-3 py-0.5 bg-[var(--color-parchment-light)] border-2 border-dashed border-[var(--color-ink-red)] shadow-[2px_2px_0_0_rgba(42,37,34,0.3)] text-[10px] font-display font-bold uppercase tracking-widest text-[var(--color-ink-red)] whitespace-nowrap">
+          Ictus Vanus
         </div>
       )}
       {/* Target handle (top) */}

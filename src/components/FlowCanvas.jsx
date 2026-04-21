@@ -21,7 +21,7 @@ import ChronicleLog from './ChronicleLog';
 const nodeTypes = { actionNode: ActionNode };
 const edgeTypes = { inkEdge: InkEdge };
 
-function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onUndo, onClear, currentStep, activeNodeId, setActiveNodeId, isMoveModalOpen, setIsMoveModalOpen, userScore, aiScore, onScoreUpdate, maxScore }) {
+function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onUndo, onClear, onMatchReset, currentStep, activeNodeId, setActiveNodeId, isMoveModalOpen, setIsMoveModalOpen, userScore, aiScore, onScoreUpdate, maxScore }) {
   const { t } = useTranslation();
   
   const handleDownloadImage = useCallback(() => {
@@ -101,6 +101,7 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
         onAddNode={onAddNode}
         onUndo={onUndo}
         onClear={onClear}
+        onMatchReset={onMatchReset}
         isMoveModalOpen={isMoveModalOpen}
         setIsMoveModalOpen={setIsMoveModalOpen}
         activeNodeId={activeNodeId}
@@ -124,7 +125,7 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
   );
 }
 
-export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange, userScore, aiScore, onScoreUpdate, maxScore }) {
+export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange, userScore, aiScore, onScoreUpdate, onMatchReset, maxScore }) {
   const [nodes, setNodes, onNodesChange] = useNodesState(externalNodes || []);
   const [edges, setEdges, onEdgesChange] = useEdgesState(externalEdges || []);
   const [isMoveModalOpen, setIsMoveModalOpen] = useState(false);
@@ -310,6 +311,7 @@ export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange,
         userScore={userScore}
         aiScore={aiScore}
         onScoreUpdate={onScoreUpdate}
+        onMatchReset={onMatchReset}
         maxScore={maxScore}
       />
     </ReactFlowProvider>

@@ -31,6 +31,14 @@ function AppContent() {
     }
   }, []);
 
+  const handleMatchReset = useCallback(() => {
+    setUserScore(0);
+    setAiScore(0);
+    setFlowNodes([]);
+    setFlowEdges([]);
+    setLoadKey((k) => k + 1);
+  }, []);
+
   return (
     <div className="flex h-full w-full overflow-hidden absolute inset-0">
       <Sidebar
@@ -47,6 +55,7 @@ function AppContent() {
           userScore={userScore}
           aiScore={aiScore}
           onScoreUpdate={handleScoreUpdate}
+          onMatchReset={handleMatchReset}
           maxScore={MAX_SCORE}
         />
       </div>

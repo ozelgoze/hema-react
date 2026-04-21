@@ -237,6 +237,7 @@ export default {
   chronicle_narrator_opening: 'Müsabaka, şövalyemizin kararlı bir biçimde {moveName} tekniğine başvurmasıyla alevlendi. Kılıçların çelikten şarkısı başlamıştı.',
   chronicle_narrator_opponent: 'Hasım bu atılıma karşılık tırsarak değil, bilakis ustaca bir karşı koyuşla, {moveName} hamlesiyle mukavemet göstermeye yeltendi.',
   chronicle_narrator_user: 'Fakat kılıçşörümüz duraksamadı; rakibinin niyetini sezip anında {moveName} ile inisiyatifi yeniden kılıcının ucuna aldı.',
+  chronicle_narrator_whiff: '{moveName} darbesi boşluğa düştü — doktrin gözetilmemişti. Kenar havayı yardı, tempo rakibe geçti.',
   chronicle_narrator_win: 'Nihayet rakibin zayıf anı yakalandı ve {moveName} hamlesinin acımasız kesinliğiyle savaş meydanında tartışılmaz bir mutlak zafer kazanıldı!',
   chronicle_narrator_loss: 'Tarih affetmez... Bir anlık tereddüt veya yanlış bağlanan kılıç, hasmın amansız {moveName} vahşetiyle sonuçlandı. Kanımız toprakla buluştu.',
 
@@ -246,6 +247,7 @@ export default {
   score_match_won: '🏆 MAÇ KAZANILDI!',
   score_match_lost: '💀 MAÇ KAYBEDİLDİ!',
   score_next_round: 'Sonraki Raunt',
+  new_match: 'Yeni Maç',
 
   // ── AI Difficulty & Personality ──
   ai_difficulty: 'AI Zorluk',

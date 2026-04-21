@@ -110,10 +110,13 @@ const applyDoctrine = ({ aiTags = [], userTags = [], prevOwnTags = [], tier = ME
   let score = 0;
 
   // B. "Merkez çizgisini bozuyor → Abnemen/Zucken/Durchwechsel/Winding sonrasında uzaklaş."
-  // If the actor just broke the line (Wind, or NoBind-Thrust disengage), the NEXT move should retreat or re-bind.
+  //    Also Fiore: "Falso, Tondo, Fendente, Sgualembrato sonrasında uzaklaş ve/veya parry."
+  // If the actor just broke the line (Wind, NoBind-Thrust disengage, or committed NoBind cut),
+  // the NEXT move should retreat or re-bind — momentum is spent, point/edge is past the target.
   const brokeLineLastTurn =
     prevOwnTags.includes('Wind') ||
-    (prevOwnTags.includes('NoBind') && prevOwnTags.includes('Thrust'));
+    (prevOwnTags.includes('NoBind') && prevOwnTags.includes('Thrust')) ||
+    (prevOwnTags.includes('Cut') && prevOwnTags.includes('NoBind'));
   if (brokeLineLastTurn) {
     if (aiTags.includes('Retreat')) score += 8;
     if (aiTags.includes('Bind')) score += 3;
@@ -126,6 +129,20 @@ const applyDoctrine = ({ aiTags = [], userTags = [], prevOwnTags = [], tier = ME
     if (aiTags.includes('Grapple')) score += 6;
     if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += 5;
     if (aiTags.includes('Wind')) score += 3;
+  }
+
+  // A'. "Merkez çizgisinde kalıyor, eller önde → en yakın açıklığı kes/sapla, sonra kılıcına git veya uzaklaş."
+  // Opponent committed a counter-cut (hands extended, edge past centerline). Two openings:
+  //   1. Beat them to target with a quick thrust to the nearest opening (disengage-thrust).
+  //   2. Re-take the bind (Wind-thrust, press-through) before they recover.
+  // Staying in a deep bind against an already-extended counter wastes the tempo.
+  const opponentExtended =
+    userTags.includes('Cut') && userTags.includes('Counter');
+  if (opponentExtended) {
+    if (aiTags.includes('Thrust') && aiTags.includes('NoBind')) score += 6; // quick thrust to opening
+    if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += 4;
+    if (aiTags.includes('Wind')) score += 3; // re-bind and wind
+    if (aiTags.includes('Grapple')) score -= 3; // wrong tempo — they are still swinging
   }
 
   // C. "Reaksiyon vermiyor, vurabilirim → saplama/kesiş + rakibin kılıcına git ya da uzaklaş."
@@ -163,7 +180,7 @@ const countFinisherPaths = (reactionId) => {
   return directFinishers.length + indirectFinishers;
 };
 
-export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onClear, isMoveModalOpen, setIsMoveModalOpen, userScore, aiScore, onScoreUpdate, maxScore }) {
+export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onClear, onMatchReset, isMoveModalOpen, setIsMoveModalOpen, userScore, aiScore, onScoreUpdate, maxScore }) {
   const { t } = useTranslation();
   const [isAiMode, setIsAiMode] = useState(true);
   const [aiThinking, setAiThinking] = useState(false);
@@ -659,6 +676,14 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
                 {matchWon ? t('score_match_won') : t('score_match_lost')}
               </h3>
               <p className="text-lg font-display text-[var(--color-ink-black)] mb-4">{userScore} — {aiScore}</p>
+              {onMatchReset && (
+                <button
+                  onClick={onMatchReset}
+                  className="mt-2 px-6 py-3 min-h-[44px] bg-[var(--color-ink-black)] text-[var(--color-gold)] font-bold text-sm uppercase tracking-widest border-[2px] border-[var(--color-gold)] shadow-[4px_4px_0_0_var(--color-gold)] hover:bg-[var(--color-gold)] hover:text-[var(--color-ink-black)] transition-all active:translate-y-[2px] active:translate-x-[2px] active:shadow-none"
+                >
+                  {t('new_match')} ↻
+                </button>
+              )}
             </div>
           ) : isComplete ? (
             <div className="text-center py-2 animate-fade-in relative z-10">

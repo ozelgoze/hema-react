@@ -231,6 +231,7 @@ export default {
   chronicle_narrator_opening: 'Il duello si accese quando il nostro cavaliere impiegò risolutamente la tecnica {moveName}. Il canto d\'acciaio delle spade era iniziato.',
   chronicle_narrator_opponent: "L'avversario rispose non con paura, ma con un magistrale contrasto — il {moveName} — per opporre resistenza.",
   chronicle_narrator_user: 'Ma il nostro spadaccino non esitò; percependo l\'intento del rivale, colse istantaneamente l\'iniziativa con {moveName}.',
+  chronicle_narrator_whiff: 'Il colpo di {moveName} trovò solo aria — la dottrina non fu onorata. Il filo passò nel nulla, e il tempo cadde all\'avversario.',
   chronicle_narrator_win: 'Infine, il momento debole dell\'avversario fu colto, e con la spietata precisione del {moveName}, una vittoria assoluta e indiscutibile fu conquistata sul campo di battaglia!',
   chronicle_narrator_loss: 'La storia non perdona... Un momento di esitazione o una lama mal allineata si concluse nella brutale {moveName} del nemico. Il nostro sangue incontrò la terra.',
 
@@ -240,6 +241,7 @@ export default {
   score_match_won: '🏆 INCONTRO VINTO!',
   score_match_lost: '💀 INCONTRO PERSO!',
   score_next_round: 'Prossimo Round',
+  new_match: 'Nuovo Incontro',
 
   // ── AI Difficulty & Personality ──
   ai_difficulty: 'Difficoltà IA',

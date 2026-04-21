@@ -231,6 +231,7 @@ export default {
   chronicle_narrator_opening: 'Das Duell entflammte, als unser Ritter entschlossen die {moveName}-Technik einsetzte. Das stählerne Lied der Schwerter hatte begonnen.',
   chronicle_narrator_opponent: 'Der Widersacher antwortete nicht mit Furcht, sondern mit einer meisterhaften Gegenwehr — dem {moveName} — um Widerstand zu leisten.',
   chronicle_narrator_user: 'Doch unser Schwertmeister zögerte nicht; die Absicht des Rivalen erkennend, ergriff er sofort die Initiative mit {moveName}.',
+  chronicle_narrator_whiff: 'Der Hieb des {moveName} fand nur Luft — die Lehre wurde nicht geehrt. Die Schneide ging durch nichts, und das Tempo fiel dem Gegner zu.',
   chronicle_narrator_win: 'Endlich wurde der schwache Moment des Gegners erfasst, und mit der gnadenlosen Präzision des {moveName} wurde ein unanfechtbarer Sieg auf dem Schlachtfeld errungen!',
   chronicle_narrator_loss: 'Die Geschichte vergibt nicht... Ein Moment des Zögerns oder eine falsch geführte Klinge endete in der gnadenlosen {moveName}-Brutalität des Feindes. Unser Blut traf die Erde.',
 
@@ -240,6 +241,7 @@ export default {
   score_match_won: '🏆 KAMPF GEWONNEN!',
   score_match_lost: '💀 KAMPF VERLOREN!',
   score_next_round: 'Nächste Runde',
+  new_match: 'Neuer Kampf',
 
   // ── AI Difficulty & Personality ──
   ai_difficulty: 'KI-Schwierigkeit',

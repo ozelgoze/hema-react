@@ -230,6 +230,7 @@ export default {
   chronicle_narrator_opening: 'The duel was ignited as our knight resolutely employed the {moveName} technique. The steel song of swords had begun.',
   chronicle_narrator_opponent: 'The adversary responded not with fear, but with a masterful counter — the {moveName} — to mount their resistance.',
   chronicle_narrator_user: 'But our swordsman did not hesitate; sensing the rival\'s intent, they instantly seized the initiative with {moveName}.',
+  chronicle_narrator_whiff: 'The blow of {moveName} found only air — the doctrine was not honoured. The edge passed through nothing, and the tempo fell to the opponent.',
   chronicle_narrator_win: 'At last, the opponent\'s weak moment was seized, and with the ruthless precision of {moveName}, an undisputed absolute victory was claimed on the battlefield!',
   chronicle_narrator_loss: 'History does not forgive... A moment of hesitation or a misaligned blade resulted in the adversary\'s merciless {moveName}. Our blood met the earth.',
 
@@ -239,6 +240,7 @@ export default {
   score_match_won: '🏆 MATCH WON!',
   score_match_lost: '💀 MATCH LOST!',
   score_next_round: 'Next Round',
+  new_match: 'New Match',
 
   // ── AI Difficulty & Personality ──
   ai_difficulty: 'AI Difficulty',
