@@ -95,9 +95,12 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
         transition-transform duration-300 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}
       `}>
-        {/* Toast */}
+        {/* Toast — offset for iOS notch via safe-area-inset-top */}
         {toast && (
-          <div className="absolute top-3 left-3 right-3 z-50 bg-[var(--color-parchment-light)] border-[2px] border-[var(--color-ink-black)] text-[var(--color-ink-red)] font-display text-sm font-bold px-3 py-2.5 shadow-[4px_4px_0_0_var(--color-ink-black)] text-center animate-fade-in">
+          <div
+            className="absolute left-3 right-3 z-50 bg-[var(--color-parchment-light)] border-[2px] border-[var(--color-ink-black)] text-[var(--color-ink-red)] font-display text-sm font-bold px-3 py-2.5 shadow-[4px_4px_0_0_var(--color-ink-black)] text-center animate-fade-in"
+            style={{ top: 'calc(env(safe-area-inset-top, 0px) + 12px)' }}
+          >
             {toast}
           </div>
         )}

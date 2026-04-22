@@ -113,6 +113,15 @@ export default function ChronicleLog({ nodes }) {
   };
 
   return (
+    <>
+    {/* Mobile backdrop — tap to close; also blocks React Flow pan behind drawer */}
+    {isOpen && (
+      <div
+        onClick={() => setIsOpen(false)}
+        className="md:hidden fixed inset-0 bg-[var(--color-ink-black)]/60 z-30 backdrop-blur-sm touch-none animate-fade-in"
+        aria-hidden="true"
+      />
+    )}
     <div className={`fixed z-40 transition-all duration-300 pointer-events-auto
         ${isOpen ? 'right-0 top-0 h-full md:bottom-24 md:top-4 md:right-4 md:h-auto' : 'right-3 top-[72px] md:top-4 md:right-4 md:bottom-auto'}
       `}
@@ -170,5 +179,6 @@ export default function ChronicleLog({ nodes }) {
         </div>
       </div>
     </div>
+    </>
   );
 }
