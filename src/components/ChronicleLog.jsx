@@ -122,7 +122,7 @@ export default function ChronicleLog({ nodes }) {
         <button
           onClick={() => setIsOpen(true)}
           aria-label={t('chronicle_open')}
-          className="bg-[var(--color-parchment-dark)] border-2 border-[var(--color-ink-black)] text-[var(--color-ink-black)] font-display font-bold px-3 py-2 text-xs md:text-sm uppercase tracking-widest shadow-[4px_4px_0_0_var(--color-ink-black)] hover:bg-[var(--color-ink-black)] hover:text-[var(--color-parchment)] transition-all flex items-center gap-1.5 min-h-[40px]"
+          className="bg-[var(--color-parchment-dark)] border-2 border-[var(--color-ink-black)] text-[var(--color-ink-black)] font-display font-bold px-3 py-2 text-xs md:text-sm uppercase tracking-widest shadow-[4px_4px_0_0_var(--color-ink-black)] hover:bg-[var(--color-ink-black)] hover:text-[var(--color-parchment)] transition-all flex items-center gap-1.5 min-h-[44px] min-w-[44px] justify-center"
         >
           <span className="text-base filter grayscale">📜</span>
           <span className="hidden md:inline">{t('chronicle_open')}</span>
@@ -130,12 +130,12 @@ export default function ChronicleLog({ nodes }) {
       )}
 
       {/* The Chronicle Modal / Drawer */}
-      <div 
-        className={`bg-[var(--color-parchment)] border-l-4 md:border-2 border-[var(--color-ink-black)] w-80 md:w-96 flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.5)] md:shadow-[10px_10px_0_0_rgba(42,37,34,0.3)] transition-all duration-300 origin-right
-          ${isOpen ? 'scale-x-100 h-full md:h-[60vh] max-h-[600px]' : 'scale-x-0 h-0 hidden'}
+      <div
+        className={`bg-[var(--color-parchment)] border-l-4 md:border-2 border-[var(--color-ink-black)] w-[85vw] max-w-[360px] md:w-96 flex flex-col shadow-[-10px_0_30px_rgba(0,0,0,0.5)] md:shadow-[10px_10px_0_0_rgba(42,37,34,0.3)] transition-all duration-300 origin-right
+          ${isOpen ? 'scale-x-100 h-full h-dvh md:h-[60vh] max-h-[100vh] md:max-h-[600px]' : 'scale-x-0 h-0 hidden'}
         `}
       >
-        <div className="flex justify-between items-center bg-[var(--color-ink-black)] text-[var(--color-parchment-light)] px-4 py-3 border-b-2 border-[var(--color-ink-black)]">
+        <div className="flex justify-between items-center bg-[var(--color-ink-black)] text-[var(--color-parchment-light)] px-4 py-3 border-b-2 border-[var(--color-ink-black)] safe-top">
           <h2 className="font-display text-lg uppercase tracking-widest text-[var(--color-gold)] flex items-center gap-2">
             <span className="text-xl filter grayscale drop-shadow-md">📜</span> {t('chronicle_title')}
           </h2>

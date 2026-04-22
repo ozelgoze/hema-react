@@ -79,9 +79,13 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
           color="#334155"
         />
         <Controls
-          className="!bg-slate-800/80 !border-slate-700 !rounded-lg !shadow-xl [&>button]:!bg-slate-700 [&>button]:!border-slate-600 [&>button]:!text-slate-300 [&>button:hover]:!bg-slate-600"
+          position="top-left"
+          showInteractive={false}
+          className="!top-[76px] !left-3 md:!top-auto md:!bottom-4 md:!left-4 !bg-slate-800/80 !border-slate-700 !rounded-lg !shadow-xl [&>button]:!bg-slate-700 [&>button]:!border-slate-600 [&>button]:!text-slate-300 [&>button:hover]:!bg-slate-600 [&>button]:!w-10 [&>button]:!h-10 md:[&>button]:!w-6 md:[&>button]:!h-6"
         />
         <MiniMap
+          pannable
+          zoomable
           nodeColor={(node) => {
             const role = node.data?.nodeRole;
             if (role === 'user-action') return '#10b981';
@@ -91,7 +95,7 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
             return '#64748b';
           }}
           maskColor="rgba(0, 0, 0, 0.7)"
-          className="!bg-black/50 !border-white/10 !rounded-lg backdrop-blur-md"
+          className="!hidden md:!block !bg-black/50 !border-white/10 !rounded-lg backdrop-blur-md"
         />
       </ReactFlow>
 
@@ -116,7 +120,7 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
       <button
         onClick={handleDownloadImage}
         aria-label={t('download_image')}
-        className="absolute top-[128px] right-3 md:top-auto md:bottom-6 md:right-6 z-50 glass-panel px-3 py-2 md:px-4 md:py-3 rounded-full text-[10px] md:text-xs font-bold text-amber-300 uppercase tracking-widest border border-amber-500/30 hover:border-amber-400 hover:bg-amber-500/20 hover:scale-105 transition-all shadow-[0_0_20px_rgba(245,158,11,0.15)] flex items-center gap-1 md:gap-2 cursor-pointer min-h-[40px]"
+        className="absolute top-[128px] right-3 md:top-auto md:bottom-6 md:right-6 z-50 glass-panel px-3 py-2 md:px-4 md:py-3 rounded-full text-[10px] md:text-xs font-bold text-amber-300 uppercase tracking-widest border border-amber-500/30 hover:border-amber-400 hover:bg-amber-500/20 hover:scale-105 transition-all shadow-[0_0_20px_rgba(245,158,11,0.15)] flex items-center gap-1 md:gap-2 cursor-pointer min-h-[44px] min-w-[44px] justify-center"
         title={t('download_image')}
       >
         <span className="text-sm md:text-lg filter grayscale opacity-80">📸</span> <span className="hidden md:inline">{t('download_btn')}</span>

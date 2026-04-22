@@ -79,11 +79,11 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
         <span className="text-xl -translate-y-2 block">📖</span>
       </button>
 
-      {/* Mobile Backdrop */}
+      {/* Mobile Backdrop — touch-none blocks React Flow pan/zoom from leaking through */}
       {isOpen && (
-        <div 
+        <div
           onClick={() => setIsOpen(false)}
-          className="md:hidden fixed inset-0 bg-[var(--color-ink-black)]/70 z-[60] backdrop-blur-sm"
+          className="md:hidden fixed inset-0 bg-[var(--color-ink-black)]/70 z-[60] backdrop-blur-sm touch-none"
         />
       )}
 
@@ -103,12 +103,12 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
         )}
 
         {/* Header */}
-        <div className="px-4 py-5 border-b-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)]">
-          <div className="flex items-start justify-between mb-1">
-            <div className="flex items-center gap-3">
-              <span className="text-4xl filter grayscale opacity-90 drop-shadow-md">📖</span>
-              <div>
-                <h1 className="text-lg md:text-xl font-bold text-[var(--color-ink-red)] leading-tight font-display drop-cap">
+        <div className="px-4 py-5 border-b-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)] safe-top">
+          <div className="flex items-start justify-between mb-1 gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="text-4xl filter grayscale opacity-90 drop-shadow-md shrink-0">📖</span>
+              <div className="min-w-0">
+                <h1 className="text-lg md:text-xl font-bold text-[var(--color-ink-red)] leading-tight font-display drop-cap truncate">
                   {t('app_title')}
                 </h1>
                 <p className="hidden md:block text-[11px] text-[var(--color-ink-black)] uppercase tracking-widest font-bold mt-1">
@@ -116,6 +116,14 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
                 </p>
               </div>
             </div>
+            {/* Mobile close button — visible only when drawer is open on small screens */}
+            <button
+              onClick={() => setIsOpen(false)}
+              aria-label={t('collapse')}
+              className="md:hidden w-11 h-11 flex items-center justify-center shrink-0 border-2 border-[var(--color-ink-black)] bg-[var(--color-parchment-light)] text-[var(--color-ink-black)] hover:bg-[var(--color-ink-red)] hover:text-white transition-colors shadow-[2px_2px_0_0_var(--color-ink-black)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none font-bold text-xl leading-none"
+            >
+              ✕
+            </button>
           </div>
         </div>
 
