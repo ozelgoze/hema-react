@@ -523,6 +523,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
            onClick={() => setIsExpanded(!isExpanded)}
            className="md:hidden w-full bg-[var(--color-parchment-dark)] py-2.5 px-4 flex flex-col items-center gap-1.5 border-b-2 border-[var(--color-ink-black)] active:bg-[var(--color-parchment)] transition-colors min-h-[44px] focus:outline-none"
            aria-label={isExpanded ? t('collapse_duel_control') : t('expand_duel_control')}
+           aria-expanded={isExpanded}
         >
            <div className="w-12 h-1.5 bg-[var(--color-ink-faded)] rounded-full"></div>
            {!matchWon && !matchLost && (

@@ -131,6 +131,7 @@ export default function ChronicleLog({ nodes }) {
         <button
           onClick={() => setIsOpen(true)}
           aria-label={t('chronicle_open')}
+          aria-expanded={isOpen}
           className="bg-[var(--color-parchment-dark)] border-2 border-[var(--color-ink-black)] text-[var(--color-ink-black)] font-display font-bold px-3 py-2 text-xs md:text-sm uppercase tracking-widest shadow-[4px_4px_0_0_var(--color-ink-black)] hover:bg-[var(--color-ink-black)] hover:text-[var(--color-parchment)] transition-all flex items-center gap-1.5 min-h-[44px] min-w-[44px] justify-center"
         >
           <span className="text-base filter grayscale">📜</span>

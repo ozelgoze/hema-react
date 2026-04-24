@@ -67,17 +67,20 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
 
   return (
     <>
-      {/* Mobile Toggle Bookmark Ribbon */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        aria-label={t('tab_my_combos')}
-        className="md:hidden fixed top-0 left-4 z-[70] bg-[var(--color-ink-red)] text-[var(--color-parchment-light)] border-2 border-t-0 border-[var(--color-ink-black)] px-3 pt-6 pb-4 w-12 min-h-[60px] text-center shadow-[4px_4px_0_0_var(--color-ink-black)] safe-top"
-        style={{
-          clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%)'
-        }}
-      >
-        <span className="text-xl -translate-y-2 block">📖</span>
-      </button>
+      {/* Mobile Toggle Bookmark Ribbon — hidden while drawer is open to avoid duplicate nav */}
+      {!isOpen && (
+        <button
+          onClick={() => setIsOpen(true)}
+          aria-label={t('tab_my_combos')}
+          aria-expanded={isOpen}
+          className="md:hidden fixed top-0 left-4 z-[70] bg-[var(--color-ink-red)] text-[var(--color-parchment-light)] border-2 border-t-0 border-[var(--color-ink-black)] px-3 pt-6 pb-4 w-12 min-h-[60px] text-center shadow-[4px_4px_0_0_var(--color-ink-black)] safe-top"
+          style={{
+            clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 50% 85%, 0% 100%)'
+          }}
+        >
+          <span className="text-xl -translate-y-2 block">📖</span>
+        </button>
+      )}
 
       {/* Mobile Backdrop — touch-none blocks React Flow pan/zoom from leaking through */}
       {isOpen && (

@@ -8,6 +8,7 @@ import {
   useNodesState,
   useEdgesState,
   BackgroundVariant,
+  useReactFlow,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { toPng } from 'html-to-image';
@@ -23,7 +24,23 @@ const edgeTypes = { inkEdge: InkEdge };
 
 function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onUndo, onClear, onMatchReset, currentStep, activeNodeId, setActiveNodeId, isMoveModalOpen, setIsMoveModalOpen, userScore, aiScore, onScoreUpdate, maxScore }) {
   const { t } = useTranslation();
-  
+  const { fitView } = useReactFlow();
+
+  // Re-fit the canvas after orientation change so rotating from portrait → landscape
+  // (or vice versa) doesn't leave combo nodes off-screen. Debounced to let the browser settle.
+  useEffect(() => {
+    let timer;
+    const refit = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => fitView({ padding: 0.4, maxZoom: 1.2, duration: 300 }), 150);
+    };
+    window.addEventListener('orientationchange', refit);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('orientationchange', refit);
+    };
+  }, [fitView]);
+
   const handleDownloadImage = useCallback(() => {
     const flowElement = document.querySelector('.react-flow');
     if (!flowElement) return;
