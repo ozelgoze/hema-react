@@ -14,19 +14,45 @@ const AI_PROFILES = {
     nameKey: 'ai_personality_liechtenauer',
     style: 'aggressive',
     finisherBlockStrength: 0.6,
-    bias: (move, userTags) => {
+    // Signature: Zornhau-ort — answer every cut with a counter-cut that threads the point.
+    // Philosophy: Vor (before) — seize initiative, never cede tempo.
+    // Measure: Zornhau wants Mittel. At Weit close with Counter+Cut. At Nahe switch to Wind/Bind.
+    bias: (move, userTags, ctx = {}) => {
       let score = 0;
       const aiTags = move.tags || [];
-      // Relentless forward pressure — answer strength with strength, punish weakness
+      const { tier = MEASURE.MITTEL } = ctx;
+
       if (aiTags.includes('Strong')) score += 6;
       if (aiTags.includes('Counter')) score += 8;
       if (aiTags.includes('Wind')) score += 7;
       if (userTags.includes('Weak')) score += 12;
       if (aiTags.includes('Retreat')) score -= 10;
-      // Against a chaser: meet the charge head-on with a counter-cut
+
+      // Zornhau signature — full cut demands Mittel
+      if (userTags.includes('Cut') && aiTags.includes('Counter') && aiTags.includes('Cut')) {
+        if (tier === MEASURE.MITTEL) score += 14;
+        else if (tier === MEASURE.WEIT) score += 6;  // still the idea, but measure-weak
+        else score += 2;                              // too close for a clean counter-cut
+      }
+      // Against a chaser at full measure: meet the charge head-on
       if (userTags.includes('Cut') && userTags.includes('NoBind')) {
-        if (aiTags.includes('Counter')) score += 15;
+        if (aiTags.includes('Counter')) score += (tier === MEASURE.MITTEL ? 15 : 8);
         if (aiTags.includes('Retreat')) score -= 15;
+      }
+      // Against a thrust: displace with counter-thrust — ideal at Mittel
+      if (userTags.includes('Thrust') && userTags.includes('NoBind')) {
+        if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += (tier === MEASURE.MITTEL ? 10 : 5);
+        if (aiTags.includes('Bind') && !aiTags.includes('Counter')) score -= 3;
+      }
+      // At Nahe, the master-cut is overstretched — pivot to Bind+Wind (Indes)
+      if (tier === MEASURE.NAHE) {
+        if (aiTags.includes('Wind')) score += 5;
+        if (aiTags.includes('Bind') && aiTags.includes('Strong')) score += 3;
+      }
+      // At Weit, push distance closed with any committed Cut or Close move
+      if (tier === MEASURE.WEIT) {
+        if (aiTags.includes('Cut')) score += 3;
+        if (aiTags.includes('Close')) score += 3;
       }
       return score;
     },
@@ -35,20 +61,45 @@ const AI_PROFILES = {
     nameKey: 'ai_personality_fiore',
     style: 'grappling',
     finisherBlockStrength: 0.9, // Fiore fights long — hard to finish quickly
-    bias: (move, userTags) => {
+    // Signature: Zogho Largo → Zogho Stretto. Close distance, pin the bind, enter grapple.
+    // Philosophy: own the measure, strip the weapon from the fool who overreaches.
+    // Measure: Grapple bonuses only at Nahe. At Weit Fiore closes. At Mittel he sets the bind to transition.
+    bias: (move, userTags, ctx = {}) => {
       let score = 0;
       const aiTags = move.tags || [];
-      // Close distance, secure the bind, control with grapple/thrust
+      const { tier = MEASURE.MITTEL } = ctx;
+
       if (aiTags.includes('Bind')) score += 8;
-      if (aiTags.includes('Grapple')) score += 15;
-      if (aiTags.includes('Close')) score += 6;
       if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += 10;
       if (aiTags.includes('Weak')) score -= 8;
       if (aiTags.includes('Retreat')) score -= 12;
-      // "Chi mi segue, trova la mia punta" — against a chaser, set the point
+
+      // Grapple & Close — measure-gated: only valuable at Nahe/Mittel
+      if (aiTags.includes('Grapple')) {
+        if (tier === MEASURE.NAHE) score += 18;
+        else if (tier === MEASURE.MITTEL) score += 4;
+        else score -= 8; // at Weit, grappling is fantasy
+      }
+      if (aiTags.includes('Close')) {
+        if (tier === MEASURE.WEIT) score += 10;  // Fiore's urgent priority at Weit: close
+        else if (tier === MEASURE.MITTEL) score += 6;
+        else score += 2;
+      }
+      // "Chi mi segue, trova la mia punta" — set the point when chased (any distance)
       if (userTags.includes('Cut') && userTags.includes('NoBind')) {
         if (aiTags.includes('Thrust') && aiTags.includes('Counter')) score += 25;
         if (aiTags.includes('Retreat')) score -= 20;
+      }
+      // Against a Strong+Bind press: yield softly into Stretto — needs at least Mittel to transition
+      if (userTags.includes('Strong') && userTags.includes('Bind') && tier !== MEASURE.WEIT) {
+        if (aiTags.includes('Close') || aiTags.includes('Grapple')) score += 8;
+        if (aiTags.includes('Weak') && aiTags.includes('Bind')) score += 4;
+      }
+      // Against a grappler at Nahe: disengage-thrust to reset measure
+      if (userTags.includes('Grapple')) {
+        if (aiTags.includes('Thrust') && aiTags.includes('NoBind')) score += 6;
+        if (aiTags.includes('Grapple')) score -= 8;
+        if (aiTags.includes('Retreat') && tier === MEASURE.NAHE) score += 3; // break, don't wrestle
       }
       return score;
     },
@@ -57,19 +108,44 @@ const AI_PROFILES = {
     nameKey: 'ai_personality_meyer',
     style: 'technical',
     finisherBlockStrength: 0.7,
-    bias: (move, userTags) => {
+    // Signature: Versetzen (angled displacement) → Winden. Trade position, never energy.
+    // Philosophy: technical variety — always change the line before the opponent reads it.
+    // Measure: Wind requires Bind + Mittel/Nahe. At Weit, Meyer leans on angled cuts (Versetzen) instead.
+    bias: (move, userTags, ctx = {}) => {
       let score = 0;
       const aiTags = move.tags || [];
-      // Technical variety — winding, angles, controlled counters
-      if (aiTags.includes('Wind')) score += 10;
+      const { tier = MEASURE.MITTEL } = ctx;
+
+      // Wind is Meyer's heart — but only when measure permits a bind
+      if (aiTags.includes('Wind')) {
+        if (tier === MEASURE.MITTEL) score += 12;
+        else if (tier === MEASURE.NAHE) score += 8;
+        else score += 2; // Weit: no bind to wind around
+      }
       if (aiTags.includes('Counter')) score += 6;
       if (aiTags.includes('Bind')) score += 5;
       score += Math.random() * 4;
-      // Against chasers: create a bind, wind into a new line
+
+      // Against chasers: Versetzen into the bind, wind into a new line
       if (userTags.includes('Cut') && userTags.includes('NoBind')) {
         if (aiTags.includes('Counter')) score += 14;
-        if (aiTags.includes('Bind')) score += 10;
+        if (aiTags.includes('Bind')) score += (tier === MEASURE.MITTEL ? 10 : 5);
         if (aiTags.includes('Retreat')) score -= 8;
+      }
+      // Against Strong+Bind press: invite the overcommit, wind around it — needs the bind (Mittel/Nahe)
+      if (userTags.includes('Strong') && userTags.includes('Bind') && tier !== MEASURE.WEIT) {
+        if (aiTags.includes('Wind')) score += 9;
+        if (aiTags.includes('Weak') && aiTags.includes('Bind')) score += 4;
+        if (aiTags.includes('Grapple')) score -= 4; // not Meyer's game
+      }
+      // Against a thrust: soft-parry + wind — catalogue page, exactly (needs Mittel)
+      if (userTags.includes('Thrust') && tier === MEASURE.MITTEL) {
+        if (aiTags.includes('Bind') && aiTags.includes('Weak')) score += 6;
+      }
+      // At Weit Meyer pivots to angled cuts (Versetzen-at-distance) instead of Winden
+      if (tier === MEASURE.WEIT) {
+        if (aiTags.includes('Cut') && aiTags.includes('Counter')) score += 6;
+        if (aiTags.includes('Wind')) score -= 4; // explicitly discourage winding at Weit
       }
       if (aiTags.includes('Retreat')) score -= 6;
       return score;
@@ -113,11 +189,12 @@ const applyDoctrine = ({ aiTags = [], userTags = [], prevOwnTags = [], tier = ME
   //    Also Fiore: "Falso, Tondo, Fendente, Sgualembrato sonrasında uzaklaş ve/veya parry."
   // If the actor just broke the line (Wind, NoBind-Thrust disengage, or committed NoBind cut),
   // the NEXT move should retreat or re-bind — momentum is spent, point/edge is past the target.
+  // Measure: only meaningful at Mittel/Nahe — at Weit the actor is already far, retreat is redundant.
   const brokeLineLastTurn =
     prevOwnTags.includes('Wind') ||
     (prevOwnTags.includes('NoBind') && prevOwnTags.includes('Thrust')) ||
     (prevOwnTags.includes('Cut') && prevOwnTags.includes('NoBind'));
-  if (brokeLineLastTurn) {
+  if (brokeLineLastTurn && tier !== MEASURE.WEIT) {
     if (aiTags.includes('Retreat')) score += 8;
     if (aiTags.includes('Bind')) score += 3;
     if (aiTags.includes('Cut') && !aiTags.includes('Counter')) score -= 4;
@@ -125,31 +202,51 @@ const applyDoctrine = ({ aiTags = [], userTags = [], prevOwnTags = [], tier = ME
 
   // A. "Merkez çizgisinde kalıyor, eller arkada → güreş / kılıcı pasifize edip sapla veya kes."
   // Against a passive Strong+Bind opponent, favor pacify-then-thrust, grapple, or sword-manipulation (Wind).
+  // Measure: Grapple needs Nahe. Counter+Thrust ideally at Mittel. Wind requires the bind (Mittel/Nahe).
   if (userTags.includes('Strong') && userTags.includes('Bind')) {
-    if (aiTags.includes('Grapple')) score += 6;
-    if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += 5;
-    if (aiTags.includes('Wind')) score += 3;
+    if (aiTags.includes('Grapple')) {
+      score += (tier === MEASURE.NAHE ? 8 : tier === MEASURE.MITTEL ? 3 : -4);
+    }
+    if (aiTags.includes('Counter') && aiTags.includes('Thrust')) {
+      score += (tier === MEASURE.MITTEL ? 6 : 3);
+    }
+    if (aiTags.includes('Wind') && tier !== MEASURE.WEIT) score += 3;
   }
 
   // A'. "Merkez çizgisinde kalıyor, eller önde → en yakın açıklığı kes/sapla, sonra kılıcına git veya uzaklaş."
   // Opponent committed a counter-cut (hands extended, edge past centerline). Two openings:
   //   1. Beat them to target with a quick thrust to the nearest opening (disengage-thrust).
   //   2. Re-take the bind (Wind-thrust, press-through) before they recover.
-  // Staying in a deep bind against an already-extended counter wastes the tempo.
+  // Measure: disengage-thrust needs Mittel (reach). Wind needs Mittel/Nahe (bind). At Weit — close first.
   const opponentExtended =
     userTags.includes('Cut') && userTags.includes('Counter');
   if (opponentExtended) {
-    if (aiTags.includes('Thrust') && aiTags.includes('NoBind')) score += 6; // quick thrust to opening
-    if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += 4;
-    if (aiTags.includes('Wind')) score += 3; // re-bind and wind
-    if (aiTags.includes('Grapple')) score -= 3; // wrong tempo — they are still swinging
+    if (tier === MEASURE.MITTEL) {
+      if (aiTags.includes('Thrust') && aiTags.includes('NoBind')) score += 6;
+      if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += 4;
+      if (aiTags.includes('Wind')) score += 3;
+    } else if (tier === MEASURE.WEIT) {
+      // Can't reach a committed counter from Weit — close or re-cut from distance
+      if (aiTags.includes('Close')) score += 4;
+      if (aiTags.includes('Cut') && aiTags.includes('Counter')) score += 3;
+    } else {
+      // Nahe — blades tangled; wind or retreat break out
+      if (aiTags.includes('Wind')) score += 4;
+    }
+    if (aiTags.includes('Grapple') && tier !== MEASURE.NAHE) score -= 3; // wrong tempo
   }
 
   // C. "Reaksiyon vermiyor, vurabilirim → saplama/kesiş + rakibin kılıcına git ya da uzaklaş."
   // After a passive retreat from the user, a committed Counter+Thrust is the cleanest finish.
+  // Measure: only effective at Mittel. At Weit — too far; must close first. At Nahe — blade already engaged.
   if (userTags.includes('Retreat')) {
-    if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += 6;
-    if (aiTags.includes('Cut') && aiTags.includes('NoBind')) score += 3;
+    if (tier === MEASURE.MITTEL) {
+      if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += 6;
+      if (aiTags.includes('Cut') && aiTags.includes('NoBind')) score += 3;
+    } else if (tier === MEASURE.WEIT) {
+      if (aiTags.includes('Close')) score += 4;
+      if (aiTags.includes('Cut') && aiTags.includes('NoBind')) score += 2;
+    }
   }
 
   // D. "Vuramam → ileri-geri küçük adımlarla yaklaş."
@@ -248,6 +345,30 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
 
   // Current HEMA measure (tier 0=Nahe, 1=Mittel, 2=Weit), derived by walking the exchange.
   const currentMeasure = useMemo(() => deriveMeasure(activePlayNodes), [activePlayNodes]);
+
+  // ── AI memory: user's last 3 tag sets and AI's passivity streak ──
+  // These feed pattern-exploitation and tempo-pressure into the reaction scorer.
+  const userRecentTags = useMemo(() => {
+    return activePlayNodes
+      .filter((n) => n.data?.nodeRole === 'user-action' && !n.data?.isSelector)
+      .slice(-3)
+      .map((n) => n.data?.tags || []);
+  }, [activePlayNodes]);
+
+  // Count consecutive AI moves (most recent backwards) that were passive (Retreat or Weak+no Counter).
+  // After ≥2, the AI must pivot aggressively — HEMA's Vor/Nach principle: sitting in Nach loses the fight.
+  const aiPassivityStreak = useMemo(() => {
+    let streak = 0;
+    for (let i = activePlayNodes.length - 1; i >= 0; i--) {
+      const n = activePlayNodes[i]?.data;
+      if (n?.nodeRole !== 'opponent-action') continue;
+      const tags = n.tags || [];
+      const passive = tags.includes('Retreat') || (tags.includes('Weak') && !tags.includes('Counter'));
+      if (passive) streak++;
+      else break;
+    }
+    return streak;
+  }, [activePlayNodes]);
 
   const recommendedMoves = useMemo(() => {
     if (!lastNode) return [];
@@ -377,9 +498,9 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
             if (aiTags.includes('Retreat')) score -= 2;         // valid but cedes tempo
           }
 
-          // ── Personality bias ──
+          // ── Personality bias ── (measure-aware)
           if (personality && personality.bias) {
-            score += personality.bias(move, userTags);
+            score += personality.bias(move, userTags, { tier: currentMeasure });
           }
 
           // ── HEMA Attack Doctrine (instructor's decision tree) ──
@@ -388,6 +509,85 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
           const prevOwnTags = aiPrevOwn?.nodeRole === 'opponent-action' ? (aiPrevOwn.tags || []) : [];
           score += applyDoctrine({ aiTags, userTags, prevOwnTags, tier: currentMeasure });
           score += measureFit(move, currentMeasure);
+
+          // ── Pattern recognition — punish repeated user tags (adept+, measure-gated) ──
+          // When the user plays the same primary tag twice in a row, the AI exploits it.
+          // Each exploit is gated by the current measure — a Durchwechseln from Weit is fantasy.
+          if (aiDifficulty !== 'novice' && userRecentTags.length >= 2) {
+            const last = userRecentTags[userRecentTags.length - 1];
+            const prev = userRecentTags[userRecentTags.length - 2];
+            const shared = last.filter((t) => prev.includes(t));
+
+            // Repeated Wind = hands committed high. Durchwechseln needs bind → only Mittel/Nahe.
+            if (shared.includes('Wind') && currentMeasure !== MEASURE.WEIT) {
+              if (aiTags.includes('Thrust') && aiTags.includes('NoBind')) score += 8;
+              if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += 5;
+            }
+            // Repeated Retreat = opening up. Counter-thrust & Nachreisen need at least Mittel.
+            if (shared.includes('Retreat')) {
+              if (currentMeasure === MEASURE.MITTEL) {
+                if (aiTags.includes('Counter') && aiTags.includes('Thrust')) score += 10;
+                if (aiTags.includes('Cut') && aiTags.includes('NoBind')) score += 6;
+              } else if (currentMeasure === MEASURE.WEIT) {
+                // Too far — reward closing (Close / Cut) over thrust
+                if (aiTags.includes('Close')) score += 5;
+                if (aiTags.includes('Cut') && aiTags.includes('NoBind')) score += 3;
+              } else {
+                // Nahe — they retreat to break the grapple; follow with a committed thrust
+                if (aiTags.includes('Thrust')) score += 5;
+              }
+            }
+            // Repeated Strong+Bind = bind-stuck. Line-break only useful if there IS a bind — Mittel/Nahe.
+            if (shared.includes('Strong') && shared.includes('Bind') && currentMeasure !== MEASURE.WEIT) {
+              if (aiTags.includes('NoBind')) score += 6;
+              if (aiTags.includes('Wind')) score += 4;
+            }
+            // Repeated Cut+NoBind (wide swinging) = commit to a counter-cut — best at Mittel.
+            if (shared.includes('Cut') && shared.includes('NoBind')) {
+              if (aiTags.includes('Counter')) score += (currentMeasure === MEASURE.MITTEL ? 7 : 3);
+            }
+          }
+
+          // ── Passivity pressure (Vor/Nach) — measure-aware pivot ──
+          // After ≥2 passive AI turns, pivot forward. HOW depends on measure:
+          //   Weit   → pivot = close the distance (Close / committed Cut)
+          //   Mittel → pivot = counter-cut / strong-cut (Zornhau-style attack)
+          //   Nahe   → pivot = thrust / grapple (close-work)
+          if (aiPassivityStreak >= 2) {
+            if (aiTags.includes('Retreat')) score -= 15;
+            if (aiTags.includes('Weak') && !aiTags.includes('Counter')) score -= 6;
+            if (currentMeasure === MEASURE.WEIT) {
+              if (aiTags.includes('Close')) score += 10;
+              if (aiTags.includes('Cut') && aiTags.includes('Counter')) score += 6;
+            } else if (currentMeasure === MEASURE.MITTEL) {
+              if (aiTags.includes('Counter')) score += 9;
+              if (aiTags.includes('Strong') && aiTags.includes('Cut')) score += 6;
+            } else {
+              if (aiTags.includes('Thrust')) score += 7;
+              if (aiTags.includes('Grapple')) score += 5;
+            }
+          }
+
+          // ── Master-tier Fühlen (strength-feeling) — measure-aware ──
+          // Real masters "feel" the opponent's strength at the bind and answer in kind.
+          // Strength-mirror is only meaningful when a bind exists (Mittel/Nahe).
+          // Finisher-setup detection: repeated Strong+Bind → break the line before the user lands a Schnitt.
+          if (aiDifficulty === 'master') {
+            if (currentMeasure !== MEASURE.WEIT) {
+              if (userTags.includes('Strong') && aiTags.includes('Weak')) score += 6;
+              if (userTags.includes('Weak') && aiTags.includes('Strong')) score += 6;
+            }
+            // Count Strong+Bind signatures in the last 3 user moves
+            const setupSignals = userRecentTags.reduce((acc, tagset) => {
+              if (tagset.includes('Strong') && tagset.includes('Bind')) return acc + 1;
+              return acc;
+            }, 0);
+            if (setupSignals >= 2 && currentMeasure !== MEASURE.WEIT) {
+              // User is loading a pressure-finisher (Schnitt / bind-Thrust); break the line to starve it
+              if (aiTags.includes('NoBind')) score += 7;
+              if (aiTags.includes('Retreat')) score += 3;
+            }
+          }
 
           // ── Anti-finisher scoring (difficulty-scaled) ──
           // Higher difficulty AI picks reactions that expose FEWER finisher paths
@@ -427,7 +627,7 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
       }, difficulty.thinkTime);
       return () => clearTimeout(timer);
     }
-  }, [isOpponentTurn, isAiMode, recommendedMoves, onAddNode, nodes.length, currentPhase, isMistake, lastNode, aiDifficulty, aiPersonality]);
+  }, [isOpponentTurn, isAiMode, recommendedMoves, onAddNode, nodes.length, currentPhase, isMistake, lastNode, aiDifficulty, aiPersonality, userRecentTags, aiPassivityStreak, currentMeasure, activePlayNodes]);
 
   // Mistake punishment
   useEffect(() => {
