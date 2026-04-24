@@ -50,9 +50,13 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
       <div className="w-full h-[90vh] h-[90dvh] md:h-[80vh] md:w-[600px] bg-[var(--color-parchment)] md:border-[4px] border-t-[4px] border-[var(--color-ink-black)] shadow-[0_0_50px_rgba(42,37,34,0.5)] md:shadow-[10px_10px_0_0_var(--color-ink-black)] flex flex-col animate-slide-up md:animate-scale-in relative">
         
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)]">
+        <div className="flex justify-between items-center p-4 border-b-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)] relative">
+          <div className="absolute left-4 right-4 bottom-0 h-[2px] bg-[var(--color-ink-red)] opacity-30" aria-hidden="true" />
           <div>
-            <h2 className="text-xl font-display font-bold text-[var(--color-ink-red)] uppercase tracking-widest leading-none block">{t('you')}</h2>
+            <h2 className="text-xl font-display font-bold text-[var(--color-ink-red)] uppercase tracking-widest leading-none flex items-center gap-2">
+              <span className="text-[var(--color-ink-faded)] text-sm" aria-hidden="true">❦</span>
+              {t('you')}
+            </h2>
             <span className="text-xs font-bold text-[var(--color-ink-faded)] uppercase tracking-[0.2em]">{t('wizard_select')}</span>
           </div>
           <button onClick={onClose} aria-label={t('close') || 'Close'} className="w-11 h-11 flex items-center justify-center border-2 border-[var(--color-ink-black)] bg-[var(--color-parchment-light)] hover:bg-[var(--color-ink-red)] hover:text-white transition-colors shadow-[2px_2px_0_0_var(--color-ink-black)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none font-bold text-xl">
@@ -63,19 +67,30 @@ export default function MoveSelectorModal({ isOpen, onClose, onSelectMove, recom
         {/* Filters */}
         <div className="p-4 bg-[var(--color-parchment-light)] border-b-[2px] border-[var(--color-ink-black)] space-y-3">
           <div className="flex bg-[var(--color-parchment-dark)] border-[2px] border-[var(--color-ink-black)] p-0.5">
-            {['all', 'starter', 'reaction', 'followup', 'finisher'].map((ph) => (
-              <button
-                key={ph}
-                onClick={() => setPhaseFilter(ph === 'all' ? null : ph)}
-                className={`flex-1 px-2 py-3 text-xs font-bold uppercase tracking-wider transition-all duration-300 min-h-[44px] ${
-                  (phaseFilter === (ph === 'all' ? null : ph))
-                    ? 'bg-[var(--color-ink-black)] text-[var(--color-parchment-light)]'
-                    : 'bg-transparent text-[var(--color-ink-black)] hover:bg-[var(--color-parchment)]'
-                }`}
-              >
-                {ph === 'all' ? t('wizard_all') : t(`phase_${ph}`)}
-              </button>
-            ))}
+            {[
+              { id: 'all', glyph: '❦' },
+              { id: 'starter', glyph: '⚔' },
+              { id: 'reaction', glyph: '🛡' },
+              { id: 'followup', glyph: '⚡' },
+              { id: 'finisher', glyph: '✦' },
+            ].map(({ id: ph, glyph }) => {
+              const active = phaseFilter === (ph === 'all' ? null : ph);
+              return (
+                <button
+                  key={ph}
+                  onClick={() => setPhaseFilter(ph === 'all' ? null : ph)}
+                  aria-pressed={active}
+                  className={`flex-1 px-2 py-3 text-[11px] font-bold uppercase tracking-wider transition-all duration-300 min-h-[44px] flex flex-col items-center justify-center gap-0.5 ${
+                    active
+                      ? 'bg-[var(--color-ink-black)] text-[var(--color-parchment-light)]'
+                      : 'bg-transparent text-[var(--color-ink-black)] hover:bg-[var(--color-parchment)]'
+                  }`}
+                >
+                  <span className={`text-sm leading-none ${active ? 'text-[var(--color-gold)]' : 'opacity-70'}`} aria-hidden="true">{glyph}</span>
+                  <span>{ph === 'all' ? t('wizard_all') : t(`phase_${ph}`)}</span>
+                </button>
+              );
+            })}
           </div>
 
           <div className="relative">

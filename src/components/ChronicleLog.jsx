@@ -145,9 +145,13 @@ export default function ChronicleLog({ nodes }) {
           ${isOpen ? 'scale-x-100 h-full h-dvh md:h-[60vh] max-h-[100vh] md:max-h-[600px]' : 'scale-x-0 h-0 hidden'}
         `}
       >
-        <div className="flex justify-between items-center bg-[var(--color-ink-black)] text-[var(--color-parchment-light)] px-4 py-3 border-b-2 border-[var(--color-ink-black)] safe-top">
+        <div className="flex justify-between items-center bg-[var(--color-ink-black)] text-[var(--color-parchment-light)] px-4 py-3 border-b-2 border-[var(--color-ink-black)] safe-top relative">
+          {/* Gold filigree rule under the chronicle banner */}
+          <div className="absolute left-4 right-4 bottom-0 h-[2px] bg-[var(--color-gold)] opacity-40" aria-hidden="true" />
           <h2 className="font-display text-lg uppercase tracking-widest text-[var(--color-gold)] flex items-center gap-2">
+            <span className="text-[var(--color-gold)] text-sm opacity-70" aria-hidden="true">❦</span>
             <span className="text-xl filter grayscale drop-shadow-md">📜</span> {t('chronicle_title')}
+            <span className="text-[var(--color-gold)] text-sm opacity-70" aria-hidden="true">❦</span>
           </h2>
           <button
             onClick={() => setIsOpen(false)}
@@ -164,9 +168,13 @@ export default function ChronicleLog({ nodes }) {
           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E")` }}
         >
           {nodes.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center opacity-40 italic text-center">
-              <span className="text-4xl mb-2 grayscale">✒️</span>
-              <p>{t('chronicle_empty')}</p>
+            <div className="h-full flex flex-col items-center justify-center text-center px-6">
+              <div className="relative w-full max-w-[240px] border-2 border-dashed border-[var(--color-ink-faded)] p-6 bg-[var(--color-parchment)]/40">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[var(--color-parchment-light)] px-2 text-[var(--color-ink-faded)] text-sm" aria-hidden="true">❦</div>
+                <span className="text-4xl mb-2 block grayscale opacity-60">✒️</span>
+                <p className="font-display italic text-sm text-[var(--color-ink-faded)] leading-snug">{t('chronicle_empty')}</p>
+                <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-[var(--color-parchment-light)] px-2 text-[var(--color-ink-faded)] text-sm" aria-hidden="true">❦</div>
+              </div>
             </div>
           ) : (
             <div className="space-y-2 pb-6">

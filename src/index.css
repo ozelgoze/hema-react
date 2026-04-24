@@ -138,10 +138,10 @@ button {
   cursor: grabbing;
 }
 
+/* Ink-pen look: square linecap + default width. Stroke color is set per-edge
+   via FlowCanvas (palette-based: black/red/gold) — do not override here. */
 .react-flow__edge-path {
-  stroke: var(--color-ink-black) !important;
-  stroke-width: 3 !important;
-  stroke-linecap: square !important; /* Ink pen look */
+  stroke-linecap: square;
 }
 
 .react-flow__attribution {
@@ -220,4 +220,55 @@ button {
   to {
     stroke-dashoffset: 0;
   }
+}
+
+/* ── Ornamental Flourishes ──
+   Centered diamond fleuron between two ink rules — for section dividers. */
+.ornamental-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: var(--color-ink-faded);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  line-height: 1;
+  opacity: 0.75;
+  user-select: none;
+}
+.ornamental-rule::before,
+.ornamental-rule::after {
+  content: '';
+  flex: 1;
+  height: 0;
+  border-top: 1px solid currentColor;
+  max-width: 60px;
+}
+.ornamental-rule__glyph {
+  display: inline-block;
+  transform: translateY(-1px);
+  letter-spacing: 0.15em;
+}
+
+/* Vellum vignette — radial darkening at canvas edges for depth. */
+.vellum-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse at center, transparent 55%, rgba(42, 37, 34, 0.18) 100%),
+    radial-gradient(circle at 15% 20%, rgba(139, 69, 19, 0.04), transparent 35%),
+    radial-gradient(circle at 85% 80%, rgba(139, 69, 19, 0.04), transparent 35%);
+  mix-blend-mode: multiply;
+  z-index: 1;
+}
+
+/* Woodcut active outline — replaces neon glow. Thick black outline + gold inlay. */
+.woodcut-active {
+  outline: 3px solid var(--color-ink-black);
+  outline-offset: 3px;
+  box-shadow:
+    0 0 0 6px var(--color-gold),
+    0 0 0 8px var(--color-ink-black),
+    6px 6px 0 0 var(--color-ink-black);
 }

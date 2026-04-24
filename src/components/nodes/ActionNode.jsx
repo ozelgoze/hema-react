@@ -3,6 +3,24 @@ import { Handle, Position } from '@xyflow/react';
 import { useTranslation } from '../../i18n/LanguageContext';
 import { getManuscriptKey, getMoveById } from '../../data/hemaMoves';
 
+// Arabic → Roman numeral (up to 39 — a single exchange will never exceed this).
+const toRoman = (n) => {
+  if (!Number.isFinite(n) || n < 1) return '';
+  const map = [
+    ['XXX', 30], ['XX', 20], ['X', 10],
+    ['IX', 9], ['V', 5], ['IV', 4], ['I', 1],
+  ];
+  let out = '';
+  let remaining = Math.floor(n);
+  for (const [glyph, val] of map) {
+    while (remaining >= val) {
+      out += glyph;
+      remaining -= val;
+    }
+  }
+  return out;
+};
+
 const roleConfig = {
   'user-action': {
     class: 'glass-panel', // Base parchment woodcut style
@@ -60,21 +78,27 @@ function ActionNode({ data }) {
         ${!data.isSelector && 'panel-interactive'}
         ${data.finisherFailure ? 'border-dashed border-[var(--color-ink-red)] opacity-75' : ''}
         transition-all duration-300
-        ${data.isActive ? 'ring-4 ring-[var(--color-gold)] shadow-[0_0_20px_var(--color-gold)] scale-[1.02]' : 'opacity-80 hover:opacity-100'}
+        ${data.isActive ? 'woodcut-active scale-[1.015]' : 'opacity-85 hover:opacity-100'}
       `}
     >
       {data.isSelector ? (
-        <div className="text-center animate-pulse">
-           <span className="text-5xl filter grayscale mb-3 block">⚔️</span>
+        <div className="text-center">
+           <div className="flex items-center justify-center gap-3 mb-3 text-[var(--color-ink-red)] opacity-70" aria-hidden="true">
+             <span className="text-base">❦</span>
+             <span className="flex-1 h-px bg-[var(--color-ink-red)] max-w-[40px]" />
+             <span className="text-5xl filter grayscale animate-pulse">⚔️</span>
+             <span className="flex-1 h-px bg-[var(--color-ink-red)] max-w-[40px]" />
+             <span className="text-base">❦</span>
+           </div>
            <h2 className="text-xl font-display font-bold text-[var(--color-ink-red)] uppercase tracking-[0.2em]">{t('wizard_select')}</h2>
-           <p className="text-xs text-[var(--color-ink-black)]/70 uppercase tracking-widest mt-2">{t('your_turn')}</p>
+           <p className="text-xs text-[var(--color-ink-black)]/70 uppercase tracking-widest mt-2 font-bold">{t('your_turn')}</p>
         </div>
       ) : (
         <>
-          {/* Active Indicator Pin */}
+          {/* Active Indicator — woodcut seal with manuscript fleuron */}
       {data.isActive && (
-        <div className="absolute -top-3 -right-3 z-20 animate-bounce">
-          <span className="text-2xl drop-shadow-md">👇</span>
+        <div className="absolute -top-4 -right-4 z-20 w-9 h-9 flex items-center justify-center bg-[var(--color-gold)] border-2 border-[var(--color-ink-black)] shadow-[2px_2px_0_0_var(--color-ink-black)] rotate-[8deg]" aria-hidden="true">
+          <span className="font-display text-[var(--color-ink-black)] text-lg leading-none">❖</span>
         </div>
       )}
       {/* Whiffed finisher banner — HEMA doctrine prereq failed, blade went into empty air */}
@@ -100,8 +124,8 @@ function ActionNode({ data }) {
             <span className={`text-[10px] font-bold tracking-widest px-2 py-0.5 uppercase ${config.badgeColor}`}>
               {t(roleLabelKey)}
             </span>
-            <span className="text-sm font-display text-[var(--color-ink-faded)] italic">
-              Act. {data.step}
+            <span className="text-sm font-display text-[var(--color-ink-faded)] italic tracking-wider" title={`Act ${data.step}`}>
+              Act. {toRoman(data.step) || data.step}
             </span>
           </div>
         </div>

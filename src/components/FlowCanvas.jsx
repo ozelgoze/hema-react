@@ -61,6 +61,8 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
 
   return (
     <div className="w-full h-full relative">
+      {/* Vellum vignette — subtle edge darkening for aged-parchment depth */}
+      <div className="vellum-vignette" aria-hidden="true" />
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -91,28 +93,33 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
       >
         <Background
           variant={BackgroundVariant.Dots}
-          gap={20}
-          size={1}
-          color="#334155"
+          gap={24}
+          size={1.2}
+          color="rgba(42, 37, 34, 0.18)"
         />
         <Controls
           position="top-left"
           showInteractive={false}
-          className="!top-[76px] !left-3 md:!top-auto md:!bottom-4 md:!left-4 !bg-slate-800/80 !border-slate-700 !rounded-lg !shadow-xl [&>button]:!bg-slate-700 [&>button]:!border-slate-600 [&>button]:!text-slate-300 [&>button:hover]:!bg-slate-600 [&>button]:!w-10 [&>button]:!h-10 md:[&>button]:!w-6 md:[&>button]:!h-6"
+          className="!top-[76px] !left-3 md:!top-auto md:!bottom-4 md:!left-4 !bg-[var(--color-parchment-light)] !border-2 !border-[var(--color-ink-black)] !rounded-none !shadow-[4px_4px_0_0_var(--color-ink-black)] [&>button]:!bg-[var(--color-parchment)] [&>button]:!border-[var(--color-ink-faded)] [&>button]:!border-0 [&>button]:!border-b [&>button]:!text-[var(--color-ink-black)] [&>button:hover]:!bg-[var(--color-ink-black)] [&>button:hover]:!text-[var(--color-parchment-light)] [&>button]:!w-11 [&>button]:!h-11 md:[&>button]:!w-7 md:[&>button]:!h-7 [&>button:last-child]:!border-b-0 [&_svg]:!max-w-[60%] [&_svg]:!max-h-[60%]"
         />
         <MiniMap
           pannable
           zoomable
           nodeColor={(node) => {
             const role = node.data?.nodeRole;
-            if (role === 'user-action') return '#10b981';
-            if (role === 'opponent-action') return '#f43f5e';
-            if (role === 'opponent-point') return '#e11d48';
-            if (role === 'scoring-point') return '#f59e0b';
-            return '#64748b';
+            if (role === 'user-action') return '#2a2522';
+            if (role === 'opponent-action') return '#8B0000';
+            if (role === 'opponent-point') return '#8B0000';
+            if (role === 'scoring-point') return '#c5a059';
+            return '#4a443f';
           }}
-          maskColor="rgba(0, 0, 0, 0.7)"
-          className="!hidden md:!block !bg-black/50 !border-white/10 !rounded-lg backdrop-blur-md"
+          nodeStrokeColor="#2a2522"
+          nodeStrokeWidth={2}
+          nodeBorderRadius={0}
+          maskColor="rgba(42, 37, 34, 0.35)"
+          maskStrokeColor="#2a2522"
+          maskStrokeWidth={1}
+          className="!hidden md:!block !bg-[var(--color-parchment-light)] !border-2 !border-[var(--color-ink-black)] !rounded-none !shadow-[4px_4px_0_0_var(--color-ink-black)]"
         />
       </ReactFlow>
 
@@ -137,10 +144,11 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
       <button
         onClick={handleDownloadImage}
         aria-label={t('download_image')}
-        className="absolute top-[128px] right-3 md:top-auto md:bottom-6 md:right-6 z-50 glass-panel px-3 py-2 md:px-4 md:py-3 rounded-full text-[10px] md:text-xs font-bold text-amber-300 uppercase tracking-widest border border-amber-500/30 hover:border-amber-400 hover:bg-amber-500/20 hover:scale-105 transition-all shadow-[0_0_20px_rgba(245,158,11,0.15)] flex items-center gap-1 md:gap-2 cursor-pointer min-h-[44px] min-w-[44px] justify-center"
+        className="absolute top-[128px] right-3 md:top-auto md:bottom-6 md:right-6 z-50 bg-[var(--color-parchment-light)] text-[var(--color-ink-black)] border-2 border-[var(--color-ink-black)] shadow-[4px_4px_0_0_var(--color-ink-black)] hover:bg-[var(--color-ink-black)] hover:text-[var(--color-gold)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all px-3 py-2 md:px-4 md:py-3 text-[10px] md:text-xs font-display font-bold uppercase tracking-widest flex items-center gap-1.5 md:gap-2 cursor-pointer min-h-[44px] min-w-[44px] justify-center"
         title={t('download_image')}
       >
-        <span className="text-sm md:text-lg filter grayscale opacity-80">📸</span> <span className="hidden md:inline">{t('download_btn')}</span>
+        <span className="text-sm md:text-lg filter grayscale">✒</span>
+        <span className="hidden md:inline">{t('download_btn')}</span>
       </button>
     </div>
   );
@@ -213,24 +221,24 @@ export default function FlowCanvas({ externalNodes, externalEdges, onFlowChange,
       const newNodes = [...baseNodes, newNode];
       const newEdges = [...edges];
 
-      // Connect to previous node
+      // Connect to previous node — stroke picks from the manuscript palette:
+      // gold for scoring, crimson for opponent, ink-black for the user's own line.
       if (parentNode) {
+        const edgeStroke =
+          moveData.nodeRole === 'scoring-point'
+            ? 'var(--color-gold)'
+            : moveData.nodeRole === 'opponent-point' || moveData.nodeRole === 'opponent-action'
+              ? 'var(--color-ink-red)'
+              : 'var(--color-ink-black)';
         newEdges.push({
           id: `edge-${parentNode.id}-${newNodeId}`,
           source: parentNode.id,
           target: newNodeId,
-          animated: true,
+          animated: false,
           style: {
-            stroke:
-              moveData.nodeRole === 'scoring-point'
-                ? '#f59e0b'
-                : moveData.nodeRole === 'opponent-point'
-                  ? '#e11d48'
-                  : moveData.nodeRole === 'opponent-action'
-                    ? '#f43f5e'
-                    : '#10b981',
-            strokeWidth: 3,
-            filter: 'drop-shadow(0 0 3px currentColor)',
+            stroke: edgeStroke,
+            strokeWidth: moveData.nodeRole === 'scoring-point' ? 4 : 3,
+            strokeLinecap: 'square',
           },
         });
       }

@@ -26,10 +26,10 @@ export default function InkEdge({
       path={edgePath}
       markerEnd={markerEnd}
       style={{
-        ...style,
         stroke: 'var(--color-ink-black)',
         strokeWidth: 3,
         strokeLinecap: 'square',
+        ...style,
       }}
       className="ink-draw-animation"
       id={id}

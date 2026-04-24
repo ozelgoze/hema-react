@@ -553,8 +553,10 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
         >
           <div className="flex items-center gap-2 min-w-0">
              <h2 className="text-base md:text-lg font-display text-[var(--color-ink-red)] flex items-center gap-1.5 md:gap-2 truncate">
+               <span className="hidden md:inline text-[var(--color-ink-faded)] text-sm opacity-70 shrink-0" aria-hidden="true">❦</span>
                <span className="text-lg md:text-xl filter grayscale drop-shadow-md shrink-0">⚔️</span>
                <span className="truncate">{t('duel_control')}</span>
+               <span className="hidden md:inline text-[var(--color-ink-faded)] text-sm opacity-70 shrink-0" aria-hidden="true">❦</span>
              </h2>
              <span className="md:hidden text-[var(--color-ink-faded)] text-xs flex shrink-0">
                 {isExpanded ? '▼' : '▲'}
@@ -632,17 +634,17 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
             <div className="px-5 py-2 flex justify-center items-center gap-6 bg-[var(--color-parchment)] border-b-[2px] border-[var(--color-ink-black)]">
                <div className="flex items-center gap-2">
                  <span className="text-[10px] uppercase font-bold text-[var(--color-ink-black)] tracking-widest leading-none">{t('you')}</span>
-                 <div className="flex gap-1">
+                 <div className="flex gap-1.5">
                    {Array.from({length: maxScore}).map((_, i) => (
-                     <div key={`u-${i}`} className={`w-3 h-3 rounded-full border border-[var(--color-ink-black)] transition-all duration-300 ${i < userScore ? 'bg-[var(--color-gold)] scale-110' : 'bg-[var(--color-parchment-dark)]'}`}></div>
+                     <div key={`u-${i}`} className={`w-3 h-3 rotate-45 border border-[var(--color-ink-black)] transition-all duration-300 ${i < userScore ? 'bg-[var(--color-gold)] scale-110 shadow-[1px_1px_0_0_var(--color-ink-black)]' : 'bg-[var(--color-parchment-dark)]'}`}></div>
                    ))}
                  </div>
                </div>
-               <div className="text-xs font-display text-[var(--color-ink-red)] italic opacity-60">vs</div>
+               <div className="text-base font-display text-[var(--color-ink-red)] opacity-70 leading-none" aria-hidden="true">⚔</div>
                <div className="flex items-center gap-2">
-                 <div className="flex gap-1">
+                 <div className="flex gap-1.5">
                    {Array.from({length: maxScore}).map((_, i) => (
-                     <div key={`a-${i}`} className={`w-3 h-3 rounded-full border border-[var(--color-ink-black)] transition-all duration-300 ${i < aiScore ? 'bg-[var(--color-ink-red)] scale-110' : 'bg-[var(--color-parchment-dark)]'}`}></div>
+                     <div key={`a-${i}`} className={`w-3 h-3 rotate-45 border border-[var(--color-ink-black)] transition-all duration-300 ${i < aiScore ? 'bg-[var(--color-ink-red)] scale-110 shadow-[1px_1px_0_0_var(--color-ink-black)]' : 'bg-[var(--color-parchment-dark)]'}`}></div>
                    ))}
                  </div>
                  <span className="text-[10px] uppercase font-bold text-[var(--color-ink-black)] tracking-widest leading-none">AI</span>
@@ -658,8 +660,10 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
                liveFeedback.type === 'good' ? 'bg-[var(--color-ink-black)] text-[var(--color-gold)] border-[var(--color-gold)]' :
                'bg-[var(--color-parchment-dark)] text-[var(--color-ink-black)] border-[var(--color-ink-black)]'
            }`}>
-              <div className="text-[9px] uppercase font-bold tracking-widest opacity-80 mb-1 flex items-center gap-1">
-                 {liveFeedback.type === 'bad' || liveFeedback.type === 'warning' ? '⚠️ ' + t('warning') : '📜 ' + t('observation')} — {liveFeedback.master}
+              <div className="text-[9px] uppercase font-bold tracking-widest opacity-80 mb-1 flex items-center gap-1.5">
+                 <span>{liveFeedback.type === 'bad' || liveFeedback.type === 'warning' ? '⚠️ ' + t('warning') : '📜 ' + t('observation')}</span>
+                 <span className="opacity-60" aria-hidden="true">✦</span>
+                 <span className="font-display tracking-[0.2em]">{liveFeedback.master}</span>
               </div>
               <p className="text-xs font-body font-medium italic leading-snug">
                  {liveFeedback.text}
@@ -672,11 +676,24 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
           {/* Match Won/Lost Banner (full match result) */}
           {(matchWon || matchLost) ? (
             <div className="text-center py-4 animate-fade-in">
-              <span className="text-6xl filter drop-shadow-md block mb-4">{matchWon ? '🏆' : '💀'}</span>
+              {/* Laurel flourish surrounding the seal */}
+              <div className={`flex items-center justify-center gap-3 mb-2 ${matchWon ? 'text-[var(--color-gold)]' : 'text-[var(--color-ink-red)]'} opacity-80`} aria-hidden="true">
+                <span className="text-lg">❦</span>
+                <span className="flex-1 h-px bg-current max-w-[60px]" />
+                <span className="text-xl leading-none">✦</span>
+                <span className="flex-1 h-px bg-current max-w-[60px]" />
+                <span className="text-lg">❦</span>
+              </div>
+              <span className="text-6xl filter drop-shadow-md block mb-2">{matchWon ? '🏆' : '💀'}</span>
               <h3 className={`text-2xl font-bold font-display tracking-wide uppercase mb-2 ${matchWon ? 'text-[var(--color-gold)]' : 'text-[var(--color-ink-red)]'}`}>
                 {matchWon ? t('score_match_won') : t('score_match_lost')}
               </h3>
-              <p className="text-lg font-display text-[var(--color-ink-black)] mb-4">{userScore} — {aiScore}</p>
+              <p className="text-lg font-display text-[var(--color-ink-black)] mb-1 tracking-widest">{userScore} <span className="text-[var(--color-ink-faded)] opacity-70">⚔</span> {aiScore}</p>
+              <div className={`flex items-center justify-center gap-3 mb-4 ${matchWon ? 'text-[var(--color-gold)]' : 'text-[var(--color-ink-red)]'} opacity-60`} aria-hidden="true">
+                <span className="flex-1 h-px bg-current max-w-[80px]" />
+                <span className="text-sm">❦</span>
+                <span className="flex-1 h-px bg-current max-w-[80px]" />
+              </div>
               {onMatchReset && (
                 <button
                   onClick={onMatchReset}

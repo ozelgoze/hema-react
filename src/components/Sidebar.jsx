@@ -137,19 +137,23 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
         <div className="flex border-b-[2px] border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)]">
           <button
             onClick={() => setActiveTab('my-combos')}
-            className={`flex-1 py-4 text-xs font-bold font-display uppercase tracking-widest transition-all
+            aria-pressed={activeTab === 'my-combos'}
+            className={`flex-1 py-4 text-xs font-bold font-display uppercase tracking-widest transition-all flex items-center justify-center gap-2
               ${activeTab === 'my-combos' ? 'bg-[var(--color-parchment)] text-[var(--color-ink-red)] border-b-0 border-r-[2px] border-r-transparent shadow-[inset_0_-4px_0_0_var(--color-ink-red)]' : 'text-[var(--color-ink-black)] hover:bg-[var(--color-parchment)]/50 border-r-[2px] border-r-[var(--color-ink-black)] opacity-70'}
             `}
           >
-            {t('tab_my_combos')}
+            <span className="text-sm leading-none filter grayscale opacity-80" aria-hidden="true">🔖</span>
+            <span>{t('tab_my_combos')}</span>
           </button>
           <button
             onClick={() => setActiveTab('historical')}
-            className={`flex-1 py-4 text-xs font-bold font-display uppercase tracking-widest transition-all
+            aria-pressed={activeTab === 'historical'}
+            className={`flex-1 py-4 text-xs font-bold font-display uppercase tracking-widest transition-all flex items-center justify-center gap-2
               ${activeTab === 'historical' ? 'bg-[var(--color-parchment)] text-[var(--color-ink-red)] border-b-0 border-l-[2px] border-l-transparent shadow-[inset_0_-4px_0_0_var(--color-ink-red)]' : 'text-[var(--color-ink-black)] hover:bg-[var(--color-parchment)]/50 border-l-[2px] border-l-[var(--color-ink-black)] opacity-70'}
             `}
           >
-            {t('tab_historical')}
+            <span className="text-sm leading-none filter grayscale opacity-80" aria-hidden="true">📜</span>
+            <span>{t('tab_historical')}</span>
           </button>
         </div>
 
@@ -159,14 +163,15 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
             <div className="animate-fade-in flex flex-col h-full gap-5">
               {/* Save Section Accordion */}
               <div className="bg-[var(--color-parchment-light)] border-[2px] border-[var(--color-ink-black)] shadow-[4px_4px_0_0_var(--color-ink-black)]">
-                <button 
+                <button
                   onClick={() => setIsSaveExpanded(!isSaveExpanded)}
-                  className="w-full text-left px-4 py-4 flex justify-between items-center transition-colors hover:bg-[var(--color-parchment-dark)] focus:outline-none"
+                  aria-expanded={isSaveExpanded}
+                  className="w-full text-left px-4 py-4 flex justify-between items-center transition-colors hover:bg-[var(--color-parchment-dark)] focus:outline-none min-h-[44px]"
                 >
                   <h3 className="text-[11px] text-[var(--color-ink-red)] uppercase font-bold tracking-widest font-display flex items-center gap-2">
                      <span className="text-xl leading-none -mt-1">🔖</span> {t('save_combo')}
                   </h3>
-                  <span className="text-xs opacity-70 text-[var(--color-ink-red)] font-bold">{isSaveExpanded ? '▼' : '▶'}</span>
+                  <span className={`font-display text-[var(--color-ink-red)] text-lg leading-none transition-transform duration-200 ${isSaveExpanded ? 'rotate-90' : ''}`} aria-hidden="true">❦</span>
                 </button>
                 {isSaveExpanded && (
                   <div className="px-4 pb-4 border-t-2 border-dashed border-[var(--color-ink-faded)] pt-3 animate-fade-in">
@@ -190,13 +195,17 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
 
               {/* Saved List */}
               <div className="flex-1">
-                <h3 className="text-[12px] text-[var(--color-ink-black)] uppercase font-bold tracking-widest mb-3 pb-2 font-display">
+                <div className="ornamental-rule mb-3"><span className="ornamental-rule__glyph">❦</span></div>
+                <h3 className="text-[12px] text-[var(--color-ink-black)] uppercase font-bold tracking-widest mb-3 pb-2 font-display text-center">
                   {t('saved_combos')}
                 </h3>
                 {savedCombos.length === 0 ? (
-                  <p className="text-sm text-[var(--color-ink-faded)] text-center py-6 italic font-body">
-                    {t('no_saved_combos')}
-                  </p>
+                  <div className="relative border-2 border-dashed border-[var(--color-ink-faded)] bg-[var(--color-parchment)]/40 px-4 py-6 text-center">
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[var(--color-parchment)] px-2 text-[var(--color-ink-faded)] text-sm" aria-hidden="true">❦</div>
+                    <p className="text-sm text-[var(--color-ink-faded)] italic font-body">
+                      {t('no_saved_combos')}
+                    </p>
+                  </div>
                 ) : (
                   <div className="space-y-3">
                     {savedCombos.map((combo) => (
@@ -233,15 +242,19 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo }) {
 
           {activeTab === 'historical' && (
             <div className="animate-fade-in">
-              <h3 className="text-[12px] text-[var(--color-ink-black)] uppercase font-bold tracking-widest mb-4 pb-2 font-display">
+              <div className="ornamental-rule mb-3"><span className="ornamental-rule__glyph">❦</span></div>
+              <h3 className="text-[12px] text-[var(--color-ink-black)] uppercase font-bold tracking-widest mb-4 pb-2 font-display text-center">
                 {t('historical_masters')}
               </h3>
               <div className="space-y-5">
                 {historicalCombos.map((combo) => (
-                  <div key={combo.id} className="bg-[var(--color-parchment-light)] border-[2px] border-[var(--color-ink-black)] p-4 shadow-[4px_4px_0_0_var(--color-ink-black)] group">
+                  <div key={combo.id} className="relative bg-[var(--color-parchment-light)] border-[2px] border-[var(--color-ink-black)] p-4 shadow-[4px_4px_0_0_var(--color-ink-black)] group">
+                    {/* Corner fleuron — manuscript illumination mark */}
+                    <span className="absolute -top-2 -left-2 w-5 h-5 flex items-center justify-center bg-[var(--color-gold)] border border-[var(--color-ink-black)] text-[var(--color-ink-black)] text-[10px] font-display leading-none shadow-[1px_1px_0_0_var(--color-ink-black)]" aria-hidden="true">❦</span>
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex-1">
-                        <div className="text-[10px] text-[var(--color-ink-red)] font-bold uppercase mb-1 font-display">
+                        <div className="text-[10px] text-[var(--color-ink-red)] font-bold uppercase mb-1 font-display flex items-center gap-1.5">
+                          <span className="opacity-60" aria-hidden="true">✦</span>
                           {t('master_label')}: {combo.master}
                         </div>
                         <h4 className="font-bold text-[var(--color-ink-black)] text-base font-display">
