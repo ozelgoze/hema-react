@@ -323,10 +323,10 @@ export default {
   glossary_fuhlen_title: 'Fühlen — His',
   glossary_fuhlen_body: 'Bind içinde rakibin sert mi yumuşak mı olduğunu bıçaktan hissetmek ve buna göre tepki seçmek. Usta dövüşçünün damgası.',
 
-  // ── Turnuva Almanağı ──
-  almanac_open: '⚔ Turnuva Almanağı',
-  almanac_title: 'Turnuva Almanağı',
-  almanac_subtitle: 'Yaklaşan Müsabakalar Takvimi',
+  // ── Turnuva Takvimi ──
+  almanac_open: '⚔ Turnuva Takvimi',
+  almanac_title: 'Turnuva Takvimi',
+  almanac_subtitle: 'Yaklaşan Müsabakalar',
   almanac_region_all: 'Hepsi',
   almanac_region_europe: 'Avrupa',
   almanac_region_americas: 'Amerikalar',
@@ -347,12 +347,12 @@ export default {
   landing_about_heading: 'Bu el yazması nedir?',
   landing_about_p1: 'Burası uzun kılıç için bir atölyedir — Liechtenauer, Fiore ve Meyer’in beş yüzyıl önce yazdığı sanatı planlamak, çalışmak ve incelemek için bir yer. Açılışını seç, tepkilerini ör ve her kılıç kavşağında bağlanmayı (Bind) hisset.',
   landing_about_p2: 'Burada bir düello dört vuruşta gelişir — Açılış, Tepki, Devam, Bitirici. Her vuruş Vor ve Nach öğretisine, Güçlü ile Zayıf’a ve üç mesafeye saygı gösterir: Weit, Mittel, Nahe. Yanlış mesafede yapılan yanlış seçim boşa giden mürekkeptir.',
-  landing_about_p3: 'Sayfayı bırakıp gerçek bir müsabaka aramaya hazır olduğunda, sağdaki almanak dünya çapındaki HEMA turnuvalarının güncel takvimini tutar.',
+  landing_about_p3: 'Sayfayı bırakıp gerçek bir müsabaka aramaya hazır olduğunda, sağdaki takvim dünya çapındaki HEMA turnuvalarını güncel tutar.',
   landing_feature_1: 'Kendi kombolarını el çizimi bir akışta kur ve kaydet',
   landing_feature_2: 'Üç ustayla üç beceri kademesinde düello et',
-  landing_feature_3: 'Almanak’ta yaklaşan HEMA turnuvalarını izle',
+  landing_feature_3: 'Takvimde yaklaşan HEMA turnuvalarını izle',
   landing_cta: 'Meydana Çık',
   landing_cta_subtitle: 'Kombo atölyesini aç ve bir ustayla yüzleş',
   landing_footer: 'Eskrimciler için, eskrimciler tarafından — eski el yazmalarının ruhuyla.',
-  sidebar_back_to_landing: 'Almanak’a Dön',
+  sidebar_back_to_landing: 'Takvime Dön',
 };
