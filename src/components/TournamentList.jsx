@@ -79,29 +79,29 @@ function DateRubric({ event, locale, status }) {
 
   return (
     <div
-      className="shrink-0 w-14 sm:w-16 flex flex-col items-center justify-center text-center bg-[var(--color-parchment)] border-2 border-[var(--color-ink-black)] py-1.5 px-1 shadow-[2px_2px_0_0_var(--color-ink-black)]"
+      className="shrink-0 w-12 sm:w-16 flex flex-col items-center justify-center text-center bg-[var(--color-parchment)] border-2 border-[var(--color-ink-black)] py-1.5 px-1 shadow-[2px_2px_0_0_var(--color-ink-black)]"
       aria-hidden="true"
     >
       {sameDay ? (
-        <span className={`font-display text-2xl leading-none ${dayClass}`}>
+        <span className={`font-display text-xl sm:text-2xl leading-none ${dayClass}`}>
           {start.getUTCDate()}
         </span>
       ) : sameMonth ? (
-        <span className={`font-display text-base leading-none ${dayClass}`}>
+        <span className={`font-display text-sm sm:text-base leading-none ${dayClass}`}>
           {start.getUTCDate()}
           <span className="px-0.5 text-[var(--color-ink-faded)]">→</span>
           {end.getUTCDate()}
         </span>
       ) : (
-        <span className={`font-display text-sm leading-tight ${dayClass}`}>
+        <span className={`font-display text-[11px] sm:text-sm leading-tight ${dayClass}`}>
           {start.getUTCDate()}
-          <span className="block text-[9px] text-[var(--color-ink-faded)] -my-0.5">
+          <span className="block text-[8px] sm:text-[9px] text-[var(--color-ink-faded)] -my-0.5">
             {monthAbbrev(start, locale)}
           </span>
           {end.getUTCDate()}
         </span>
       )}
-      <span className="mt-0.5 text-[9px] font-display tracking-[0.2em] text-[var(--color-ink-black)] leading-none">
+      <span className="mt-0.5 text-[8px] sm:text-[9px] font-display tracking-[0.15em] sm:tracking-[0.2em] text-[var(--color-ink-black)] leading-none">
         {sameMonth ? monthAbbrev(start, locale) : monthAbbrev(end, locale)}
       </span>
     </div>
@@ -152,9 +152,9 @@ export default function TournamentList({
   const updatedLabel = tournamentData.lastUpdated || '—';
 
   return (
-    <div className={`flex flex-col min-h-0 ${className}`}>
+    <div className={`flex flex-col min-h-0 min-w-0 ${className}`}>
       {showFilters && (
-        <div className="px-4 sm:px-6 py-3 border-b-2 border-dashed border-[var(--color-ink-faded)]/50 bg-[var(--color-parchment)]">
+        <div className="px-3 sm:px-4 lg:px-6 py-3 border-b-2 border-dashed border-[var(--color-ink-faded)]/50 bg-[var(--color-parchment)]">
           <div className="flex flex-wrap items-center gap-2 mb-2">
             {REGIONS.map((r) => (
               <button
@@ -189,7 +189,7 @@ export default function TournamentList({
         </div>
       )}
 
-      <div className="flex-1 overflow-y-auto scrollbar-thin px-4 sm:px-6 py-5">
+      <div className="flex-1 min-h-0 overflow-y-auto scrollbar-thin px-3 sm:px-4 lg:px-6 py-4 sm:py-5">
         {groups.length === 0 ? (
           <div className="relative border-2 border-dashed border-[var(--color-ink-faded)] bg-[var(--color-parchment)]/40 px-4 py-8 text-center">
             <div
@@ -207,7 +207,7 @@ export default function TournamentList({
             {groups.map((group) => (
               <section key={group.key}>
                 <div
-                  className={`${stickyHeaders ? 'sticky top-0 z-[1] -mx-4 sm:-mx-6 px-4 sm:px-6 bg-[var(--color-parchment-light)]/95 backdrop-blur-[1px]' : ''} py-1.5 flex items-center gap-3`}
+                  className={`${stickyHeaders ? 'sticky top-0 z-[1] -mx-3 sm:-mx-4 lg:-mx-6 px-3 sm:px-4 lg:px-6 bg-[var(--color-parchment-light)]/95 backdrop-blur-[1px]' : ''} py-1.5 flex items-center gap-3`}
                 >
                   <span
                     className="font-display text-lg text-[var(--color-ink-red)] leading-none"
@@ -232,7 +232,7 @@ export default function TournamentList({
                     return (
                       <li
                         key={e.id}
-                        className={`relative flex gap-3 p-2.5 border-2 border-[var(--color-ink-black)] shadow-[3px_3px_0_0_var(--color-ink-black)] ${
+                        className={`relative flex gap-2.5 sm:gap-3 p-2 sm:p-2.5 border-2 border-[var(--color-ink-black)] shadow-[3px_3px_0_0_var(--color-ink-black)] ${
                           isPast
                             ? 'bg-[var(--color-parchment)]/60 opacity-70'
                             : isImminent
@@ -244,7 +244,7 @@ export default function TournamentList({
 
                         <div className="min-w-0 flex-1 flex flex-col justify-center">
                           <div className="flex items-start justify-between gap-2">
-                            <h4 className={`font-display font-bold text-base leading-tight pr-1 ${
+                            <h4 className={`font-display font-bold text-sm sm:text-base leading-tight pr-1 break-words ${
                               isPast ? 'text-[var(--color-ink-faded)]' : 'text-[var(--color-ink-black)]'
                             }`}>
                               {e.url ? (
@@ -267,7 +267,7 @@ export default function TournamentList({
                               {e.country}
                             </span>
                           </div>
-                          <div className="mt-0.5 text-[12px] font-body italic text-[var(--color-ink-faded)] truncate">
+                          <div className="mt-0.5 text-[11px] sm:text-[12px] font-body italic text-[var(--color-ink-faded)] truncate">
                             {e.city}
                             {e.countryName && e.countryName !== e.city ? `, ${e.countryName}` : ''}
                           </div>
@@ -295,7 +295,7 @@ export default function TournamentList({
       </div>
 
       {showFooter && (
-        <div className="px-4 sm:px-6 py-3 border-t-2 border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)]">
+        <div className="px-3 sm:px-4 lg:px-6 py-3 border-t-2 border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)]">
           <div className="flex items-center justify-between gap-3 text-[10px] font-display uppercase tracking-widest text-[var(--color-ink-faded)]">
             <span>{t('almanac_updated').replace('{date}', updatedLabel)}</span>
             <span>
