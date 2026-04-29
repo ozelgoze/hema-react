@@ -2,15 +2,15 @@ import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import { LanguageProvider } from './i18n/LanguageContext';
 import FlowCanvas from './components/FlowCanvas';
 import Sidebar from './components/Sidebar';
+import LandingPage from './components/LandingPage';
 import { hasSeenOnboarding } from './utils/onboardingState';
 
-// OnboardingTour is opt-in past first visit — code-split so first paint stays light.
 const OnboardingTour = lazy(() => import('./components/OnboardingTour'));
 const TournamentAlmanac = lazy(() => import('./components/TournamentAlmanac'));
 
-const MAX_SCORE = 3; // First to 3 wins
+const MAX_SCORE = 3;
 
-function AppContent() {
+function ComboApp({ onExit }) {
   const [flowNodes, setFlowNodes] = useState([]);
   const [flowEdges, setFlowEdges] = useState([]);
   const [loadKey, setLoadKey] = useState(0);
@@ -35,11 +35,8 @@ function AppContent() {
   }, []);
 
   const handleScoreUpdate = useCallback((winner) => {
-    if (winner === 'user') {
-      setUserScore((s) => s + 1);
-    } else if (winner === 'ai') {
-      setAiScore((s) => s + 1);
-    }
+    if (winner === 'user') setUserScore((s) => s + 1);
+    else if (winner === 'ai') setAiScore((s) => s + 1);
   }, []);
 
   const handleMatchReset = useCallback(() => {
@@ -58,6 +55,7 @@ function AppContent() {
         onLoadCombo={handleLoadCombo}
         onShowTutorial={() => setTourOpen(true)}
         onShowAlmanac={() => setAlmanacOpen(true)}
+        onExit={onExit}
       />
       <div className="flex-1 h-full">
         <FlowCanvas
@@ -84,6 +82,15 @@ function AppContent() {
       )}
     </div>
   );
+}
+
+function AppContent() {
+  const [view, setView] = useState('landing');
+
+  if (view === 'landing') {
+    return <LandingPage onEnter={() => setView('combo')} />;
+  }
+  return <ComboApp onExit={() => setView('landing')} />;
 }
 
 export default function App() {

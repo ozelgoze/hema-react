@@ -330,4 +330,23 @@ export default {
   almanac_empty: 'No tournaments answer this writ. Try a wider region or unveil the past.',
   almanac_updated: 'Updated {date}',
   almanac_events_count: 'tourneys',
+  almanac_status_ongoing: 'Now',
+  almanac_status_tomorrow: 'Tomorrow',
+  almanac_status_in_days: 'in {n} days',
+  almanac_status_past: 'Past',
+
+  // ── Landing Page ──
+  landing_eyebrow: 'A Tactical Lab for Historical European Martial Arts',
+  landing_tagline: 'Build longsword combos, duel the masters of old, and chart the tourneys to come.',
+  landing_about_heading: 'What is this manuscript?',
+  landing_about_p1: 'This is a workshop for the longsword — a place to plan, train, and study the art as Liechtenauer, Fiore, and Meyer set it down five centuries ago. Choose your opening, weave your reactions, and feel for the bind in every crossing of blades.',
+  landing_about_p2: 'A duel here unfolds in four beats — Starter, Reaction, Follow-up, Finisher. Each beat respects the doctrine of Vor and Nach, the Strong and the Weak, and the three measures: Weit, Mittel, Nahe. The wrong choice at the wrong distance is wasted ink.',
+  landing_about_p3: 'When you are ready to leave the page and seek a real bout, the almanac on the right keeps a running calendar of HEMA tournaments around the world.',
+  landing_feature_1: 'Build & save your own combos in a hand-drawn flow',
+  landing_feature_2: 'Duel three master personalities at three skill tiers',
+  landing_feature_3: 'Track upcoming HEMA tourneys in the Almanac',
+  landing_cta: 'Enter the Lists',
+  landing_cta_subtitle: 'Open the combo builder and face a master',
+  landing_footer: 'Made for fencers, by fencers — in the spirit of the old manuscripts.',
+  sidebar_back_to_landing: 'Return to Almanac',
 };

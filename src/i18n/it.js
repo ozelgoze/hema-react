@@ -331,4 +331,23 @@ export default {
   almanac_empty: 'Nessun torneo risponde a questo bando. Prova una regione più ampia o svela il passato.',
   almanac_updated: 'Aggiornato {date}',
   almanac_events_count: 'tornei',
+  almanac_status_ongoing: 'Ora',
+  almanac_status_tomorrow: 'Domani',
+  almanac_status_in_days: 'tra {n} giorni',
+  almanac_status_past: 'Passato',
+
+  // ── Pagina di Apertura ──
+  landing_eyebrow: 'Un laboratorio tattico per le Arti Marziali Storiche Europee',
+  landing_tagline: 'Costruisci combinazioni di spada lunga, sfida i maestri d’un tempo e segna i tornei a venire.',
+  landing_about_heading: 'Cos’è questo manoscritto?',
+  landing_about_p1: 'Questa è una bottega per la spada lunga — un luogo per pianificare, allenarsi e studiare l’arte come Liechtenauer, Fiore e Meyer la fissarono cinque secoli fa. Scegli l’apertura, intreccia le reazioni e senti il legamento in ogni incrocio di lame.',
+  landing_about_p2: 'Un duello qui si svolge in quattro tempi — Inizio, Reazione, Ripresa, Finale. Ogni tempo rispetta la dottrina di Vor e Nach, di Forte e Debole, e delle tre misure: Larga, Mezza, Stretta. La scelta sbagliata alla distanza sbagliata è inchiostro sprecato.',
+  landing_about_p3: 'Quando sarai pronto a lasciare la pagina e cercare un vero scontro, l’almanacco a destra tiene il calendario corrente dei tornei HEMA nel mondo.',
+  landing_feature_1: 'Costruisci e salva le tue combo in un flusso disegnato a mano',
+  landing_feature_2: 'Sfida tre maestri in tre livelli di abilità',
+  landing_feature_3: 'Segui i prossimi tornei HEMA nell’Almanacco',
+  landing_cta: 'Entra in Lizza',
+  landing_cta_subtitle: 'Apri il costruttore di combo e affronta un maestro',
+  landing_footer: 'Fatto da schermitori, per schermitori — nello spirito degli antichi manoscritti.',
+  sidebar_back_to_landing: 'Torna all’Almanacco',
 };

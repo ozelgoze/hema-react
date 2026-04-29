@@ -331,4 +331,23 @@ export default {
   almanac_empty: 'Kein Turnier antwortet auf diesen Brief. Versuche eine weitere Region oder zeige die Vergangenheit.',
   almanac_updated: 'Aktualisiert {date}',
   almanac_events_count: 'Turniere',
+  almanac_status_ongoing: 'Jetzt',
+  almanac_status_tomorrow: 'Morgen',
+  almanac_status_in_days: 'in {n} Tagen',
+  almanac_status_past: 'Vergangen',
+
+  // ── Startseite ──
+  landing_eyebrow: 'Ein taktisches Studierzimmer für die historischen europäischen Kampfkünste',
+  landing_tagline: 'Baue Langschwert-Kombinationen, fechte gegen die Meister der alten Zeit und verzeichne die kommenden Turniere.',
+  landing_about_heading: 'Was ist diese Handschrift?',
+  landing_about_p1: 'Dies ist eine Werkstatt für das Langschwert — ein Ort zum Planen, Üben und Studieren der Kunst, wie Liechtenauer, Fiore und Meyer sie vor fünfhundert Jahren niedergeschrieben haben. Wähle deine Eröffnung, webe deine Antworten und fühle die Bindung bei jedem Klingenkreuz.',
+  landing_about_p2: 'Ein Gefecht hier entfaltet sich in vier Schlägen — Auftakt, Antwort, Nachsetzen, Endstreich. Jeder Schlag achtet auf die Lehre von Vor und Nach, von Stark und Schwach, und auf die drei Maße: Weit, Mittel, Nahe. Die falsche Wahl im falschen Abstand ist verschwendete Tinte.',
+  landing_about_p3: 'Wenn du bereit bist, das Pergament zu verlassen und einen echten Kampf zu suchen, hält der Almanach rechts einen laufenden Kalender der HEMA-Turniere weltweit bereit.',
+  landing_feature_1: 'Baue & speichere eigene Kombinationen in einem handgezeichneten Fluss',
+  landing_feature_2: 'Fechte gegen drei Meister-Persönlichkeiten in drei Stufen',
+  landing_feature_3: 'Verfolge kommende HEMA-Turniere im Almanach',
+  landing_cta: 'Tritt in die Schranken',
+  landing_cta_subtitle: 'Öffne den Kombo-Bauer und stelle dich einem Meister',
+  landing_footer: 'Für Fechter, von Fechtern — im Geiste der alten Handschriften.',
+  sidebar_back_to_landing: 'Zurück zum Almanach',
 };

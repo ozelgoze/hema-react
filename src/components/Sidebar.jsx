@@ -3,7 +3,7 @@ import { useTranslation } from '../i18n/LanguageContext';
 import { historicalCombos } from '../data/historicalCombos';
 import { storageService } from '../services/storageService';
 
-export default function Sidebar({ currentNodes, currentEdges, onLoadCombo, onShowTutorial, onShowAlmanac }) {
+export default function Sidebar({ currentNodes, currentEdges, onLoadCombo, onShowTutorial, onShowAlmanac, onExit }) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('my-combos');
   const [savedCombos, setSavedCombos] = useState([]);
@@ -301,9 +301,18 @@ export default function Sidebar({ currentNodes, currentEdges, onLoadCombo, onSho
           )}
         </div>
 
-        {/* Footer — almanac + tutorial replay */}
-        {(onShowTutorial || onShowAlmanac) && (
+        {/* Footer — exit + almanac + tutorial replay */}
+        {(onShowTutorial || onShowAlmanac || onExit) && (
           <div className="border-t-2 border-[var(--color-ink-black)] bg-[var(--color-parchment-dark)] px-4 py-3 safe-bottom flex flex-col gap-2">
+            {onExit && (
+              <button
+                onClick={() => { onExit(); setIsOpen(false); }}
+                className="w-full min-h-[44px] py-2.5 px-3 bg-[var(--color-parchment)] border-2 border-[var(--color-ink-black)] text-[var(--color-ink-black)] font-display text-[11px] font-bold uppercase tracking-widest shadow-[3px_3px_0_0_var(--color-ink-black)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-none transition-all flex items-center justify-center gap-2"
+              >
+                <span className="text-base leading-none" aria-hidden="true">←</span>
+                <span>{t('sidebar_back_to_landing')}</span>
+              </button>
+            )}
             {onShowAlmanac && (
               <button
                 onClick={() => { onShowAlmanac(); setIsOpen(false); }}
