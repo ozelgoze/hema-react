@@ -1,9 +1,11 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useState, useCallback, useMemo, useEffect, lazy, Suspense } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { getMovesByPhase, getMoveById, hemaMoves, deriveMeasure, measureFit, MEASURE, evaluateFinisher } from '../data/hemaMoves';
 import LanguageSelector from './LanguageSelector';
-import MoveSelectorModal from './MoveSelectorModal';
 import MeasureGauge from './MeasureGauge';
+
+// MoveSelectorModal is opt-in (only renders when the user opens the picker), so split it.
+const MoveSelectorModal = lazy(() => import('./MoveSelectorModal'));
 
 // ═══════════════════════════════════════════════════════════
 // AI Personality Profiles — functional tag system
@@ -974,14 +976,18 @@ export default function ComboWizard({ currentStep, nodes, onAddNode, onUndo, onC
       </div>
     </div>
     
-    <MoveSelectorModal 
-       isOpen={isMoveModalOpen} 
-       onClose={() => setIsMoveModalOpen(false)} 
-       onSelectMove={handleMoveSelect}
-       recommendedMoves={recommendedMoves}
-       isAiMode={isAiMode}
-       currentPhase={currentPhase}
-    />
+    {isMoveModalOpen && (
+      <Suspense fallback={null}>
+        <MoveSelectorModal
+          isOpen={isMoveModalOpen}
+          onClose={() => setIsMoveModalOpen(false)}
+          onSelectMove={handleMoveSelect}
+          recommendedMoves={recommendedMoves}
+          isAiMode={isAiMode}
+          currentPhase={currentPhase}
+        />
+      </Suspense>
+    )}
     </>
   );
 }

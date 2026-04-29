@@ -1,7 +1,12 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import { LanguageProvider } from './i18n/LanguageContext';
 import FlowCanvas from './components/FlowCanvas';
 import Sidebar from './components/Sidebar';
+import { hasSeenOnboarding } from './utils/onboardingState';
+
+// OnboardingTour is opt-in past first visit — code-split so first paint stays light.
+const OnboardingTour = lazy(() => import('./components/OnboardingTour'));
+const TournamentAlmanac = lazy(() => import('./components/TournamentAlmanac'));
 
 const MAX_SCORE = 3; // First to 3 wins
 
@@ -11,6 +16,12 @@ function AppContent() {
   const [loadKey, setLoadKey] = useState(0);
   const [userScore, setUserScore] = useState(0);
   const [aiScore, setAiScore] = useState(0);
+  const [tourOpen, setTourOpen] = useState(false);
+  const [almanacOpen, setAlmanacOpen] = useState(false);
+
+  useEffect(() => {
+    if (!hasSeenOnboarding()) setTourOpen(true);
+  }, []);
 
   const handleFlowChange = useCallback((nodes, edges) => {
     setFlowNodes(nodes);
@@ -45,6 +56,8 @@ function AppContent() {
         currentNodes={flowNodes}
         currentEdges={flowEdges}
         onLoadCombo={handleLoadCombo}
+        onShowTutorial={() => setTourOpen(true)}
+        onShowAlmanac={() => setAlmanacOpen(true)}
       />
       <div className="flex-1 h-full">
         <FlowCanvas
@@ -59,6 +72,16 @@ function AppContent() {
           maxScore={MAX_SCORE}
         />
       </div>
+      {tourOpen && (
+        <Suspense fallback={null}>
+          <OnboardingTour open={tourOpen} onClose={() => setTourOpen(false)} />
+        </Suspense>
+      )}
+      {almanacOpen && (
+        <Suspense fallback={null}>
+          <TournamentAlmanac open={almanacOpen} onClose={() => setAlmanacOpen(false)} />
+        </Suspense>
+      )}
     </div>
   );
 }

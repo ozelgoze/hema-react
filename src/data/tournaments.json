@@ -1,0 +1,72 @@
+{
+  "lastUpdated": "2026-04-28",
+  "source": "seed",
+  "events": [
+    {
+      "id": "swordfish-2026",
+      "name": "Swordfish",
+      "startDate": "2026-11-13",
+      "endDate": "2026-11-15",
+      "city": "Gothenburg",
+      "country": "SE",
+      "weapons": ["longsword", "rapier", "saber", "sword-and-buckler"],
+      "url": "https://www.ghfs.se/swordfish/",
+      "region": "europe"
+    },
+    {
+      "id": "fechtschule-am-rhein-2026",
+      "name": "Fechtschule am Rhein",
+      "startDate": "2026-05-29",
+      "endDate": "2026-05-31",
+      "city": "Mainz",
+      "country": "DE",
+      "weapons": ["longsword", "rapier", "messer"],
+      "url": "https://fechtschule-am-rhein.de/",
+      "region": "europe"
+    },
+    {
+      "id": "longpoint-2026",
+      "name": "Longpoint",
+      "startDate": "2026-07-23",
+      "endDate": "2026-07-26",
+      "city": "Baltimore, MD",
+      "country": "US",
+      "weapons": ["longsword", "messer", "ringen"],
+      "url": "https://www.longpoint.events/",
+      "region": "americas"
+    },
+    {
+      "id": "helsinki-longsword-open-2026",
+      "name": "Helsinki Longsword Open",
+      "startDate": "2026-03-21",
+      "endDate": "2026-03-22",
+      "city": "Helsinki",
+      "country": "FI",
+      "weapons": ["longsword"],
+      "url": "https://hlo.fi/",
+      "region": "europe"
+    },
+    {
+      "id": "fightcamp-2026",
+      "name": "Fightcamp",
+      "startDate": "2026-08-07",
+      "endDate": "2026-08-09",
+      "city": "Northamptonshire",
+      "country": "GB",
+      "weapons": ["longsword", "rapier", "saber", "sword-and-buckler"],
+      "url": "https://www.fightcamp.co.uk/",
+      "region": "europe"
+    },
+    {
+      "id": "nordic-historical-fencing-league-2026",
+      "name": "Nordic Historical Fencing League — Final",
+      "startDate": "2026-10-10",
+      "endDate": "2026-10-11",
+      "city": "Copenhagen",
+      "country": "DK",
+      "weapons": ["longsword"],
+      "url": "https://nordichistoricalfencing.com/",
+      "region": "europe"
+    }
+  ]
+}

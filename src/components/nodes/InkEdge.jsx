@@ -1,6 +1,7 @@
+import { memo } from 'react';
 import { BaseEdge, getSmoothStepPath } from '@xyflow/react';
 
-export default function InkEdge({
+function InkEdge({
   id,
   sourceX,
   sourceY,
@@ -18,7 +19,7 @@ export default function InkEdge({
     targetX,
     targetY,
     targetPosition,
-    borderRadius: 0, // Sharp square edges like old woodcut drawings
+    borderRadius: 0,
   });
 
   return (
@@ -36,3 +37,5 @@ export default function InkEdge({
     />
   );
 }
+
+export default memo(InkEdge);

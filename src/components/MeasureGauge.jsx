@@ -1,6 +1,7 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from '../i18n/LanguageContext';
 import { MEASURE } from '../data/hemaMoves';
+import Glossary from './Glossary';
 
 // Measure tier → pixel gap between the two fencer glyphs.
 // Two sets tuned to viewport: mobile stays compact so narrow phones (≤360px) don't overflow.
@@ -19,6 +20,12 @@ const TIER_KEY = {
   [MEASURE.NAHE]: 'measure_nahe',
   [MEASURE.MITTEL]: 'measure_mittel',
   [MEASURE.WEIT]: 'measure_weit',
+};
+
+const TIER_GLOSSARY = {
+  [MEASURE.NAHE]: 'nahe',
+  [MEASURE.MITTEL]: 'mittel',
+  [MEASURE.WEIT]: 'weit',
 };
 
 // Stylized fencer silhouette — compact SVG, woodcut-feel.
@@ -70,13 +77,14 @@ function MeasureGauge({ tier }) {
   const gapMap = isMobile ? TIER_GAP_MOBILE : TIER_GAP_DESKTOP;
   const gap = gapMap[tier] ?? gapMap[MEASURE.MITTEL];
   const label = t(TIER_KEY[tier] ?? TIER_KEY[MEASURE.MITTEL]);
+  const glossaryTerm = TIER_GLOSSARY[tier] ?? TIER_GLOSSARY[MEASURE.MITTEL];
 
   return (
     <div className="px-3 md:px-4 py-2 bg-[var(--color-parchment)] border-b-[2px] border-[var(--color-ink-black)]">
       <div className="flex items-center justify-between gap-2 md:gap-3">
-        <span className="text-[9px] uppercase font-bold tracking-widest text-[var(--color-ink-black)] shrink-0">
+        <Glossary term="measure" className="text-[9px] uppercase font-bold tracking-widest text-[var(--color-ink-black)] shrink-0">
           {t('measure_label')}
-        </span>
+        </Glossary>
 
         <div className={`relative flex items-center justify-center flex-1 min-w-0 h-[40px] md:h-[42px] ${pulse ? 'animate-pulse' : ''}`}>
           {/* Center track — marks the ideal contact point */}
@@ -92,11 +100,12 @@ function MeasureGauge({ tier }) {
           </div>
         </div>
 
-        <span
-          className={`text-[9px] md:text-xs font-display font-bold uppercase tracking-wider md:tracking-widest text-[var(--color-ink-red)] shrink-0 text-right max-w-[90px] md:max-w-none leading-tight transition-colors ${pulse ? 'text-[var(--color-gold)]' : ''}`}
+        <Glossary
+          term={glossaryTerm}
+          className={`text-[9px] md:text-xs font-display font-bold uppercase tracking-wider md:tracking-widest text-[var(--color-ink-red)] shrink-0 text-right max-w-[90px] md:max-w-none leading-tight transition-colors ${pulse ? '!text-[var(--color-gold)]' : ''}`}
         >
           {label}
-        </span>
+        </Glossary>
       </div>
     </div>
   );

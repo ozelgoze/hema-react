@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "fetch-tournaments": "node scripts/fetch-tournaments.mjs",
+    "prebuild": "node scripts/fetch-tournaments.mjs",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"

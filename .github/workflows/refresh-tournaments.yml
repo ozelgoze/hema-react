@@ -1,0 +1,38 @@
+name: Refresh tournament almanac
+
+on:
+  schedule:
+    # Daily at 04:17 UTC — odd minute reduces collision with hourly cron storms.
+    - cron: "17 4 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Fetch latest tournaments
+        run: node scripts/fetch-tournaments.mjs
+        env:
+          # Override here if the data repo moves.
+          # TOURNAMENTS_SOURCE_URL: https://raw.githubusercontent.com/<owner>/hema-events/main/events.json
+
+      - name: Commit changes (if any)
+        run: |
+          if [[ -z "$(git status --porcelain src/data/tournaments.json)" ]]; then
+            echo "No tournament changes — nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/data/tournaments.json
+          git commit -m "chore: refresh tournament almanac"
+          git push

@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect, lazy, Suspense } from 'react';
 import {
   ReactFlow,
   ReactFlowProvider,
@@ -11,16 +11,28 @@ import {
   useReactFlow,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { toPng } from 'html-to-image';
 import { useTranslation } from '../i18n/LanguageContext';
 
 import ActionNode from './nodes/ActionNode';
 import InkEdge from './nodes/InkEdge';
 import ComboWizard from './ComboWizard';
-import ChronicleLog from './ChronicleLog';
+
+// ChronicleLog mounts a drawer that is closed by default — lazy so first paint stays light.
+const ChronicleLog = lazy(() => import('./ChronicleLog'));
 
 const nodeTypes = { actionNode: ActionNode };
 const edgeTypes = { inkEdge: InkEdge };
+
+// Stable mini-map color resolver — defined outside the component so the
+// callback identity doesn't change between renders, sparing MiniMap re-renders.
+const miniMapNodeColor = (node) => {
+  const role = node.data?.nodeRole;
+  if (role === 'user-action') return '#2a2522';
+  if (role === 'opponent-action') return '#8B0000';
+  if (role === 'opponent-point') return '#8B0000';
+  if (role === 'scoring-point') return '#c5a059';
+  return '#4a443f';
+};
 
 function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode, onUndo, onClear, onMatchReset, currentStep, activeNodeId, setActiveNodeId, isMoveModalOpen, setIsMoveModalOpen, userScore, aiScore, onScoreUpdate, maxScore }) {
   const { t } = useTranslation();
@@ -41,22 +53,24 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
     };
   }, [fitView]);
 
-  const handleDownloadImage = useCallback(() => {
+  const handleDownloadImage = useCallback(async () => {
     const flowElement = document.querySelector('.react-flow');
     if (!flowElement) return;
-
-    toPng(flowElement, { 
-      backgroundColor: '#020617',
-      quality: 1,
-      pixelRatio: 2,
-    }).then((dataUrl) => {
+    try {
+      // Defer the ~440 KB html-to-image bundle until the user actually exports.
+      const { toPng } = await import('html-to-image');
+      const dataUrl = await toPng(flowElement, {
+        backgroundColor: '#020617',
+        quality: 1,
+        pixelRatio: 2,
+      });
       const link = document.createElement('a');
       link.download = `hema-duel-${Date.now()}.png`;
       link.href = dataUrl;
       link.click();
-    }).catch((err) => {
+    } catch (err) {
       console.error('Failed to export image', err);
-    });
+    }
   }, []);
 
   return (
@@ -105,14 +119,7 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
         <MiniMap
           pannable
           zoomable
-          nodeColor={(node) => {
-            const role = node.data?.nodeRole;
-            if (role === 'user-action') return '#2a2522';
-            if (role === 'opponent-action') return '#8B0000';
-            if (role === 'opponent-point') return '#8B0000';
-            if (role === 'scoring-point') return '#c5a059';
-            return '#4a443f';
-          }}
+          nodeColor={miniMapNodeColor}
           nodeStrokeColor="#2a2522"
           nodeStrokeWidth={2}
           nodeBorderRadius={0}
@@ -139,7 +146,9 @@ function FlowCanvasInner({ nodes, edges, onNodesChange, onEdgesChange, onAddNode
         maxScore={maxScore}
       />
 
-      <ChronicleLog nodes={nodes} />
+      <Suspense fallback={null}>
+        <ChronicleLog nodes={nodes} />
+      </Suspense>
 
       <button
         onClick={handleDownloadImage}
