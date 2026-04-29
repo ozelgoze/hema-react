@@ -1,0 +1,15 @@
+{
+  "name": "hema-events",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Auto-curated HEMA tournament data feed for hema-react.",
+  "scripts": {
+    "scrape": "node scripts/scrape-hema-scorecard.mjs",
+    "build": "node scripts/build-events.mjs",
+    "all": "npm run scrape && npm run build"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0"
+  }
+}

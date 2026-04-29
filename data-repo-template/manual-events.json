@@ -1,0 +1,4 @@
+{
+  "comment": "Hand-curated events that the scraper misses or needs corrections for. Schema matches events.json. These are merged with scraped events at build time; on duplicate id, manual wins.",
+  "events": []
+}
